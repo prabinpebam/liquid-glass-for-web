@@ -39,27 +39,37 @@
       </div>
 
       <div class="topbar__actions">
-        <label class="select" title="Background">
-          <span class="select__label">Background</span>
-          <select id="bgSelect" aria-label="Background">
-            <option value="grid">Grid</option>
-            <option value="img1">Photo 1</option>
-            <option value="img2">Photo 2</option>
-            <option value="img3">Photo 3</option>
-            <option value="img4">Photo 4</option>
-            <option value="img5">Photo 5</option>
-            <option value="img6">Photo 6</option>
-            <option value="img7">Photo 7</option>
-          </select>
-        </label>
-        <label class="select" title="Motion preset">
-          <span class="select__label">Motion</span>
-          <select id="motionSelect" aria-label="Motion preset">
-            <option value="default">Default</option>
-            <option value="calm">Calm</option>
-            <option value="crisp">Crisp</option>
-          </select>
-        </label>
+        <div class="dd" id="bgSelect" data-value="grid">
+          <span class="dd__label">Background</span>
+          <button class="dd__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="bgSelectLabel bgSelectValue">
+            <span class="dd__value" id="bgSelectValue">Grid</span>
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
+          <div class="dd__menu" role="listbox" tabindex="-1" aria-labelledby="bgSelectLabel" hidden>
+            <button class="dd__option is-on" type="button" role="option" aria-selected="true" data-value="grid">Grid</button>
+            <button class="dd__option" type="button" role="option" aria-selected="false" data-value="img1">Photo 1</button>
+            <button class="dd__option" type="button" role="option" aria-selected="false" data-value="img2">Photo 2</button>
+            <button class="dd__option" type="button" role="option" aria-selected="false" data-value="img3">Photo 3</button>
+            <button class="dd__option" type="button" role="option" aria-selected="false" data-value="img4">Photo 4</button>
+            <button class="dd__option" type="button" role="option" aria-selected="false" data-value="img5">Photo 5</button>
+            <button class="dd__option" type="button" role="option" aria-selected="false" data-value="img6">Photo 6</button>
+            <button class="dd__option" type="button" role="option" aria-selected="false" data-value="img7">Photo 7</button>
+          </div>
+          <span class="dd__sr" id="bgSelectLabel">Background</span>
+        </div>
+        <div class="dd" id="motionSelect" data-value="default">
+          <span class="dd__label">Motion</span>
+          <button class="dd__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="motionSelectLabel motionSelectValue">
+            <span class="dd__value" id="motionSelectValue">Default</span>
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
+          <div class="dd__menu" role="listbox" tabindex="-1" aria-labelledby="motionSelectLabel" hidden>
+            <button class="dd__option is-on" type="button" role="option" aria-selected="true" data-value="default">Default</button>
+            <button class="dd__option" type="button" role="option" aria-selected="false" data-value="calm">Calm</button>
+            <button class="dd__option" type="button" role="option" aria-selected="false" data-value="crisp">Crisp</button>
+          </div>
+          <span class="dd__sr" id="motionSelectLabel">Motion preset</span>
+        </div>
         <button class="iconbtn" id="themeToggle" aria-label="Toggle color theme" title="Toggle theme">
           <i class="fa-solid fa-sun i-sun" aria-hidden="true"></i>
           <i class="fa-solid fa-moon i-moon" aria-hidden="true"></i>

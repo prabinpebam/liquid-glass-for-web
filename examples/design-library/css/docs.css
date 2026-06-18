@@ -170,13 +170,35 @@ body {
 }
 
 .topbar__actions { display: flex; align-items: center; gap: 8px; }
-.select { display: inline-flex; align-items: center; gap: 6px; }
-.select__label { font-size: 12px; color: var(--d-ink-dim); }
-.select select {
-  height: 34px; padding: 0 10px; border-radius: 10px; font: inherit; font-size: 13px;
-  color: var(--d-ink); background: var(--d-glass); border: 1px solid var(--d-line-strong); outline: none;
+.dd { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+.dd__label { font-size: 12px; color: var(--d-ink-dim); }
+.dd__sr { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.dd__trigger {
+  height: 34px; min-width: 86px; padding: 0 10px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 10px;
+  color: var(--d-ink); background: var(--d-glass); border: 1px solid var(--d-line-strong);
+  font: inherit; font-size: 13px; cursor: pointer; outline: none;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
 }
-.select select:focus { border-color: var(--d-accent); }
+.dd__trigger:hover, .dd.is-open .dd__trigger { background: var(--d-glass-2); }
+.dd__trigger:focus-visible, .dd.is-open .dd__trigger { border-color: var(--d-accent); }
+.dd__trigger:active { transform: scale(0.98); }
+.dd__trigger i { font-size: 10px; color: var(--d-ink-faint); transition: transform 0.15s var(--d-ease); }
+.dd.is-open .dd__trigger i { transform: rotate(180deg); }
+.dd__menu {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 80;
+  min-width: 118px; padding: 6px; border-radius: 12px;
+  background: var(--d-chrome); border: 1px solid var(--d-line-strong); box-shadow: var(--d-shadow);
+  backdrop-filter: blur(20px) saturate(1.35); -webkit-backdrop-filter: blur(20px) saturate(1.35);
+}
+.dd__option {
+  width: 100%; min-height: 30px; padding: 0 10px; border: 0; border-radius: 8px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  color: var(--d-ink); background: transparent; font: inherit; font-size: 13px; text-align: left; cursor: pointer;
+}
+.dd__option:hover, .dd__option:focus-visible { background: var(--d-glass-2); outline: none; }
+.dd__option.is-on { background: rgba(77, 124, 255, 0.22); color: var(--d-ink); }
+.dd__option.is-on::after { content: '\f00c'; font: var(--fa-font-solid); font-size: 10px; color: var(--d-accent-strong); }
 
 .iconbtn {
   display: inline-grid; place-items: center;
@@ -455,7 +477,7 @@ body {
   .topbar__menu { display: inline-grid; }
   .shell { grid-template-columns: minmax(0, 1fr); }
   .content { padding: 24px 20px 80px; }
-  .select { display: none; }
+  .dd { display: none; }
   .sidebar {
     position: fixed; top: var(--d-header-h); left: 0; z-index: 40;
     width: var(--d-sidebar-w); height: calc(100vh - var(--d-header-h));

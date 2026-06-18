@@ -549,6 +549,51 @@ function setupSearch() {
   });
 }
 
+function setupDropdown(root, { value, onChange }) {
+  if (!root) return;
+  const trigger = root.querySelector('.dd__trigger');
+  const valueEl = root.querySelector('.dd__value');
+  const menu = root.querySelector('.dd__menu');
+  const options = Array.from(root.querySelectorAll('.dd__option'));
+
+  const setOpen = (open) => {
+    root.classList.toggle('is-open', open);
+    trigger.setAttribute('aria-expanded', String(open));
+    menu.hidden = !open;
+    if (open) menu.focus({ preventScroll: true });
+  };
+  const setValue = (next, notify = true) => {
+    const option = options.find((item) => item.dataset.value === next) || options[0];
+    root.dataset.value = option.dataset.value;
+    valueEl.textContent = option.textContent.trim();
+    options.forEach((item) => {
+      const selected = item === option;
+      item.classList.toggle('is-on', selected);
+      item.setAttribute('aria-selected', String(selected));
+    });
+    if (notify) onChange(option.dataset.value);
+  };
+  const move = (dir) => {
+    const current = Math.max(0, options.findIndex((item) => item.classList.contains('is-on')));
+    const next = options[(current + dir + options.length) % options.length];
+    next.focus({ preventScroll: true });
+  };
+
+  trigger.addEventListener('click', () => setOpen(!root.classList.contains('is-open')));
+  trigger.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true); options.find((item) => item.classList.contains('is-on'))?.focus({ preventScroll: true }); }
+  });
+  menu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); setOpen(false); trigger.focus({ preventScroll: true }); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.activeElement?.click(); }
+  });
+  options.forEach((option) => option.addEventListener('click', () => { setValue(option.dataset.value); setOpen(false); trigger.focus({ preventScroll: true }); }));
+  document.addEventListener('click', (e) => { if (!root.contains(e.target)) setOpen(false); });
+  setValue(value, false);
+}
+
 /* ----------------------------------- chrome ------------------------------- */
 function setupChrome() {
   const html = document.documentElement;
@@ -563,24 +608,24 @@ function setupChrome() {
   });
 
   // motion preset (sets the @liquid-glass/ui token attribute)
-  document.getElementById('motionSelect').addEventListener('change', (e) => {
-    const v = e.target.value;
-    if (v === 'default') html.removeAttribute('data-lg-motion');
-    else html.setAttribute('data-lg-motion', v);
+  setupDropdown(document.getElementById('motionSelect'), {
+    value: html.getAttribute('data-lg-motion') || 'default',
+    onChange(v) {
+      if (v === 'default') html.removeAttribute('data-lg-motion');
+      else html.setAttribute('data-lg-motion', v);
+    },
   });
 
   // background preset (global) — line grid or a rotated landscape photo
-  const bgSelect = document.getElementById('bgSelect');
-  if (bgSelect) {
-    const savedBg = localStorage.getItem('lg-docs-bg') || 'grid';
-    html.setAttribute('data-bg', savedBg);
-    bgSelect.value = savedBg;
-    bgSelect.addEventListener('change', (e) => {
-      const v = e.target.value;
+  const savedBg = localStorage.getItem('lg-docs-bg') || 'grid';
+  html.setAttribute('data-bg', savedBg);
+  setupDropdown(document.getElementById('bgSelect'), {
+    value: savedBg,
+    onChange(v) {
       html.setAttribute('data-bg', v);
       localStorage.setItem('lg-docs-bg', v);
-    });
-  }
+    },
+  });
 
   // mobile nav
   const sidebar = document.getElementById('sidebar');
