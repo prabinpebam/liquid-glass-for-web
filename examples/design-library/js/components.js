@@ -426,6 +426,44 @@ function glassPanel(cls, kids, opts = {}) {
   return el;
 }
 
+export function glassMaterialLab() {
+  const materials = [
+    { name: 'Clear', tone: 'Very transparent', cls: 'clear', blur: 0.2, refraction: 0.28, distortion: 26 },
+    { name: 'Optic', tone: 'Transparent, higher bend', cls: 'clear-strong', blur: 0.4, refraction: 0.62, distortion: 52 },
+    { name: 'Soft Frost', tone: 'Slightly frosted', cls: 'soft', blur: 2.4, refraction: 0.36, distortion: 34 },
+    { name: 'Satin', tone: 'Balanced frost', cls: 'satin', blur: 4.8, refraction: 0.44, distortion: 42 },
+    { name: 'Deep Frost', tone: 'More frosted', cls: 'deep', blur: 8.5, refraction: 0.34, distortion: 30 },
+    { name: 'Milk Glass', tone: 'Most frosted', cls: 'milk', blur: 12, refraction: 0.24, distortion: 22 },
+  ];
+
+  const cards = materials.map((mat) => {
+    const sample = h('div', { class: `lgc-mat__sample lgc-mat__sample--${mat.cls}` }, [
+      h('div', { class: 'lgc-mat__label' }, [h('b', {}, mat.name), h('span', {}, mat.tone)]),
+    ]);
+    const glass = attachGlass(sample, {
+      surface: 'convex', radius: 22, bezel: 18, scaleBase: mat.distortion,
+      refraction: mat.refraction, saturation: 5, specular: 1, blur: mat.blur,
+    });
+
+    const refValue = h('span', { class: 'lgc-mat__value' }, mat.refraction.toFixed(2));
+    const distValue = h('span', { class: 'lgc-mat__value' }, String(mat.distortion));
+    const ref = h('input', { class: 'lgc-mat__range', type: 'range', min: '0.05', max: '1.2', step: '0.01', value: String(mat.refraction), 'aria-label': `${mat.name} refraction` });
+    const dist = h('input', { class: 'lgc-mat__range', type: 'range', min: '8', max: '120', step: '1', value: String(mat.distortion), 'aria-label': `${mat.name} distortion` });
+    ref.addEventListener('input', () => { const v = Number(ref.value); glass.refraction = v; refValue.textContent = v.toFixed(2); });
+    dist.addEventListener('input', () => { const v = Number(dist.value); glass.distortion = v; distValue.textContent = String(v); });
+
+    return h('article', { class: 'lgc-mat' }, [
+      sample,
+      h('div', { class: 'lgc-mat__controls' }, [
+        h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Refraction', refValue]), ref]),
+        h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Distortion', distValue]), dist]),
+      ]),
+    ]);
+  });
+
+  return h('div', { class: 'lgc-matlab' }, cards);
+}
+
 /* --- Elements: text entry ------------------------------------------------ */
 export function glassInput({ value = '', placeholder = 'Jane Appleseed', icon = null } = {}) {
   const input = h('input', { type: 'text', value, placeholder, 'aria-label': placeholder, autocomplete: 'off' });
@@ -1063,6 +1101,7 @@ export function glassCheckout() {
 
 /* --- registry: inventory demo key → live builder ------------------------- */
 export const MOUNTS = {
+  materialLab: () => glassMaterialLab(),
   toggle: () => glassSwitch({ on: true }),
   slider: () => glassSlider({ value: 0.4 }),
   button: () => h('div', { class: 'lgc-row' }, [glassButton({ label: 'Primary', variant: 'accent' }), glassButton({ label: 'Glass' }), glassButton({ label: 'Save', icon: 'check' })]),

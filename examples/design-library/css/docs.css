@@ -836,6 +836,27 @@ body {
 .lgc-price__cta { display: block; padding: 9px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: 600; background: rgba(255, 255, 255, 0.16); cursor: pointer; }
 .lgc-price__cta.is-hot { background: linear-gradient(180deg, #5cb8ff, #4d7cff); }
 
+/* material lab */
+.lgc-matlab { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.lgc-mat { display: grid; gap: 10px; min-width: 0; }
+.lgc-mat__sample { position: relative; min-height: 112px; padding: 16px; border-radius: 22px; color: #fff; overflow: hidden; box-shadow: 0 7px 20px rgba(0, 0, 0, 0.18); }
+.lgc-mat__sample--clear { background: rgba(255, 255, 255, 0.045); }
+.lgc-mat__sample--clear-strong { background: rgba(255, 255, 255, 0.065); }
+.lgc-mat__sample--soft { background: rgba(255, 255, 255, 0.13); }
+.lgc-mat__sample--satin { background: rgba(255, 255, 255, 0.18); }
+.lgc-mat__sample--deep { background: rgba(255, 255, 255, 0.24); }
+.lgc-mat__sample--milk { background: rgba(255, 255, 255, 0.31); }
+.lgc-mat__label { position: relative; z-index: 1; display: grid; align-content: end; height: 100%; gap: 3px; }
+.lgc-mat__label b { font-size: 15px; font-weight: 700; letter-spacing: 0; }
+.lgc-mat__label span { font-size: 11.5px; color: rgba(255, 255, 255, 0.72); }
+.lgc-mat__controls { display: grid; gap: 8px; padding: 0 2px; }
+.lgc-mat__control { display: grid; gap: 5px; }
+.lgc-mat__control > span { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11.5px; color: rgba(255, 255, 255, 0.7); }
+.lgc-mat__value { color: #fff; font-variant-numeric: tabular-nums; }
+.lgc-mat__range { width: 100%; height: 18px; accent-color: #74c0fc; cursor: pointer; }
+.lgc-mat__range:focus-visible { outline: 2px solid rgba(116, 192, 252, 0.65); outline-offset: 3px; border-radius: 999px; }
+@media (max-width: 680px) { .lgc-matlab { grid-template-columns: 1fr; } }
+
 /* ============================================================
    Extended catalog — flat helpers (used inside composite glass)
    ============================================================ */

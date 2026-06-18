@@ -338,6 +338,8 @@ export function attachGlass(el, opts = {}) {
     el,
     set refraction(v) { o.refraction = v; applyScale(); },
     get refraction() { return o.refraction; },
+    set distortion(v) { o.scaleBase = v; applyScale(); },
+    get distortion() { return o.scaleBase != null ? o.scaleBase : 3.2 * Math.max(curBezel, 1); },
     set saturation(v) { o.saturation = v; sat.setAttribute('values', String(v)); },
     set specular(v) { o.specular = v; funcA.setAttribute('slope', String(v)); },
     set blur(v) { o.blur = v; blur.setAttribute('stdDeviation', String(v)); },

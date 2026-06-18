@@ -146,7 +146,7 @@ const INVENTORY = [
         ['Elevation', 'built', 'Shadow scale rest → raised → lifted.', 'elevation'],
       ]},
       { label: 'Material & motion', items: [
-        ['Glass / material', 'built', 'Bezel, blur, refraction, tint, specular.', 'surface'],
+        ['Glass / material', 'built', 'Transparent and frosted surfaces with per-material controls.', 'materialLab'],
         ['Motion', 'built', 'Durations, easings, spring families, presets.', 'motion'],
         ['Z-index', 'built', 'Stacking scale base → toast.', 'zindex'],
         ['Semantic', 'built', 'Control height/padding, focus ring defaults.', 'semantic'],
@@ -397,6 +397,7 @@ function renderHeroStats() {
 
 /* Wide live demos span two gallery columns so horizontal compounds fit. */
 const WIDE = new Set([
+  'materialLab',
   'navbar', 'mediaPlayer', 'toolbar', 'commandPalette', 'modal', 'authForm',
   'datePicker', 'chatThread', 'dataTable', 'table', 'pricingTable', 'productCard',
   'pageHeader', 'footer', 'banner', 'formFull', 'settingsPanel', 'richTextEditor',
