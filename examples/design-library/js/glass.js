@@ -266,7 +266,7 @@ export function attachGlass(el, opts = {}) {
   const id = nextId();
   const o = {
     surface: 'convex', radius: 'pill', bezel: 14, thickness: 1.5,
-    blur: 0.4, refraction: 1, saturation: 6, specular: 0.5,
+    blur: 0.4, refraction: 1, saturation: 6, specular: 1,
     light: -Math.PI / 3, fallbackBlur: 8, ...opts,
   };
 

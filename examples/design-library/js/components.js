@@ -56,7 +56,7 @@ export function glassSwitch({ on = true } = {}) {
     'aria-checked': String(on), 'aria-label': 'Toggle',
   }, [track, knob]);
 
-  const glass = attachGlass(knob, { surface: 'lip', radius: 'pill', bezel: 13, scaleBase: 26.6, refraction: 0.4, saturation: 6, specular: 0.5, blur: 0.2 });
+  const glass = attachGlass(knob, { surface: 'lip', radius: 'pill', bezel: 13, scaleBase: 26.6, refraction: 0.4, saturation: 6, specular: 1, blur: 0.2 });
   const trackColor = mixColor('#94949F77', '#3BBF4EEE'); // gray → green
 
   // kube proportions scaled 0.477612 (track height 32px) to match other controls;
@@ -128,7 +128,7 @@ export function glassSlider({ value = 0.4 } = {}) {
   const thumb = h('span', { class: 'lgc-slider__thumb', tabindex: '0', role: 'slider', 'aria-valuemin': '0', 'aria-valuemax': '100' });
   const el = h('div', { class: 'lgc-slider' }, [trackEl, thumb]);
 
-  const glass = attachGlass(thumb, { surface: 'convex', radius: 'pill', bezel: 18, scaleBase: 55.9, refraction: 0.4, saturation: 7, specular: 0.5, blur: 0 });
+  const glass = attachGlass(thumb, { surface: 'convex', radius: 'pill', bezel: 18, scaleBase: 55.9, refraction: 0.4, saturation: 7, specular: 1, blur: 0 });
   // kube proportions scaled 0.667 to fit the UI: 220x40 rig, 60x40 convex thumb
   // on a ~9px track, shrinking to 0.6 at rest (the original aspect ratio).
   const REST = 0.6, ACTIVE = 1;
@@ -180,7 +180,7 @@ export function glassLens() {
   const capsule = h('span', { class: 'lgc-lens__capsule', style: 'left:50%;top:50%;transform:translate(-50%,-50%)' });
   const stage = h('div', { class: 'lgc-lens' }, [capsule]);
 
-  const glass = attachGlass(capsule, { surface: 'convex', radius: 26, bezel: 22, scaleBase: 56, refraction: 1, saturation: 9, specular: 0.5, blur: 0 });
+  const glass = attachGlass(capsule, { surface: 'convex', radius: 26, bezel: 22, scaleBase: 56, refraction: 1, saturation: 9, specular: 1, blur: 0 });
 
   const SR = spring('grab', 0.8);   // refraction
   const S = spring('jelly', 0.8);   // base press
@@ -241,7 +241,7 @@ export function glassButton({ label = 'Button', icon = null, variant = 'standard
     [icon ? fa(icon) : null, h('span', {}, label)]);
   if (variant === 'accent') return el; // accent is a solid tinted fill, no glass
 
-  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 12, refraction: 0.4, saturation: 5, specular: 0.5, blur: 0.3 });
+  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 12, refraction: 0.4, saturation: 5, specular: 1, blur: 0.3 });
   const Q = spring('settle', 0.4), A = spring('snap', 1);
   Q.onChange((v) => (glass.refraction = v));
   A.onChange((v) => (el.style.transform = `scale(${v.toFixed(3)})`));
@@ -256,7 +256,7 @@ export function glassButton({ label = 'Button', icon = null, variant = 'standard
 
 export function glassIconButton({ icon = 'plus', label = 'Action' } = {}) {
   const el = h('button', { class: 'lgc-iconbtn', type: 'button', 'aria-label': label }, [fa(icon)]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 14, bezel: 8, refraction: 0.4, saturation: 5, specular: 0.5, blur: 0.3 });
+  const glass = attachGlass(el, { surface: 'convex', radius: 14, bezel: 8, refraction: 0.4, saturation: 5, specular: 1, blur: 0.3 });
   const Q = spring('settle', 0.4), A = spring('snap', 1);
   Q.onChange((v) => (glass.refraction = v));
   A.onChange((v) => (el.style.transform = `scale(${v.toFixed(3)})`));
@@ -268,7 +268,7 @@ export function glassIconButton({ icon = 'plus', label = 'Action' } = {}) {
 
 export function glassFab({ icon = 'plus' } = {}) {
   const el = h('button', { class: 'lgc-fab', type: 'button', 'aria-label': 'Create' }, [fa(icon)]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 12, refraction: 0.4, saturation: 6, specular: 0.5, blur: 0.3 });
+  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 12, refraction: 0.4, saturation: 6, specular: 1, blur: 0.3 });
   const Q = spring('settle', 0.4), A = spring('grab', 1);
   Q.onChange((v) => (glass.refraction = v));
   A.onChange((v) => (el.style.transform = `scale(${v.toFixed(3)})`));
@@ -288,7 +288,7 @@ export function glassSegmented({ options = ['Day', 'Week', 'Month'], value = 0 }
     h('button', { class: 'lgc-seg__opt' + (i === value ? ' is-on' : ''), type: 'button', 'data-i': i }, label));
   const el = h('div', { class: 'lgc-seg', role: 'tablist' }, [indicator, ...segs]);
 
-  const glass = attachGlass(indicator, { surface: 'convex', radius: 'pill', bezel: 10, refraction: 0.4, saturation: 5, specular: 0.5, blur: 0.2 });
+  const glass = attachGlass(indicator, { surface: 'convex', radius: 'pill', bezel: 10, refraction: 0.4, saturation: 5, specular: 1, blur: 0.2 });
   const X = spring('snap', value), W = spring('snap', 0), Q = spring('settle', 0.4);
   let cur = value, settleTimer = 0;
 
@@ -322,7 +322,7 @@ export function glassCheckbox({ checked = true } = {}) {
   const mark = fa('check', { cls: 'lgc-check__mark' });
   const box = h('span', { class: 'lgc-check__box' }, [mark]);
   const el = h('button', { class: 'lgc-check', type: 'button', role: 'checkbox', 'aria-checked': String(checked) }, [box]);
-  const glass = attachGlass(box, { surface: 'convex', radius: 8, bezel: 7, refraction: 0.4, saturation: 5, specular: 0.5, blur: 0.2 });
+  const glass = attachGlass(box, { surface: 'convex', radius: 8, bezel: 7, refraction: 0.4, saturation: 5, specular: 1, blur: 0.2 });
   const P = spring('jelly', checked ? 1 : 0), Q = spring('settle', checked ? 0.9 : 0.4);
   P.onChange((v) => { mark.style.transform = `scale(${clamp01(v).toFixed(3)})`; mark.style.opacity = clamp01(v).toFixed(3); });
   Q.onChange((v) => (glass.refraction = v));
@@ -340,7 +340,7 @@ export function glassRadio({ checked = true } = {}) {
   const dot = h('span', { class: 'lgc-radio__dot' });
   const disc = h('span', { class: 'lgc-radio__disc' }, [dot]);
   const el = h('button', { class: 'lgc-radio', type: 'button', role: 'radio', 'aria-checked': String(checked) }, [disc]);
-  const glass = attachGlass(disc, { surface: 'convex', radius: 'pill', bezel: 8, refraction: 0.4, saturation: 5, specular: 0.5, blur: 0.2 });
+  const glass = attachGlass(disc, { surface: 'convex', radius: 'pill', bezel: 8, refraction: 0.4, saturation: 5, specular: 1, blur: 0.2 });
   const P = spring('grab', checked ? 1 : 0), Q = spring('settle', checked ? 0.9 : 0.4);
   P.onChange((v) => { dot.style.transform = `translate(-50%,-50%) scale(${clamp01(v).toFixed(3)})`; });
   Q.onChange((v) => (glass.refraction = v));
@@ -357,7 +357,7 @@ export function glassRadio({ checked = true } = {}) {
 export function glassSearch() {
   const input = h('input', { type: 'search', placeholder: 'Search…', 'aria-label': 'Search', autocomplete: 'off' });
   const el = h('div', { class: 'lgc-search' }, [fa('magnifying-glass', { cls: 'lgc-search__i' }), input, h('kbd', { class: 'lgc-search__kbd' }, '/')]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 14, refraction: 0.4, saturation: 4, specular: 0.5, blur: 1 });
+  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 14, refraction: 0.4, saturation: 4, specular: 1, blur: 1 });
   const Q = spring('settle', 0.4);
   Q.onChange((v) => (glass.refraction = v));
   input.addEventListener('focus', () => { Q.set(0.9); el.classList.add('is-focus'); });
@@ -371,7 +371,7 @@ export function glassSearch() {
 export function glassChip({ label = 'Design', removable = true } = {}) {
   const el = h('button', { class: 'lgc-chip is-on', type: 'button' },
     [h('span', {}, label), removable ? fa('xmark', { cls: 'lgc-chip__x' }) : null]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 10, refraction: 0.4, saturation: 5, specular: 0.5, blur: 0.4 });
+  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 10, refraction: 0.4, saturation: 5, specular: 1, blur: 0.4 });
   const Q = spring('settle', 0.4);
   Q.onChange((v) => (glass.refraction = v));
   let on = true;
@@ -390,7 +390,7 @@ export function glassCard() {
       h('div', { class: 'lgc-card__d' }, 'A surface that refracts what is behind it.'),
     ]),
   ]);
-  attachGlass(el, { surface: 'convex', radius: 18, bezel: 16, refraction: 0.4, saturation: 5, specular: 0.5, blur: 2 });
+  attachGlass(el, { surface: 'convex', radius: 18, bezel: 16, refraction: 0.4, saturation: 5, specular: 1, blur: 2 });
   return el;
 }
 
@@ -402,7 +402,7 @@ export function glassToast() {
     h('span', { class: 'lgc-toast__dot' }, [fa('check')]),
     h('div', {}, [h('b', {}, 'Saved'), h('div', { class: 'lgc-toast__d' }, 'Your changes are live.')]),
   ]);
-  attachGlass(el, { surface: 'convex', radius: 14, bezel: 14, refraction: 0.4, saturation: 5, specular: 0.5, blur: 3 });
+  attachGlass(el, { surface: 'convex', radius: 14, bezel: 14, refraction: 0.4, saturation: 5, specular: 1, blur: 3 });
   return el;
 }
 
