@@ -12,7 +12,7 @@
   /* Focus ring (LG-P9) */
   --lg-focus-color: var(--lg-color-focus);
   --lg-focus-width: var(--lg-stroke-width-focus);
-  --lg-focus-offset: 2px;
+  --lg-focus-offset: 2px; /* instance dim: ring gap, no scale category fits */
 
   --lg-surface-radius-default: var(--lg-radius-lg);
 }

@@ -12,13 +12,12 @@ import { createButton } from '../../components/button/button.js';
  * @param {Object} props
  * @param {string} [props.placeholder]
  * @param {string} [props.material] surface material
- * @param {string} [props.iconUrl] mask url for the leading search glyph
  * @param {boolean} [props.action] show a trailing accent "Search" button
  * @returns {HTMLElement}
  */
-export function createSearchbar({ placeholder = 'Search', material = 'regular', iconUrl, action = false } = {}) {
+export function createSearchbar({ placeholder = 'Search', material = 'regular', action = false } = {}) {
   const children = [
-    createIcon({ name: 'search', url: iconUrl, size: 'sm' }),
+    createIcon({ name: 'search', size: 'sm' }),
     el('input', { class: 'lg-searchbar__field', type: 'search', placeholder, 'aria-label': placeholder }),
   ];
   if (action) children.push(createButton({ label: 'Search', variant: 'accent' }));

@@ -31,6 +31,8 @@
   /* Surface tint / stroke / specular */
   --lg-tint-base: rgba(255, 255, 255, 0.10);
   --lg-stroke-base: rgba(255, 255, 255, 0.32);
+  --lg-stroke-width: 1px;
+  --lg-stroke-width-focus: 2px;
   --lg-specular-opacity: 0.5;
   --lg-specular-saturation: 1;
 

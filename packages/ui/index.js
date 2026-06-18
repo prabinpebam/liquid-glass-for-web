@@ -30,6 +30,9 @@ import { createSearchbar } from './compound/searchbar/searchbar.js';
 // Physics runtime (the motion system's engine; see motion-spec.md)
 import { Spring, createSpring, readSpring, activation, elastics, prefersReducedMotion } from './behaviors/springs.js';
 
+// Interaction behaviors (LG-P12): attached to rendered nodes, never in factories.
+import { attachToggle } from './behaviors/toggle.js';
+
 const root = () => document.documentElement;
 
 /** Apply a named theme (token overrides on a target; default :root, subtree-capable). */
@@ -88,5 +91,6 @@ export default {
   },
   material: { bind, unbind, bindWhenConnected, refresh, refreshAll },
   motion: { Spring, createSpring, readSpring, activation, elastics, prefersReducedMotion },
+  behaviors: { attachToggle },
   personalization: { applyTheme, applyDensity, applyTransparency, applyContrast, applyAccent, applyMotion },
 };

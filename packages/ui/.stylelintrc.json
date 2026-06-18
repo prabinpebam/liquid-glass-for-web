@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/stylelintrc",
+  "//": "Encodes design-spec.md §5 (anti-patterns lint must reject). Raw color/value literals are legal ONLY in the token + theme value layer; the override below enforces the token-only discipline on atoms/components/compound/layouts (LG-P1, LG-P13).",
+  "rules": {
+    "declaration-no-important": true
+  },
+  "overrides": [
+    {
+      "files": [
+        "atoms/**/*.css",
+        "components/**/*.css",
+        "compound/**/*.css",
+        "layouts/**/*.css"
+      ],
+      "rules": {
+        "color-no-hex": true,
+        "color-named": "never",
+        "declaration-property-value-disallowed-list": {
+          "/.*/": ["/rgba?\\(/"]
+        },
+        "property-disallowed-list": ["left", "right"]
+      }
+    }
+  ]
+}

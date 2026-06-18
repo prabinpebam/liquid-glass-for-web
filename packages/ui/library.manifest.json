@@ -47,7 +47,8 @@
   "capabilities": ["theme", "accent", "density", "transparency", "motion"],
 
   "behaviors": {
-    "springs": { "runtime": true }
+    "springs": { "runtime": true },
+    "toggle": { "attach": "attachToggle", "target": "lg-toggle" }
   },
 
   "factories": {

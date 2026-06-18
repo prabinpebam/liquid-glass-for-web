@@ -22,10 +22,17 @@
     "components",
     "compound",
     "layouts",
+    "behaviors",
     "README.md"
   ],
+  "scripts": {
+    "lint:css": "stylelint \"{atoms,components,compound,layouts,tokens,themes}/**/*.css\" contract-tokens.css"
+  },
   "dependencies": {
     "@liquid-glass/core": "workspace:*"
+  },
+  "devDependencies": {
+    "stylelint": "^16.10.0"
   },
   "keywords": [
     "liquid-glass",

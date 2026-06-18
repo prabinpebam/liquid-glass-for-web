@@ -28,9 +28,10 @@ core/              el() DOM primitive + material binder (tokens → engine)
 atoms/         L1  surface (the glass shell + engine attach point), text, icon
 components/    L2  button, toggle
 compound/      L3  searchbar
+behaviors/          optional attach* interactions (structure stays pure)
 layouts/       L4  (added as needed)
 library.manifest.json  the inventory + CSS load order
-index.js           default export: { primitives, factories, material, personalization }
+index.js           default export: { primitives, factories, material, motion, behaviors, personalization }
 ```
 
 ## Quick start (buildless)
@@ -48,6 +49,10 @@ index.js           default export: { primitives, factories, material, personaliz
   const bar = ui.factories.searchbar({ placeholder: 'Search', action: true });
   document.body.appendChild(bar);
   ui.material.bind(bar);          // light up the glass after mounting
+
+  const toggle = ui.factories.toggle({ label: 'Transparency' });
+  document.body.appendChild(toggle);
+  ui.behaviors.attachToggle(toggle); // attach interaction separately
 
   ui.personalization.applyTheme('light');
   ui.personalization.applyAccent('#ff5470');

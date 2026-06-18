@@ -25,7 +25,7 @@
 }
 
 .lg-button:hover,
-.lg-button.is-hover { background: color-mix(in srgb, var(--lg-tint-base) 70%, white 8%); }
+.lg-button.is-hover { background: color-mix(in srgb, var(--lg-tint-base) 70%, var(--lg-color-neutral-0) 8%); }
 
 .lg-button:active,
 .lg-button.is-pressed { transform: scale(0.97); }
@@ -40,7 +40,7 @@
 .lg-button.is-disabled {
   color: var(--lg-color-on-glass-dim);
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.6; /* instance dim: disabled dimming, not a scale category */
 }
 
 /* Variant: accent */
