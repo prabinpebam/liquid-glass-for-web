@@ -27,6 +27,9 @@ import { createToggle } from './components/toggle/toggle.js';
 // L3 compounds
 import { createSearchbar } from './compound/searchbar/searchbar.js';
 
+// Physics runtime (the motion system's engine; see motion-spec.md)
+import { Spring, createSpring, readSpring, activation, elastics, prefersReducedMotion } from './behaviors/springs.js';
+
 const root = () => document.documentElement;
 
 /** Apply a named theme (token overrides on a target; default :root, subtree-capable). */
@@ -45,6 +48,12 @@ function applyTransparency(on = true, target = root()) {
 function applyContrast(high = false, target = root()) {
   target.setAttribute('data-lg-contrast', high ? 'high' : 'normal');
   refreshAll();
+}
+
+/** Select a global motion preset (closed set, retunes durations + springs together). */
+function applyMotion(preset = 'default', target = root()) {
+  if (preset === 'default') target.removeAttribute('data-lg-motion');
+  else target.setAttribute('data-lg-motion', preset);
 }
 
 /** Set the accent color; writes the derived ramp onto the target's tokens. */
@@ -78,5 +87,6 @@ export default {
     searchbar: createSearchbar,
   },
   material: { bind, unbind, bindWhenConnected, refresh, refreshAll },
-  personalization: { applyTheme, applyDensity, applyTransparency, applyContrast, applyAccent },
+  motion: { Spring, createSpring, readSpring, activation, elastics, prefersReducedMotion },
+  personalization: { applyTheme, applyDensity, applyTransparency, applyContrast, applyAccent, applyMotion },
 };

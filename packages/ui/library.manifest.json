@@ -35,9 +35,20 @@
     "modes": ["light", "dark"]
   },
 
+  "motion": {
+    "attribute": "data-lg-motion",
+    "default": "default",
+    "presets": ["default", "calm", "crisp"],
+    "springFamilies": ["snap", "glide", "settle", "grab", "jelly", "damp"]
+  },
+
   "materials": ["regular", "clear", "frosted"],
 
-  "capabilities": ["theme", "accent", "density", "transparency"],
+  "capabilities": ["theme", "accent", "density", "transparency", "motion"],
+
+  "behaviors": {
+    "springs": { "runtime": true }
+  },
 
   "factories": {
     "surface":   { "layer": "L1", "required": ["children"] },

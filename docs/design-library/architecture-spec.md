@@ -83,6 +83,7 @@ packages/ui/
     searchbar/ { searchbar.css, searchbar.js }
 
   behaviors/                     # optional interactivity controllers (LG-P12)
+    springs.js  # shared physics runtime (Spring + token-bound families); motion-spec
     toggle.js   slider.js   menu.js   ...
 
   icons/                         # icon registry shim (name → url); artwork stays in the host
@@ -258,7 +259,8 @@ All are **token overrides on root attributes / media queries** (LG-P6/P8):
 | Theme | `[data-lg-theme="light\|dark"]` | re-tints glass + text tokens |
 | Density | `[data-lg-density="compact\|comfortable"]` | swaps `--lg-space-*` / control heights |
 | Transparency | `[data-lg-transparency="off"]` | re-points glass tint/blur tokens to solid fallback |
-| Reduced motion | `@media (prefers-reduced-motion: reduce)` | collapses `--lg-motion-*` to `0ms`, disables springs |
+| Motion | `[data-lg-motion="calm\|crisp"]` + `--lg-motion-scale` | retunes durations + spring families together (closed preset set, motion-spec) |
+| Reduced motion | `@media (prefers-reduced-motion: reduce)` | collapses `--lg-motion-*` to `0ms`, makes the runtime jump springs to target |
 
 `personalization.applyAccent(hex)` writes a derived accent ramp onto `:root` as
 `--lg-color-accent*`, re-coloring every accent-bound component at once.
@@ -310,8 +312,9 @@ variables. Migration path (incremental, non-breaking):
    `--lg-*` tokens.
 2. Replace each hand-written demo (`pill`, `toggle`, `slider`, `searchbar`, …)
    with the matching `create*` factory as it lands.
-3. Move the playground's spring/jiggle physics behind `--lg-motion-spring-*`
-   tokens so the engine reads constants from tokens (LG-P8).
+3. Move the playground's spring/jiggle physics onto the shared runtime
+   `behaviors/springs.js`, so each demo picks a named spring family and reads the
+   activation tokens instead of literal constants (LG-P8, motion-spec).
 4. Delete the duplicated CSS once every demo renders from the library.
 
 This keeps the proven kube-faithful motion while moving its values into the token
@@ -337,8 +340,12 @@ Rules:
   values inline (drag-time positioning is the one allowed exception).
 - `attach*` returns a `detach()` that fully restores the node.
 - Behaviors are optional and tree-shakeable — a static page ships none.
-- Spring / jiggle physics (the kube-faithful motion) live here and read
-  `--lg-motion-spring-*` constants (LG-P8).
+- Spring / jiggle physics (the kube-faithful motion) live here and are built on
+  the shared runtime `behaviors/springs.js`: behaviors pick a named spring
+  **family** and read the shared **activation** endpoints from the motion tokens
+  rather than hard-coding constants (LG-P8). The full motion language — families,
+  the activation transition, velocity/squash, presets, and the runtime contract —
+  is specified in [motion-spec.md](motion-spec.md).
 
 ---
 

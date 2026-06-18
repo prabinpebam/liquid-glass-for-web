@@ -112,10 +112,17 @@ composed on top." This keeps the expensive refraction pipeline in exactly one
 place and makes every higher layer cheap to build and reason about.
 
 ### LG-P8 — Motion is token-driven physics
-Durations/easings are tokens (`--lg-motion-fast`, `--lg-motion-spring-*`).
-Interactive physics (knob springs, lens squash-and-stretch) read spring constants
-from tokens. `@media (prefers-reduced-motion: reduce)` collapses motion tokens to
-`0ms` / disables springs at the token layer — components are untouched.
+Motion is a first-class, tokenized subsystem — see the dedicated
+[motion-spec.md](motion-spec.md). Durations/easings are tokens
+(`--lg-motion-fast`); interactive motion is **spring physics**, not keyframes,
+and a component selects a named **spring family** (`snap`, `glide`, `settle`,
+`grab`, `jelly`, `damp`) rather than writing a stiffness/damping pair. Every
+interactive glass control shares **one activation transition** (opaque → glass,
+refraction boost, lift) from shared tokens, so the whole library "turns to glass"
+with one identity. All motion scales together off one dial (`--lg-motion-scale`)
+and a closed set of presets (`[data-lg-motion]`); `prefers-reduced-motion`
+collapses durations to `0ms` and makes the runtime jump springs to target — at the
+token layer, so components are untouched.
 
 ### LG-P9 — Fallback and accessibility are contracts
 - **Fallback:** `backdrop-filter: url(#…)` refraction is Chromium-only. The

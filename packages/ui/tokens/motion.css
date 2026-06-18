@@ -1,27 +1,108 @@
 /* ============================================================
    Liquid Glass — Motion tokens (L0, primitive)
-   Durations, easings, and spring constants. Reduced-motion
-   collapses these so components never branch on motion.
+
+   Motion is a first-class part of the design system, not a per-
+   component afterthought. These tokens are the SINGLE source of
+   every duration, easing, spring constant, and activation delta
+   in the library (see docs/design-library/motion-spec.md, LG-P8).
+
+   Three things live here:
+     1. Discrete transitions  — durations + easings (CSS).
+     2. Spring families       — named {stiffness, damping} roles the
+                                 physics runtime reads (behaviors/springs.js).
+     3. The activation model  — the shared resting -> engaged feel
+                                 (opaque -> glass, refraction boost, lift).
+
+   Everything scales together off one dial (--lg-motion-scale) and a
+   CLOSED set of presets ([data-lg-motion]); reduced-motion collapses
+   it all at the token layer so components never branch on motion.
    ============================================================ */
 :root {
-  --lg-motion-fast: 120ms;
-  --lg-motion-medium: 200ms;
-  --lg-motion-slow: 320ms;
+  /* ---- Global control: one dial for the whole library ------------------ */
+  /* Multiplies every duration. Presets below retune this AND the springs
+     together, so the entire library's motion is controlled in one place. */
+  --lg-motion-scale: 1;
+  /* Read by the physics runtime; 1 = jump springs straight to target. */
+  --lg-motion-reduce: 0;
+
+  /* ---- Discrete transitions: durations + easings ---------------------- */
+  --lg-motion-fast: calc(120ms * var(--lg-motion-scale));
+  --lg-motion-medium: calc(200ms * var(--lg-motion-scale));
+  --lg-motion-slow: calc(320ms * var(--lg-motion-scale));
 
   --lg-motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --lg-motion-ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
 
-  /* Spring constants read by the physics layer (stiffness/damping). */
-  --lg-motion-spring-knob-stiffness: 2000;
-  --lg-motion-spring-knob-damping: 80;
-  --lg-motion-spring-lens-stiffness: 340;
-  --lg-motion-spring-lens-damping: 20;
+  /* ---- Spring families (the physics runtime reads these) --------------
+     Each family is a named {stiffness, damping} ROLE harvested from the
+     kube-faithful demos. Interactive components pick a family BY NAME
+     (LG-P8 / LG-P13) and never invent a stiffness/damping pair at a call
+     site. This is a closed catalog — add a family by governance, not ad hoc. */
+
+  /* snap — crisp material response (scale + opacity of a knob/thumb). */
+  --lg-motion-spring-snap-stiffness: 2000;
+  --lg-motion-spring-snap-damping: 80;
+  /* glide — travel along a track (switch position, track-colour blend). */
+  --lg-motion-spring-glide-stiffness: 1000;
+  --lg-motion-spring-glide-damping: 80;
+  /* settle — gentle parameter settle (refraction level easing in/out). */
+  --lg-motion-spring-settle-stiffness: 170;
+  --lg-motion-spring-settle-damping: 26;
+  /* grab — bouncy grab response (lens lift + magnification). */
+  --lg-motion-spring-grab-stiffness: 250;
+  --lg-motion-spring-grab-damping: 14;
+  /* jelly — squash-and-stretch (lens scaleX/scaleY + lifting shadow). */
+  --lg-motion-spring-jelly-stiffness: 340;
+  --lg-motion-spring-jelly-damping: 20;
+  /* damp — slow opacity settle (shadow / inset alpha). */
+  --lg-motion-spring-damp-stiffness: 220;
+  --lg-motion-spring-damp-damping: 24;
+
+  /* Back-compat aliases for the two families named before the catalog. */
+  --lg-motion-spring-knob-stiffness: var(--lg-motion-spring-snap-stiffness);
+  --lg-motion-spring-knob-damping: var(--lg-motion-spring-snap-damping);
+  --lg-motion-spring-lens-stiffness: var(--lg-motion-spring-jelly-stiffness);
+  --lg-motion-spring-lens-damping: var(--lg-motion-spring-jelly-damping);
+
+  /* ---- Activation: the shared resting -> engaged transition -----------
+     Every interactive glass control crystallizes the SAME way on press/grab:
+     the opaque material turns to glass, refraction boosts, the control lifts.
+     Endpoints are tokens so the whole library engages with one feel. The
+     per-control travel scale (e.g. a knob's 0.65->0.9 vs a thumb's 0.6->1.0)
+     is an instance dimension (LG-P2); these dimensionless endpoints are shared. */
+  --lg-motion-glass-alpha-rest: 1;      /* solid white material at rest */
+  --lg-motion-glass-alpha-active: 0.1;  /* turns to glass when engaged */
+  --lg-motion-refraction-rest: 0.4;     /* x(material refraction) at rest */
+  --lg-motion-refraction-active: 0.9;   /* x(material refraction) when engaged */
+
+  /* ---- Velocity & elastic constants ----------------------------------- */
+  --lg-motion-squash-velocity: 5000;    /* drag px/s mapped to full squash */
+  --lg-motion-squash-floor: 0.7;        /* min scaleY under the fastest drag */
+  --lg-motion-velocity-relax: 0.8;      /* per-frame velocity decay when still */
+  --lg-motion-rubber-band: 22;          /* overshoot divisor past a track end */
 }
 
+/* ---- Global motion presets — a CLOSED set (LG-P13) ----------------------
+   One attribute on the root retunes durations AND springs together, so a host
+   can dial the whole library's character without touching any component. */
+[data-lg-motion="calm"] {
+  --lg-motion-scale: 1.35;
+  --lg-motion-spring-snap-stiffness: 1200;
+  --lg-motion-spring-glide-stiffness: 700;
+  --lg-motion-spring-grab-damping: 18;
+}
+[data-lg-motion="crisp"] {
+  --lg-motion-scale: 0.7;
+  --lg-motion-spring-snap-stiffness: 2600;
+  --lg-motion-spring-glide-stiffness: 1400;
+}
+
+/* Reduced motion collapses everything at the token layer. Durations go to 0ms;
+   --lg-motion-reduce flips so the physics runtime jumps springs to target
+   instead of animating. Components stay untouched (LG-P8). */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --lg-motion-fast: 0ms;
-    --lg-motion-medium: 0ms;
-    --lg-motion-slow: 0ms;
+    --lg-motion-scale: 0;
+    --lg-motion-reduce: 1;
   }
 }
