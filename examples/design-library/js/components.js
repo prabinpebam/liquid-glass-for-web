@@ -11,7 +11,7 @@
    ResizeObserver builds the filter once the node is mounted and measurable.
    MOUNTS maps an inventory demo key → builder, consumed by docs.js.
    ========================================================================== */
-import { attachGlass, Spring, spring, clamp01, lerp } from './glass.js';
+import { attachGlass as attachGlassEngine, Spring, spring, clamp01, lerp } from './glass.js';
 
 /* --- tiny DOM + icon helpers --------------------------------------------- */
 function h(tag, attrs = {}, kids = []) {
@@ -42,6 +42,48 @@ function mixColor(a, b) {
   return (t) => `rgba(${Math.round(lerp(ca[0], cb[0], t))}, ${Math.round(lerp(ca[1], cb[1], t))}, ${Math.round(lerp(ca[2], cb[2], t))}, ${lerp(ca[3], cb[3], t).toFixed(3)})`;
 }
 
+/* --- Liquid Glass material catalog ---------------------------------------
+   Every glass surface in this design-library demo chooses one of these named
+   materials. Component call sites may pass shape/size geometry only; optical
+   parameters (blur, refraction, distortion, saturation, specular) live here. */
+const GLASS_MATERIALS = {
+  clear: { name: 'Clear', tone: 'Very transparent', cls: 'clear', blur: 0.2, refraction: 0.28, distortion: 26, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.045)' },
+  optic: { name: 'Optic', tone: 'Transparent, higher bend', cls: 'clear-strong', blur: 0.4, refraction: 0.62, distortion: 52, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.065)' },
+  softFrost: { name: 'Soft Frost', tone: 'Slightly frosted', cls: 'soft', blur: 2.4, refraction: 0.36, distortion: 34, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.13)' },
+  satin: { name: 'Satin', tone: 'Balanced frost', cls: 'satin', blur: 4.8, refraction: 0.44, distortion: 42, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.18)' },
+  deepFrost: { name: 'Deep Frost', tone: 'More frosted', cls: 'deep', blur: 8.5, refraction: 0.34, distortion: 30, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.24)' },
+  milk: { name: 'Milk Glass', tone: 'Most frosted', cls: 'milk', blur: 12, refraction: 0.24, distortion: 22, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.31)' },
+};
+const MATERIAL_NAMES = Object.keys(GLASS_MATERIALS);
+const material = (name = 'satin') => GLASS_MATERIALS[name] || GLASS_MATERIALS.satin;
+function applyGlassMaterial(glass, materialName = 'satin') {
+  const m = material(materialName);
+  glass.el.dataset.glassMaterial = materialName;
+  glass.el.style.setProperty('--lgc-material-tint', m.tint);
+  glass.el.style.background = m.tint;
+  glass.distortion = m.distortion;
+  glass.refraction = m.refraction;
+  glass.blur = m.blur;
+  return glass;
+}
+function attachGlass(el, shape = {}) {
+  const materialName = shape.material ?? 'satin';
+  const m = material(materialName);
+  el.dataset.glassMaterial = materialName;
+  el.style.setProperty('--lgc-material-tint', m.tint);
+  el.style.background = m.tint;
+  return attachGlassEngine(el, {
+    surface: shape.surface ?? 'convex',
+    radius: shape.radius ?? 'pill',
+    bezel: shape.bezel ?? 14,
+    scaleBase: m.distortion,
+    refraction: m.refraction,
+    saturation: m.saturation,
+    specular: m.specular,
+    blur: m.blur,
+  });
+}
+
 /* ============================================================================
    Switch — faithful port of the kube switch state machine.
    Activation S = forced || grabbing drives: knob glass alpha 1→0.1 (opaque →
@@ -56,7 +98,7 @@ export function glassSwitch({ on = true } = {}) {
     'aria-checked': String(on), 'aria-label': 'Toggle',
   }, [track, knob]);
 
-  const glass = attachGlass(knob, { surface: 'lip', radius: 'pill', bezel: 13, scaleBase: 26.6, refraction: 0.4, saturation: 6, specular: 1, blur: 0.2 });
+  const glass = attachGlass(knob, { material: 'clear', surface: 'lip', radius: 'pill', bezel: 13 });
   const trackColor = mixColor('#94949F77', '#3BBF4EEE'); // gray → green
 
   // kube proportions scaled 0.477612 (track height 32px) to match other controls;
@@ -80,7 +122,7 @@ export function glassSwitch({ on = true } = {}) {
   B.onChange(renderKnob); A.onChange(renderKnob);
   C.onChange((v) => (knob.style.background = `rgba(255,255,255,${v.toFixed(3)})`));
   T.onChange((v) => (track.style.background = trackColor(v)));
-  Q.onChange((v) => (glass.refraction = v));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
 
   const S = () => (forced || g > 0.5 ? 1 : 0);
   const sync = () => {
@@ -89,7 +131,8 @@ export function glassSwitch({ on = true } = {}) {
     C.set(1 - 0.9 * s);
     A.set(lerp(REST, ACTIVE, s));
     T.set(g > 0.5 ? (h2 > 0.5 ? 1 : 0) : f);
-    Q.set(lerp(0.4, 0.9, s));
+    applyGlassMaterial(glass, s > 0.5 ? 'optic' : 'clear');
+    Q.set(s);
     knob.style.boxShadow = SHADOW + (s > 0.5 ? INSET : '');
     el.setAttribute('aria-checked', String(f > 0.5));
   };
@@ -128,7 +171,7 @@ export function glassSlider({ value = 0.4 } = {}) {
   const thumb = h('span', { class: 'lgc-slider__thumb', tabindex: '0', role: 'slider', 'aria-valuemin': '0', 'aria-valuemax': '100' });
   const el = h('div', { class: 'lgc-slider' }, [trackEl, thumb]);
 
-  const glass = attachGlass(thumb, { surface: 'convex', radius: 'pill', bezel: 18, scaleBase: 55.9, refraction: 0.4, saturation: 7, specular: 1, blur: 0 });
+  const glass = attachGlass(thumb, { material: 'clear', surface: 'convex', radius: 'pill', bezel: 18 });
   // kube proportions scaled 0.667 to fit the UI: 220x40 rig, 60x40 convex thumb
   // on a ~9px track, shrinking to 0.6 at rest (the original aspect ratio).
   const REST = 0.6, ACTIVE = 1;
@@ -139,7 +182,7 @@ export function glassSlider({ value = 0.4 } = {}) {
   let val = clamp01(value), n = 0, grabOffset = 0;
   A.onChange((v) => (thumb.style.transform = `translateX(-50%) scale(${v.toFixed(3)})`));
   X.onChange((v) => (thumb.style.background = `rgba(255,255,255,${v.toFixed(3)})`));
-  Q.onChange((v) => (glass.refraction = v));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
 
   const PAD = 18; // thumb centre clamps 18px from each track end (27*0.667)
   const layout = () => {
@@ -154,7 +197,7 @@ export function glassSlider({ value = 0.4 } = {}) {
     layout();
   };
   const S = () => (n > 0.5 ? 1 : 0);
-  const sync = () => { const s = S(); A.set(lerp(REST, ACTIVE, s)); X.set(1 - 0.9 * s); Q.set(lerp(0.4, 0.9, s)); thumb.classList.toggle('is-active', s > 0.5); };
+  const sync = () => { const s = S(); A.set(lerp(REST, ACTIVE, s)); X.set(1 - 0.9 * s); applyGlassMaterial(glass, s > 0.5 ? 'optic' : 'clear'); Q.set(s); thumb.classList.toggle('is-active', s > 0.5); };
 
   thumb.addEventListener('pointerdown', (e) => { n = 1; const tr = thumb.getBoundingClientRect(); grabOffset = e.clientX - (tr.left + tr.width / 2); thumb.setPointerCapture(e.pointerId); sync(); });
   trackEl.addEventListener('pointerdown', (e) => { n = 1; grabOffset = 0; sync(); setFromX(e.clientX); });
@@ -180,9 +223,9 @@ export function glassLens() {
   const capsule = h('span', { class: 'lgc-lens__capsule', style: 'left:50%;top:50%;transform:translate(-50%,-50%)' });
   const stage = h('div', { class: 'lgc-lens' }, [capsule]);
 
-  const glass = attachGlass(capsule, { surface: 'convex', radius: 26, bezel: 22, scaleBase: 56, refraction: 1, saturation: 9, specular: 1, blur: 0 });
+  const glass = attachGlass(capsule, { material: 'optic', surface: 'convex', radius: 26, bezel: 22 });
 
-  const SR = spring('grab', 0.8);   // refraction
+  const SR = spring('grab', 1);     // material state
   const S = spring('jelly', 0.8);   // base press
   const A = spring('jelly', 0.8);   // scaleY
   const T = spring('jelly', 1.0);   // scaleX
@@ -193,12 +236,12 @@ export function glassLens() {
   const render = () => {
     capsule.style.transform = `translate(-50%,-50%) scaleX(${T.get().toFixed(3)}) scaleY(${A.get().toFixed(3)})`;
     capsule.style.boxShadow = `0 ${(grabbing ? 16 : 6)}px 26px rgba(0,0,0,${SA.get().toFixed(3)})`;
-    glass.refraction = SR.get();
+    applyGlassMaterial(glass, SR.get() > 0.5 ? 'optic' : 'clear');
   };
   const tick = () => {
     const grab = grabbing ? 1 : 0;
     velX *= 0.8; if (Math.abs(velX) < 1) velX = 0;
-    SR.set(grab ? 1 : 0.8);
+    SR.set(grab ? 1 : 0);
     S.set(grab ? 1 : 0.8);
     A.set(S.get() * Math.max(0.7, 1 - Math.abs(velX) / 5000));
     T.set(S.get() + (1 - A.get()));
@@ -241,12 +284,12 @@ export function glassButton({ label = 'Button', icon = null, variant = 'standard
     [icon ? fa(icon) : null, h('span', {}, label)]);
   if (variant === 'accent') return el; // accent is a solid tinted fill, no glass
 
-  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 12, refraction: 0.4, saturation: 5, specular: 1, blur: 0.3 });
+  const glass = attachGlass(el, { material: 'clear', surface: 'convex', radius: 'pill', bezel: 12 });
   const Q = spring('settle', 0.4), A = spring('snap', 1);
-  Q.onChange((v) => (glass.refraction = v));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
   A.onChange((v) => (el.style.transform = `scale(${v.toFixed(3)})`));
-  const down = () => { Q.set(0.9); A.set(0.96); el.classList.add('is-active'); };
-  const up = () => { Q.set(0.4); A.set(1); el.classList.remove('is-active'); };
+  const down = () => { applyGlassMaterial(glass, 'optic'); Q.set(1); A.set(0.96); el.classList.add('is-active'); };
+  const up = () => { applyGlassMaterial(glass, 'clear'); Q.set(0); A.set(1); el.classList.remove('is-active'); };
   el.addEventListener('pointerdown', down);
   el.addEventListener('pointerup', up);
   el.addEventListener('pointerleave', up);
@@ -256,24 +299,24 @@ export function glassButton({ label = 'Button', icon = null, variant = 'standard
 
 export function glassIconButton({ icon = 'plus', label = 'Action' } = {}) {
   const el = h('button', { class: 'lgc-iconbtn', type: 'button', 'aria-label': label }, [fa(icon)]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 14, bezel: 8, refraction: 0.4, saturation: 5, specular: 1, blur: 0.3 });
+  const glass = attachGlass(el, { material: 'clear', surface: 'convex', radius: 14, bezel: 8 });
   const Q = spring('settle', 0.4), A = spring('snap', 1);
-  Q.onChange((v) => (glass.refraction = v));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
   A.onChange((v) => (el.style.transform = `scale(${v.toFixed(3)})`));
-  el.addEventListener('pointerdown', () => { Q.set(0.9); A.set(0.92); });
-  const up = () => { Q.set(0.4); A.set(1); };
+  el.addEventListener('pointerdown', () => { applyGlassMaterial(glass, 'optic'); Q.set(1); A.set(0.92); });
+  const up = () => { applyGlassMaterial(glass, 'clear'); Q.set(0); A.set(1); };
   el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up);
   return el;
 }
 
 export function glassFab({ icon = 'plus' } = {}) {
   const el = h('button', { class: 'lgc-fab', type: 'button', 'aria-label': 'Create' }, [fa(icon)]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 12, refraction: 0.4, saturation: 6, specular: 1, blur: 0.3 });
+  const glass = attachGlass(el, { material: 'clear', surface: 'convex', radius: 'pill', bezel: 12 });
   const Q = spring('settle', 0.4), A = spring('grab', 1);
-  Q.onChange((v) => (glass.refraction = v));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
   A.onChange((v) => (el.style.transform = `scale(${v.toFixed(3)})`));
-  el.addEventListener('pointerdown', () => { Q.set(0.9); A.set(0.9); });
-  const up = () => { Q.set(0.4); A.set(1); };
+  el.addEventListener('pointerdown', () => { applyGlassMaterial(glass, 'optic'); Q.set(1); A.set(0.9); });
+  const up = () => { applyGlassMaterial(glass, 'clear'); Q.set(0); A.set(1); };
   el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up);
   return el;
 }
@@ -288,7 +331,7 @@ export function glassSegmented({ options = ['Day', 'Week', 'Month'], value = 0 }
     h('button', { class: 'lgc-seg__opt' + (i === value ? ' is-on' : ''), type: 'button', 'data-i': i }, label));
   const el = h('div', { class: 'lgc-seg', role: 'tablist' }, [indicator, ...segs]);
 
-  const glass = attachGlass(indicator, { surface: 'convex', radius: 'pill', bezel: 10, refraction: 0.4, saturation: 5, specular: 1, blur: 0.2 });
+  const glass = attachGlass(indicator, { material: 'clear', surface: 'convex', radius: 'pill', bezel: 10 });
   const X = spring('snap', value), W = spring('snap', 0), Q = spring('settle', 0.4);
   let cur = value, settleTimer = 0;
 
@@ -299,14 +342,14 @@ export function glassSegmented({ options = ['Day', 'Week', 'Month'], value = 0 }
     void target;
   };
   X.onChange(place); W.onChange(place);
-  Q.onChange((v) => (glass.refraction = v));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
 
   const moveTo = (i) => {
     cur = i;
     segs.forEach((s, k) => s.classList.toggle('is-on', k === i));
     const t = segs[i];
     X.set(t.offsetLeft); W.set(t.offsetWidth);
-    Q.set(0.9); clearTimeout(settleTimer); settleTimer = setTimeout(() => Q.set(0.4), 260);
+    applyGlassMaterial(glass, 'optic'); Q.set(1); clearTimeout(settleTimer); settleTimer = setTimeout(() => { applyGlassMaterial(glass, 'clear'); Q.set(0); }, 260);
   };
   segs.forEach((s, i) => s.addEventListener('click', () => moveTo(i)));
   const init = () => { const t = segs[cur]; X.jump(t.offsetLeft); W.jump(t.offsetWidth); place(); };
@@ -322,12 +365,12 @@ export function glassCheckbox({ checked = true } = {}) {
   const mark = fa('check', { cls: 'lgc-check__mark' });
   const box = h('span', { class: 'lgc-check__box' }, [mark]);
   const el = h('button', { class: 'lgc-check', type: 'button', role: 'checkbox', 'aria-checked': String(checked) }, [box]);
-  const glass = attachGlass(box, { surface: 'convex', radius: 8, bezel: 7, refraction: 0.4, saturation: 5, specular: 1, blur: 0.2 });
+  const glass = attachGlass(box, { material: checked ? 'optic' : 'clear', surface: 'convex', radius: 8, bezel: 7 });
   const P = spring('jelly', checked ? 1 : 0), Q = spring('settle', checked ? 0.9 : 0.4);
   P.onChange((v) => { mark.style.transform = `scale(${clamp01(v).toFixed(3)})`; mark.style.opacity = clamp01(v).toFixed(3); });
-  Q.onChange((v) => (glass.refraction = v));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
   let on = checked;
-  const set = (v) => { on = v; el.setAttribute('aria-checked', String(on)); el.classList.toggle('is-on', on); P.set(on ? 1 : 0); Q.set(on ? 0.9 : 0.4); };
+  const set = (v) => { on = v; el.setAttribute('aria-checked', String(on)); el.classList.toggle('is-on', on); applyGlassMaterial(glass, on ? 'optic' : 'clear'); P.set(on ? 1 : 0); Q.set(on ? 1 : 0); };
   set(checked);
   el.addEventListener('click', () => set(!on));
   return el;
@@ -340,12 +383,12 @@ export function glassRadio({ checked = true } = {}) {
   const dot = h('span', { class: 'lgc-radio__dot' });
   const disc = h('span', { class: 'lgc-radio__disc' }, [dot]);
   const el = h('button', { class: 'lgc-radio', type: 'button', role: 'radio', 'aria-checked': String(checked) }, [disc]);
-  const glass = attachGlass(disc, { surface: 'convex', radius: 'pill', bezel: 8, refraction: 0.4, saturation: 5, specular: 1, blur: 0.2 });
+  const glass = attachGlass(disc, { material: checked ? 'optic' : 'clear', surface: 'convex', radius: 'pill', bezel: 8 });
   const P = spring('grab', checked ? 1 : 0), Q = spring('settle', checked ? 0.9 : 0.4);
   P.onChange((v) => { dot.style.transform = `translate(-50%,-50%) scale(${clamp01(v).toFixed(3)})`; });
-  Q.onChange((v) => (glass.refraction = v));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
   let on = checked;
-  const set = (v) => { on = v; el.setAttribute('aria-checked', String(on)); el.classList.toggle('is-on', on); P.set(on ? 1 : 0); Q.set(on ? 0.9 : 0.4); };
+  const set = (v) => { on = v; el.setAttribute('aria-checked', String(on)); el.classList.toggle('is-on', on); applyGlassMaterial(glass, on ? 'optic' : 'clear'); P.set(on ? 1 : 0); Q.set(on ? 1 : 0); };
   set(checked);
   el.addEventListener('click', () => set(true));
   return el;
@@ -357,11 +400,11 @@ export function glassRadio({ checked = true } = {}) {
 export function glassSearch() {
   const input = h('input', { type: 'search', placeholder: 'Search…', 'aria-label': 'Search', autocomplete: 'off' });
   const el = h('div', { class: 'lgc-search' }, [fa('magnifying-glass', { cls: 'lgc-search__i' }), input, h('kbd', { class: 'lgc-search__kbd' }, '/')]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 14, refraction: 0.4, saturation: 4, specular: 1, blur: 1 });
+  const glass = attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 'pill', bezel: 14 });
   const Q = spring('settle', 0.4);
-  Q.onChange((v) => (glass.refraction = v));
-  input.addEventListener('focus', () => { Q.set(0.9); el.classList.add('is-focus'); });
-  input.addEventListener('blur', () => { Q.set(0.4); el.classList.remove('is-focus'); });
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'satin' : 'softFrost'));
+  input.addEventListener('focus', () => { applyGlassMaterial(glass, 'satin'); Q.set(1); el.classList.add('is-focus'); });
+  input.addEventListener('blur', () => { applyGlassMaterial(glass, 'softFrost'); Q.set(0); el.classList.remove('is-focus'); });
   return el;
 }
 
@@ -371,11 +414,11 @@ export function glassSearch() {
 export function glassChip({ label = 'Design', removable = true } = {}) {
   const el = h('button', { class: 'lgc-chip is-on', type: 'button' },
     [h('span', {}, label), removable ? fa('xmark', { cls: 'lgc-chip__x' }) : null]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 'pill', bezel: 10, refraction: 0.4, saturation: 5, specular: 1, blur: 0.4 });
+  const glass = attachGlass(el, { material: 'optic', surface: 'convex', radius: 'pill', bezel: 10 });
   const Q = spring('settle', 0.4);
-  Q.onChange((v) => (glass.refraction = v));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
   let on = true;
-  el.addEventListener('click', () => { on = !on; el.classList.toggle('is-on', on); Q.set(on ? 0.9 : 0.4); });
+  el.addEventListener('click', () => { on = !on; el.classList.toggle('is-on', on); applyGlassMaterial(glass, on ? 'optic' : 'clear'); Q.set(on ? 1 : 0); });
   return el;
 }
 
@@ -390,7 +433,7 @@ export function glassCard() {
       h('div', { class: 'lgc-card__d' }, 'A surface that refracts what is behind it.'),
     ]),
   ]);
-  attachGlass(el, { surface: 'convex', radius: 18, bezel: 16, refraction: 0.4, saturation: 5, specular: 1, blur: 2 });
+  attachGlass(el, { material: 'satin', surface: 'convex', radius: 18, bezel: 16 });
   return el;
 }
 
@@ -402,47 +445,34 @@ export function glassToast() {
     h('span', { class: 'lgc-toast__dot' }, [fa('check')]),
     h('div', {}, [h('b', {}, 'Saved'), h('div', { class: 'lgc-toast__d' }, 'Your changes are live.')]),
   ]);
-  attachGlass(el, { surface: 'convex', radius: 14, bezel: 14, refraction: 0.4, saturation: 5, specular: 1, blur: 3 });
+  attachGlass(el, { material: 'satin', surface: 'convex', radius: 14, bezel: 14 });
   return el;
 }
 
 /* ============================================================================
-   THE REST OF THE LIBRARY — every part below is built on the SAME glass
-   construction as the hero lens: one `attachGlass()` surface per part (LG-P7),
-   with only opacity / blur / refraction varied. Composite parts (modal, navbar,
-   card-likes…) are a SINGLE glass surface holding flat content — never glass
-   nested inside glass — exactly mirroring the lens.
+  THE REST OF THE LIBRARY — every part below is built on the SAME glass
+  construction as the hero lens: one `attachGlass()` surface per part (LG-P7),
+  choosing from the shared material catalog above. Composite parts (modal,
+  navbar, card-likes…) are a SINGLE glass surface holding flat content — never
+  glass nested inside glass — exactly mirroring the lens.
    ========================================================================== */
 
-/** Wrap a content node set in one glass surface. The shared engine builds the
- *  filter; only size-driven params vary. */
+/** Wrap content in one materialized glass surface. Only shape geometry varies. */
 function glassPanel(cls, kids, opts = {}) {
   const el = h('div', { class: cls }, kids);
-  attachGlass(el, {
-    surface: 'convex', radius: opts.radius ?? 18, bezel: opts.bezel ?? 16,
-    refraction: opts.refraction ?? 0.32, saturation: opts.saturation ?? 5,
-    specular: 1, blur: opts.blur ?? 2.5,
-  });
+  attachGlass(el, { material: opts.material ?? 'satin', surface: 'convex', radius: opts.radius ?? 18, bezel: opts.bezel ?? 16 });
   return el;
 }
 
 export function glassMaterialLab() {
-  const materials = [
-    { name: 'Clear', tone: 'Very transparent', cls: 'clear', blur: 0.2, refraction: 0.28, distortion: 26 },
-    { name: 'Optic', tone: 'Transparent, higher bend', cls: 'clear-strong', blur: 0.4, refraction: 0.62, distortion: 52 },
-    { name: 'Soft Frost', tone: 'Slightly frosted', cls: 'soft', blur: 2.4, refraction: 0.36, distortion: 34 },
-    { name: 'Satin', tone: 'Balanced frost', cls: 'satin', blur: 4.8, refraction: 0.44, distortion: 42 },
-    { name: 'Deep Frost', tone: 'More frosted', cls: 'deep', blur: 8.5, refraction: 0.34, distortion: 30 },
-    { name: 'Milk Glass', tone: 'Most frosted', cls: 'milk', blur: 12, refraction: 0.24, distortion: 22 },
-  ];
+  const materials = MATERIAL_NAMES.map((name) => material(name));
 
   const cards = materials.map((mat) => {
     const sample = h('div', { class: `lgc-mat__sample lgc-mat__sample--${mat.cls}` }, [
       h('div', { class: 'lgc-mat__label' }, [h('b', {}, mat.name), h('span', {}, mat.tone)]),
     ]);
     const glass = attachGlass(sample, {
-      surface: 'convex', radius: 22, bezel: 18, scaleBase: mat.distortion,
-      refraction: mat.refraction, saturation: 5, specular: 1, blur: mat.blur,
+      material: MATERIAL_NAMES.find((name) => material(name) === mat), surface: 'convex', radius: 22, bezel: 18,
     });
 
     const refValue = h('span', { class: 'lgc-mat__value' }, mat.refraction.toFixed(2));
@@ -468,20 +498,20 @@ export function glassMaterialLab() {
 export function glassInput({ value = '', placeholder = 'Jane Appleseed', icon = null } = {}) {
   const input = h('input', { type: 'text', value, placeholder, 'aria-label': placeholder, autocomplete: 'off' });
   const el = h('label', { class: 'lgc-field' }, [icon ? fa(icon, { cls: 'lgc-field__i' }) : null, input]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 12, bezel: 11, refraction: 0.35, saturation: 4, specular: 1, blur: 1 });
-  const Q = spring('settle', 0.4); Q.onChange((v) => (glass.refraction = v));
-  input.addEventListener('focus', () => { Q.set(0.85); el.classList.add('is-focus'); });
-  input.addEventListener('blur', () => { Q.set(0.4); el.classList.remove('is-focus'); });
+  const glass = attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 12, bezel: 11 });
+  const Q = spring('settle', 0); Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'satin' : 'softFrost'));
+  input.addEventListener('focus', () => { applyGlassMaterial(glass, 'satin'); Q.set(1); el.classList.add('is-focus'); });
+  input.addEventListener('blur', () => { applyGlassMaterial(glass, 'softFrost'); Q.set(0); el.classList.remove('is-focus'); });
   return el;
 }
 
 export function glassTextarea({ value = '', placeholder = 'Write a message…' } = {}) {
   const ta = h('textarea', { rows: '3', placeholder, 'aria-label': placeholder }, value);
   const el = h('div', { class: 'lgc-field lgc-field--area' }, [ta]);
-  const glass = attachGlass(el, { surface: 'convex', radius: 14, bezel: 14, refraction: 0.35, saturation: 4, specular: 1, blur: 1.5 });
-  const Q = spring('settle', 0.4); Q.onChange((v) => (glass.refraction = v));
-  ta.addEventListener('focus', () => { Q.set(0.85); el.classList.add('is-focus'); });
-  ta.addEventListener('blur', () => { Q.set(0.4); el.classList.remove('is-focus'); });
+  const glass = attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 14, bezel: 14 });
+  const Q = spring('settle', 0); Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'satin' : 'softFrost'));
+  ta.addEventListener('focus', () => { applyGlassMaterial(glass, 'satin'); Q.set(1); el.classList.add('is-focus'); });
+  ta.addEventListener('blur', () => { applyGlassMaterial(glass, 'softFrost'); Q.set(0); el.classList.remove('is-focus'); });
   return el;
 }
 
@@ -489,7 +519,7 @@ export function glassOtp({ length = 4, filled = 2 } = {}) {
   const el = h('div', { class: 'lgc-otp' });
   for (let i = 0; i < length; i++) {
     const cell = h('div', { class: 'lgc-otp__cell' + (i === filled ? ' is-active' : '') }, i < filled ? String(i + 5) : '');
-    attachGlass(cell, { surface: 'convex', radius: 10, bezel: 8, refraction: 0.4, saturation: 5, specular: 1, blur: 0.4 });
+    attachGlass(cell, { material: i === filled ? 'optic' : 'clear', surface: 'convex', radius: 10, bezel: 8 });
     el.append(cell);
   }
   return el;
@@ -500,12 +530,12 @@ export function glassTabs({ options = ['Overview', 'Specs', 'Usage'], value = 0 
   const indicator = h('span', { class: 'lgc-tabs__ind' });
   const tabs = options.map((label, i) => h('button', { class: 'lgc-tabs__t' + (i === value ? ' is-on' : ''), type: 'button' }, label));
   const el = h('div', { class: 'lgc-tabs', role: 'tablist' }, [indicator, ...tabs]);
-  const glass = attachGlass(indicator, { surface: 'convex', radius: 10, bezel: 8, refraction: 0.4, saturation: 5, specular: 1, blur: 0.3 });
+  const glass = attachGlass(indicator, { material: 'clear', surface: 'convex', radius: 10, bezel: 8 });
   const X = spring('snap', value), W = spring('snap', 0), Q = spring('settle', 0.4);
   let cur = value, timer = 0;
   const place = () => { indicator.style.transform = `translateX(${X.get()}px)`; indicator.style.width = `${W.get()}px`; };
-  X.onChange(place); W.onChange(place); Q.onChange((v) => (glass.refraction = v));
-  const moveTo = (i) => { cur = i; tabs.forEach((s, k) => s.classList.toggle('is-on', k === i)); const n = tabs[i]; X.set(n.offsetLeft); W.set(n.offsetWidth); Q.set(0.9); clearTimeout(timer); timer = setTimeout(() => Q.set(0.4), 260); };
+  X.onChange(place); W.onChange(place); Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
+  const moveTo = (i) => { cur = i; tabs.forEach((s, k) => s.classList.toggle('is-on', k === i)); const n = tabs[i]; X.set(n.offsetLeft); W.set(n.offsetWidth); applyGlassMaterial(glass, 'optic'); Q.set(1); clearTimeout(timer); timer = setTimeout(() => { applyGlassMaterial(glass, 'clear'); Q.set(0); }, 260); };
   tabs.forEach((s, i) => s.addEventListener('click', () => moveTo(i)));
   const init = () => { const n = tabs[cur]; X.jump(n.offsetLeft); W.jump(n.offsetWidth); place(); };
   new ResizeObserver(init).observe(el); requestAnimationFrame(init);
@@ -515,14 +545,14 @@ export function glassTabs({ options = ['Overview', 'Specs', 'Usage'], value = 0 
 export function glassMenu({ items = ['Duplicate', 'Rename', 'Move to…', 'Delete'], active = 0 } = {}) {
   const rows = items.map((label, i) => h('div', { class: 'lgc-menu__i' + (i === active ? ' is-on' : '') }, label));
   rows.forEach((r, i) => r.addEventListener('click', () => rows.forEach((x, k) => x.classList.toggle('is-on', k === i))));
-  return glassPanel('lgc-menu', rows, { radius: 14, bezel: 12, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-menu', rows, { material: 'satin', radius: 14, bezel: 12 });
 }
 
 export function glassPagination({ pages = ['1', '2', '3', '…', '9'], current = 1 } = {}) {
   const el = h('div', { class: 'lgc-pager' });
   const btns = pages.map((p, i) => {
     const b = h('button', { class: 'lgc-pager__b' + (i === current ? ' is-on' : '') + (p === '…' ? ' is-gap' : ''), type: 'button' }, p);
-    if (p !== '…') attachGlass(b, { surface: 'convex', radius: 10, bezel: 7, refraction: 0.4, saturation: 5, specular: 1, blur: 0.3 });
+    if (p !== '…') attachGlass(b, { material: i === current ? 'optic' : 'clear', surface: 'convex', radius: 10, bezel: 7 });
     el.append(b); return b;
   });
   btns.forEach((b, i) => { if (pages[i] !== '…') b.addEventListener('click', () => btns.forEach((x, k) => x.classList.toggle('is-on', k === i && pages[k] !== '…'))); });
@@ -531,7 +561,7 @@ export function glassPagination({ pages = ['1', '2', '3', '…', '9'], current =
 
 /* --- Components: disclosure & feedback ----------------------------------- */
 export function glassTooltip({ text = 'Copied to clipboard' } = {}) {
-  return glassPanel('lgc-tooltip', [h('span', {}, text)], { radius: 10, bezel: 9, blur: 2, refraction: 0.4, saturation: 6 });
+  return glassPanel('lgc-tooltip', [h('span', {}, text)], { material: 'softFrost', radius: 10, bezel: 9 });
 }
 
 export function glassAccordion({ items = [['Getting started', true], ['Theming', false], ['Motion', false]] } = {}) {
@@ -543,7 +573,7 @@ export function glassAccordion({ items = [['Getting started', true], ['Theming',
     head.addEventListener('click', () => { const isOpen = row.classList.toggle('is-open'); ico.className = `fa-solid fa-${isOpen ? 'minus' : 'plus'} lgc-acc__i`; });
     return row;
   });
-  return glassPanel('lgc-acc', rows, { radius: 14, bezel: 12, blur: 2.5, refraction: 0.3 });
+  return glassPanel('lgc-acc', rows, { material: 'satin', radius: 14, bezel: 12 });
 }
 
 /* --- Components: data display -------------------------------------------- */
@@ -552,7 +582,7 @@ export function glassStat({ label = 'Revenue', value = '$48.2k', delta = '12.4%'
     h('div', { class: 'lgc-stat__l' }, label),
     h('div', { class: 'lgc-stat__n' }, value),
     h('div', { class: 'lgc-stat__d' }, [fa('arrow-trend-up'), h('span', {}, delta)]),
-  ], { radius: 16, bezel: 14, blur: 2.5, refraction: 0.35 });
+  ], { material: 'satin', radius: 16, bezel: 14 });
 }
 
 export function glassList({ items = [['inbox', 'Inbox', '24'], ['file-lines', 'Drafts', '3'], ['paper-plane', 'Sent', '']] } = {}) {
@@ -561,13 +591,13 @@ export function glassList({ items = [['inbox', 'Inbox', '24'], ['file-lines', 'D
     h('span', { class: 'lgc-list__t' }, label),
     n ? h('span', { class: 'lgc-list__n' }, n) : null,
   ]));
-  return glassPanel('lgc-list', rows, { radius: 14, bezel: 12, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-list', rows, { material: 'satin', radius: 14, bezel: 12 });
 }
 
 export function glassTable({ head = ['Name', 'Role', 'Status'], rows = [['Jane A.', 'Owner', 'Active'], ['Milo K.', 'Editor', 'Active'], ['Sora P.', 'Viewer', 'Away']] } = {}) {
   const mkRow = (cells, cls = '') => h('div', { class: 'lgc-tbl__r' + cls }, cells.map((c) => h('span', {}, c)));
   const body = [mkRow(head, ' lgc-tbl__r--h'), ...rows.map((r) => mkRow(r))];
-  return glassPanel('lgc-tbl', body, { radius: 16, bezel: 14, blur: 2.5, refraction: 0.3 });
+  return glassPanel('lgc-tbl', body, { material: 'satin', radius: 16, bezel: 14 });
 }
 
 export function glassFormField({ label = 'Email', help = "We'll never share it.", icon = 'envelope' } = {}) {
@@ -586,13 +616,13 @@ export function glassNavbar() {
     h('span', { class: 'lgc-nav__cta' }, 'Sign in'),
     h('span', { class: 'lgc-nav__avatar' }, 'JA'),
   ]);
-  return glassPanel('lgc-nav', [inner], { radius: 16, bezel: 12, blur: 2, refraction: 0.3 });
+  return glassPanel('lgc-nav', [inner], { material: 'satin', radius: 16, bezel: 12 });
 }
 
 export function glassSidebar({ items = [['gauge', 'Dashboard'], ['folder', 'Projects'], ['chart-simple', 'Reports'], ['gear', 'Settings']], active = 0 } = {}) {
   const rows = items.map(([icon, label], i) => h('div', { class: 'lgc-side__i' + (i === active ? ' is-on' : '') }, [h('span', { class: 'lgc-side__ic' }, [fa(icon)]), h('span', {}, label)]));
   rows.forEach((r, i) => r.addEventListener('click', () => rows.forEach((x, k) => x.classList.toggle('is-on', k === i))));
-  return glassPanel('lgc-side', rows, { radius: 16, bezel: 13, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-side', rows, { material: 'satin', radius: 16, bezel: 13 });
 }
 
 export function glassToolbar() {
@@ -602,14 +632,14 @@ export function glassToolbar() {
     h('span', { class: 'lgc-tool__sep' }),
     mk('<i class="fa-solid fa-align-left"></i>'), mk('<i class="fa-solid fa-list-ul"></i>'), mk('<i class="fa-solid fa-link"></i>'),
   ]);
-  return glassPanel('lgc-tool', [inner], { radius: 14, bezel: 11, blur: 2, refraction: 0.3 });
+  return glassPanel('lgc-tool', [inner], { material: 'satin', radius: 14, bezel: 11 });
 }
 
 export function glassCommandPalette() {
   const field = h('div', { class: 'lgc-cmd__field' }, [fa('magnifying-glass', { cls: 'lgc-cmd__si' }), h('span', { class: 'lgc-cmd__sp' }, 'Type a command…'), h('kbd', {}, '⌘K')]);
   const rows = [['arrow-right', 'New file', '⌘N', true], ['gear', 'Open settings', '⌘,', false], ['user-plus', 'Invite teammate', '', false]].map(([icon, label, kbd, on]) =>
     h('div', { class: 'lgc-cmd__i' + (on ? ' is-on' : '') }, [h('span', { class: 'lgc-cmd__ic' }, [fa(icon)]), h('span', { class: 'lgc-cmd__t' }, label), kbd ? h('kbd', {}, kbd) : null]));
-  return glassPanel('lgc-cmd', [field, ...rows], { radius: 18, bezel: 14, blur: 4, refraction: 0.3 });
+  return glassPanel('lgc-cmd', [field, ...rows], { material: 'deepFrost', radius: 18, bezel: 14 });
 }
 
 /* --- Compounds: overlays & flows ----------------------------------------- */
@@ -623,7 +653,7 @@ export function glassModal() {
       h('button', { class: 'lgc-modal__btn lgc-modal__btn--danger', type: 'button' }, 'Delete'),
     ]),
   ]);
-  return glassPanel('lgc-modal', [inner], { radius: 20, bezel: 16, blur: 4, refraction: 0.3 });
+  return glassPanel('lgc-modal', [inner], { material: 'deepFrost', radius: 20, bezel: 16 });
 }
 
 export function glassAuthForm() {
@@ -634,7 +664,7 @@ export function glassAuthForm() {
     h('div', { class: 'lgc-auth__f' }, [fa('lock'), h('span', {}, '••••••••')]),
     h('button', { class: 'lgc-auth__cta', type: 'button' }, 'Continue'),
   ]);
-  return glassPanel('lgc-auth', [inner], { radius: 20, bezel: 16, blur: 4, refraction: 0.3 });
+  return glassPanel('lgc-auth', [inner], { material: 'deepFrost', radius: 20, bezel: 16 });
 }
 
 export function glassDatePicker() {
@@ -646,7 +676,7 @@ export function glassDatePicker() {
     d.addEventListener('click', () => { grid.querySelectorAll('.is-on').forEach((x) => x.classList.remove('is-on')); d.classList.add('is-on'); });
     grid.append(d);
   }
-  return glassPanel('lgc-cal', [head, dow, grid], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-cal', [head, dow, grid], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 /* --- Compounds: communication & media ------------------------------------ */
@@ -665,12 +695,12 @@ export function glassMediaPlayer() {
     ]),
     bar,
   ]);
-  return glassPanel('lgc-media', [inner], { radius: 16, bezel: 13, blur: 2.5, refraction: 0.3 });
+  return glassPanel('lgc-media', [inner], { material: 'satin', radius: 16, bezel: 13 });
 }
 
 export function glassChat() {
   const them = h('div', { class: 'lgc-chat__b lgc-chat__b--them' }, 'Ready to ship the glass build?');
-  attachGlass(them, { surface: 'convex', radius: 16, bezel: 12, refraction: 0.35, saturation: 5, specular: 1, blur: 1.5 });
+  attachGlass(them, { material: 'softFrost', surface: 'convex', radius: 16, bezel: 12 });
   const me = h('div', { class: 'lgc-chat__b lgc-chat__b--me' }, 'Shipping now 🚀');
   return h('div', { class: 'lgc-chat' }, [them, me]);
 }
@@ -685,7 +715,7 @@ export function glassProductCard() {
       h('div', { class: 'lgc-prod__row' }, [h('b', {}, '$129'), h('span', { class: 'lgc-prod__add' }, [fa('plus'), h('span', {}, 'Add')])]),
     ]),
   ]);
-  return glassPanel('lgc-prod', [inner], { radius: 18, bezel: 16, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-prod', [inner], { material: 'satin', radius: 18, bezel: 16 });
 }
 
 export function glassPricing() {
@@ -696,7 +726,7 @@ export function glassPricing() {
       h('ul', { class: 'lgc-price__f' }, feats.map((f) => h('li', {}, [fa('check'), h('span', {}, f)]))),
       h('span', { class: 'lgc-price__cta' + (hot ? ' is-hot' : '') }, 'Choose'),
     ]);
-    return glassPanel('lgc-price' + (hot ? ' is-hot' : ''), [inner], { radius: 18, bezel: 15, blur: 3, refraction: 0.3 });
+    return glassPanel('lgc-price' + (hot ? ' is-hot' : ''), [inner], { material: hot ? 'deepFrost' : 'satin', radius: 18, bezel: 15 });
   };
   return h('div', { class: 'lgc-price-row' }, [
     plan('Free', '$0', ['1 project', 'Community support'], false),
@@ -731,7 +761,7 @@ function inlineSteps(steps, current) {
 /* --- Elements: more actions & entry -------------------------------------- */
 export function glassToggleButton({ label = 'Bold', icon = 'bold', on = true } = {}) {
   const b = h('button', { class: 'lgc-tglbtn' + (on ? ' is-on' : ''), type: 'button' }, [fa(icon), h('span', {}, label)]);
-  attachGlass(b, { surface: 'convex', radius: 12, bezel: 10, refraction: 0.38, saturation: 5, specular: 1, blur: 0.6 });
+  attachGlass(b, { material: on ? 'optic' : 'clear', surface: 'convex', radius: 12, bezel: 10 });
   b.addEventListener('click', () => b.classList.toggle('is-on'));
   return b;
 }
@@ -742,7 +772,7 @@ export function glassSplitButton({ label = 'Save' } = {}) {
     h('span', { class: 'lgc-split__sep' }),
     h('button', { class: 'lgc-split__caret', type: 'button' }, [fa('chevron-down')]),
   ]);
-  attachGlass(el, { surface: 'convex', radius: 12, bezel: 10, refraction: 0.36, saturation: 5, specular: 1, blur: 0.6 });
+  attachGlass(el, { material: 'clear', surface: 'convex', radius: 12, bezel: 10 });
   return el;
 }
 
@@ -754,7 +784,7 @@ export function glassStepper({ value = 3, min = 0, max = 99 } = {}) {
   dec.addEventListener('click', () => { v = Math.max(min, v - 1); out.textContent = String(v); });
   inc.addEventListener('click', () => { v = Math.min(max, v + 1); out.textContent = String(v); });
   const el = h('div', { class: 'lgc-step' }, [dec, out, inc]);
-  attachGlass(el, { surface: 'convex', radius: 12, bezel: 10, refraction: 0.36, saturation: 5, specular: 1, blur: 0.6 });
+  attachGlass(el, { material: 'clear', surface: 'convex', radius: 12, bezel: 10 });
   return el;
 }
 
@@ -765,7 +795,7 @@ export function glassPassword({ value = 'secret123' } = {}) {
   let shown = false;
   toggle.addEventListener('click', () => { shown = !shown; input.type = shown ? 'text' : 'password'; eye.className = `fa-solid fa-${shown ? 'eye-slash' : 'eye'} lgc-field__i lgc-field__i--btn`; });
   const el = h('label', { class: 'lgc-field lgc-field--pass' }, [fa('lock', { cls: 'lgc-field__i' }), input, toggle]);
-  attachGlass(el, { surface: 'convex', radius: 12, bezel: 11, refraction: 0.35, saturation: 4, specular: 1, blur: 1 });
+  attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 12, bezel: 11 });
   return el;
 }
 
@@ -773,19 +803,19 @@ export function glassTagInput({ tags = ['design', 'glass'] } = {}) {
   const chips = tags.map((t) => h('span', { class: 'lgc-taginput__chip' }, [h('span', {}, t), fa('xmark')]));
   const input = h('input', { type: 'text', placeholder: 'Add tag…', 'aria-label': 'Add tag' });
   const el = h('div', { class: 'lgc-field lgc-taginput' }, [...chips, input]);
-  attachGlass(el, { surface: 'convex', radius: 12, bezel: 11, refraction: 0.35, saturation: 4, specular: 1, blur: 1 });
+  attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 12, bezel: 11 });
   return el;
 }
 
 export function glassSelect({ value = 'Medium' } = {}) {
   const el = h('button', { class: 'lgc-field lgc-select', type: 'button' }, [h('span', { class: 'lgc-select__v' }, value), fa('chevron-down', { cls: 'lgc-select__c' })]);
-  attachGlass(el, { surface: 'convex', radius: 12, bezel: 11, refraction: 0.35, saturation: 4, specular: 1, blur: 1 });
+  attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 12, bezel: 11 });
   return el;
 }
 
 export function glassFileInput() {
   const el = h('button', { class: 'lgc-fileinput', type: 'button' }, [fa('arrow-up-from-bracket'), h('span', {}, 'Choose file')]);
-  attachGlass(el, { surface: 'convex', radius: 12, bezel: 11, refraction: 0.36, saturation: 5, specular: 1, blur: 0.8 });
+  attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 12, bezel: 11 });
   return el;
 }
 
@@ -797,22 +827,22 @@ export function glassRating({ value = 3, max = 5 } = {}) {
     s.addEventListener('click', () => stars.forEach((x, k) => x.classList.toggle('is-on', k <= i)));
     stars.push(s); el.append(s);
   }
-  attachGlass(el, { surface: 'convex', radius: 999, bezel: 10, refraction: 0.36, saturation: 5, specular: 1, blur: 0.6 });
+  attachGlass(el, { material: 'clear', surface: 'convex', radius: 999, bezel: 10 });
   return el;
 }
 
 export function glassButtonGroup({ options = ['List', 'Board', 'Calendar'], value = 1 } = {}) {
   const el = h('div', { class: 'lgc-bg' });
   const btns = options.map((t, i) => { const b = h('button', { class: 'lgc-bg__b' + (i === value ? ' is-on' : ''), type: 'button' }, t); b.addEventListener('click', () => btns.forEach((x, k) => x.classList.toggle('is-on', k === i))); el.append(b); return b; });
-  attachGlass(el, { surface: 'convex', radius: 12, bezel: 10, refraction: 0.36, saturation: 5, specular: 1, blur: 0.6 });
+  attachGlass(el, { material: 'clear', surface: 'convex', radius: 12, bezel: 10 });
   return el;
 }
 
 /* --- Components: forms & navigation -------------------------------------- */
 export function glassCombobox({ value = 'Glass', items = ['Glass', 'Gradient', 'Grid', 'Grain'] } = {}) {
   const field = h('label', { class: 'lgc-field' }, [fa('magnifying-glass', { cls: 'lgc-field__i' }), h('input', { type: 'text', value, 'aria-label': 'Combobox' })]);
-  attachGlass(field, { surface: 'convex', radius: 12, bezel: 11, refraction: 0.35, saturation: 4, specular: 1, blur: 1 });
-  const list = glassPanel('lgc-combo__list', items.map((t, i) => h('div', { class: 'lgc-combo__i' + (i === 0 ? ' is-on' : '') }, t)), { radius: 12, bezel: 11, blur: 3, refraction: 0.3 });
+  attachGlass(field, { material: 'softFrost', surface: 'convex', radius: 12, bezel: 11 });
+  const list = glassPanel('lgc-combo__list', items.map((t, i) => h('div', { class: 'lgc-combo__i' + (i === 0 ? ' is-on' : '') }, t)), { material: 'satin', radius: 12, bezel: 11 });
   return h('div', { class: 'lgc-combo' }, [field, list]);
 }
 
@@ -822,34 +852,34 @@ export function glassAutocomplete() {
 
 export function glassRadioGroup({ options = ['Light', 'Dark', 'Auto'], value = 1 } = {}) {
   const rows = options.map((label, i) => { const r = h('label', { class: 'lgc-rg__i' + (i === value ? ' is-on' : '') }, [h('span', { class: 'lgc-rg__dot' }), h('span', {}, label)]); return r; });
-  const group = glassPanel('lgc-rg', rows, { radius: 14, bezel: 12, blur: 2.5, refraction: 0.3 });
+  const group = glassPanel('lgc-rg', rows, { material: 'satin', radius: 14, bezel: 12 });
   rows.forEach((r, i) => r.addEventListener('click', () => rows.forEach((x, k) => x.classList.toggle('is-on', k === i))));
   return group;
 }
 
 export function glassInputGroup({ value = 'mysite' } = {}) {
   const el = h('div', { class: 'lgc-field lgc-ig' }, [h('span', { class: 'lgc-ig__addon' }, 'https://'), h('input', { type: 'text', value, 'aria-label': 'Domain' }), h('span', { class: 'lgc-ig__addon' }, '.com')]);
-  attachGlass(el, { surface: 'convex', radius: 12, bezel: 11, refraction: 0.35, saturation: 4, specular: 1, blur: 1 });
+  attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 12, bezel: 11 });
   return el;
 }
 
 export function glassBreadcrumb({ items = ['Home', 'Components', 'Button'] } = {}) {
   const kids = [];
   items.forEach((t, i) => { kids.push(h('a', { class: 'lgc-crumb__a' + (i === items.length - 1 ? ' is-cur' : ''), href: '#' }, t)); if (i < items.length - 1) kids.push(fa('chevron-right', { cls: 'lgc-crumb__s' })); });
-  return glassPanel('lgc-crumb', [h('div', { class: 'lgc-crumb__in' }, kids)], { radius: 999, bezel: 10, blur: 2, refraction: 0.32 });
+  return glassPanel('lgc-crumb', [h('div', { class: 'lgc-crumb__in' }, kids)], { material: 'softFrost', radius: 999, bezel: 10 });
 }
 
 export function glassDropdown({ label = 'Options', items = ['Edit', 'Duplicate', 'Archive', 'Delete'] } = {}) {
   const trigger = h('button', { class: 'lgc-dd__trigger', type: 'button' }, [h('span', {}, label), fa('chevron-down')]);
-  attachGlass(trigger, { surface: 'convex', radius: 12, bezel: 10, refraction: 0.36, saturation: 5, specular: 1, blur: 0.6 });
+  attachGlass(trigger, { material: 'clear', surface: 'convex', radius: 12, bezel: 10 });
   const rows = items.map((t, i) => h('div', { class: 'lgc-dd__i' + (i === 0 ? ' is-on' : '') }, t));
-  const menu = glassPanel('lgc-dd__menu', rows, { radius: 12, bezel: 11, blur: 3, refraction: 0.3 });
+  const menu = glassPanel('lgc-dd__menu', rows, { material: 'satin', radius: 12, bezel: 11 });
   rows.forEach((r, i) => r.addEventListener('click', () => rows.forEach((x, k) => x.classList.toggle('is-on', k === i))));
   return h('div', { class: 'lgc-dd' }, [trigger, menu]);
 }
 
 export function glassSteps({ steps = ['Cart', 'Address', 'Payment', 'Review'], current = 1 } = {}) {
-  return glassPanel('lgc-steps', [inlineSteps(steps, current)], { radius: 16, bezel: 13, blur: 2.5, refraction: 0.3 });
+  return glassPanel('lgc-steps', [inlineSteps(steps, current)], { material: 'satin', radius: 16, bezel: 13 });
 }
 
 export function glassPopover() {
@@ -858,7 +888,7 @@ export function glassPopover() {
     h('div', { class: 'lgc-pop__d' }, 'Anyone with the link can view this project.'),
     h('div', { class: 'lgc-pop__row' }, [h('span', { class: 'lgc-pop__link' }, 'studio.co/p/9f2'), h('button', { class: 'lgc-pop__btn', type: 'button' }, 'Copy')]),
   ]);
-  return glassPanel('lgc-pop', [inner], { radius: 16, bezel: 13, blur: 3.5, refraction: 0.3 });
+  return glassPanel('lgc-pop', [inner], { material: 'deepFrost', radius: 16, bezel: 13 });
 }
 
 export function glassTree() {
@@ -873,7 +903,7 @@ export function glassTree() {
     node('Card.tsx', 2, {}),
     node('index.ts', 1, {}),
   ];
-  return glassPanel('lgc-tree', rows, { radius: 14, bezel: 12, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-tree', rows, { material: 'satin', radius: 14, bezel: 12 });
 }
 
 export function glassBanner({ text = 'A new version of the editor is available.', action = 'Refresh' } = {}) {
@@ -883,7 +913,7 @@ export function glassBanner({ text = 'A new version of the editor is available.'
     h('button', { class: 'lgc-banner__btn', type: 'button' }, action),
     h('button', { class: 'lgc-banner__x', type: 'button' }, [fa('xmark')]),
   ]);
-  return glassPanel('lgc-banner', [inner], { radius: 14, bezel: 12, blur: 2.5, refraction: 0.3 });
+  return glassPanel('lgc-banner', [inner], { material: 'satin', radius: 14, bezel: 12 });
 }
 
 export function glassEmptyState() {
@@ -893,24 +923,24 @@ export function glassEmptyState() {
     h('div', { class: 'lgc-empty__d' }, 'Create your first project to get started.'),
     h('button', { class: 'lgc-empty__cta', type: 'button' }, [fa('plus'), h('span', {}, 'New project')]),
   ]);
-  return glassPanel('lgc-empty', [inner], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-empty', [inner], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 export function glassLoading() {
   const inner = h('div', { class: 'lgc-loading__in' }, [h('span', { class: 'lgc-loading__spin' }), h('span', { class: 'lgc-loading__t' }, 'Loading…')]);
-  return glassPanel('lgc-loading', [inner], { radius: 16, bezel: 13, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-loading', [inner], { material: 'satin', radius: 16, bezel: 13 });
 }
 
 export function glassTimeline({ items = [['Created', '2:14 PM'], ['Reviewed', '3:02 PM'], ['Shipped', '4:20 PM']] } = {}) {
   const rows = items.map(([t, time], i) => h('div', { class: 'lgc-tl__i' }, [h('span', { class: 'lgc-tl__node' + (i === 0 ? ' is-on' : '') }), h('div', { class: 'lgc-tl__b' }, [h('b', {}, t), h('span', {}, time)])]));
-  return glassPanel('lgc-tl', rows, { radius: 16, bezel: 13, blur: 2.5, refraction: 0.3 });
+  return glassPanel('lgc-tl', rows, { material: 'satin', radius: 16, bezel: 13 });
 }
 
 export function glassQuantity({ value = 2 } = {}) { return glassStepper({ value }); }
 
 export function glassMediaObject() {
   const inner = h('div', { class: 'lgc-mo__in' }, [h('span', { class: 'lgc-mo__media' }), h('div', { class: 'lgc-mo__b' }, [h('b', {}, 'Weekly digest'), h('span', {}, 'A summary of activity across your workspace, delivered every Monday.')])]);
-  return glassPanel('lgc-mo', [inner], { radius: 16, bezel: 13, blur: 2.5, refraction: 0.3 });
+  return glassPanel('lgc-mo', [inner], { material: 'satin', radius: 16, bezel: 13 });
 }
 
 /* --- Compounds: chrome, overlays, flows, data, media, commerce ----------- */
@@ -919,7 +949,7 @@ export function glassPageHeader() {
     h('div', { class: 'lgc-ph__l' }, [h('div', { class: 'lgc-ph__t' }, 'Projects'), h('div', { class: 'lgc-ph__d' }, '12 active · 3 archived')]),
     h('div', { class: 'lgc-ph__a' }, [h('button', { class: 'lgc-ph__btn', type: 'button' }, 'Filter'), h('button', { class: 'lgc-ph__btn lgc-ph__btn--p', type: 'button' }, [fa('plus'), h('span', {}, 'New')])]),
   ]);
-  return glassPanel('lgc-ph', [inner], { radius: 16, bezel: 13, blur: 2.5, refraction: 0.3 });
+  return glassPanel('lgc-ph', [inner], { material: 'satin', radius: 16, bezel: 13 });
 }
 
 export function glassFooter() {
@@ -928,7 +958,7 @@ export function glassFooter() {
     h('div', { class: 'lgc-foot__brand' }, [h('span', { class: 'lgc-foot__dot' }), h('b', {}, 'Studio')]),
     col('Product', ['Features', 'Pricing']), col('Company', ['About', 'Blog']), col('Legal', ['Terms', 'Privacy']),
   ]);
-  return glassPanel('lgc-foot', [inner], { radius: 16, bezel: 13, blur: 2.5, refraction: 0.3 });
+  return glassPanel('lgc-foot', [inner], { material: 'satin', radius: 16, bezel: 13 });
 }
 
 export function glassDrawer() {
@@ -937,7 +967,7 @@ export function glassDrawer() {
     ...['Status', 'Owner', 'Date range', 'Tags'].map((t) => h('div', { class: 'lgc-drawer__row' }, [h('span', {}, t), fa('chevron-right')])),
     h('button', { class: 'lgc-drawer__cta', type: 'button' }, 'Apply filters'),
   ]);
-  return glassPanel('lgc-drawer', [inner], { radius: 18, bezel: 14, blur: 4, refraction: 0.3 });
+  return glassPanel('lgc-drawer', [inner], { material: 'deepFrost', radius: 18, bezel: 14 });
 }
 
 export function glassNotifications() {
@@ -946,7 +976,7 @@ export function glassNotifications() {
     h('div', { class: 'lgc-notif__h' }, [h('b', {}, 'Notifications'), h('span', { class: 'lgc-notif__clear' }, 'Mark all read')]),
     item('user-plus', 'Milo joined the team', '2m'), item('comment', 'New comment on Aurora', '18m'), item('circle-check', 'Deploy succeeded', '1h'),
   ]);
-  return glassPanel('lgc-notif', [inner], { radius: 18, bezel: 14, blur: 4, refraction: 0.3 });
+  return glassPanel('lgc-notif', [inner], { material: 'deepFrost', radius: 18, bezel: 14 });
 }
 
 export function glassCoachmark() {
@@ -955,7 +985,7 @@ export function glassCoachmark() {
     h('div', { class: 'lgc-coach__d' }, 'Press ⌘K anywhere to open the command palette.'),
     h('div', { class: 'lgc-coach__row' }, [h('span', { class: 'lgc-coach__dots' }, '● ○ ○'), h('button', { class: 'lgc-coach__btn', type: 'button' }, 'Next')]),
   ]);
-  return glassPanel('lgc-coach', [inner], { radius: 16, bezel: 13, blur: 3.5, refraction: 0.3 });
+  return glassPanel('lgc-coach', [inner], { material: 'deepFrost', radius: 16, bezel: 13 });
 }
 
 export function glassForm() {
@@ -966,7 +996,7 @@ export function glassForm() {
     field('Email', 'jane@studio.co', 'envelope'),
     h('div', { class: 'lgc-form__row' }, [h('button', { class: 'lgc-form__btn', type: 'button' }, 'Cancel'), h('button', { class: 'lgc-form__btn lgc-form__btn--p', type: 'button' }, 'Save changes')]),
   ]);
-  return glassPanel('lgc-form', [inner], { radius: 18, bezel: 15, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-form', [inner], { material: 'satin', radius: 18, bezel: 15 });
 }
 
 export function glassWizard() {
@@ -976,7 +1006,7 @@ export function glassWizard() {
     h('div', { class: 'lgc-wiz__d' }, 'Give your project a name and a short description.'),
     h('div', { class: 'lgc-wiz__row' }, [h('button', { class: 'lgc-wiz__btn', type: 'button' }, 'Back'), h('button', { class: 'lgc-wiz__btn lgc-wiz__btn--p', type: 'button' }, 'Continue')]),
   ]);
-  return glassPanel('lgc-wiz', [inner], { radius: 18, bezel: 15, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-wiz', [inner], { material: 'satin', radius: 18, bezel: 15 });
 }
 
 export function glassUploader() {
@@ -986,7 +1016,7 @@ export function glassUploader() {
     h('div', { class: 'lgc-upl__d' }, 'or click to browse · PNG, JPG up to 10MB'),
     h('div', { class: 'lgc-upl__file' }, [fa('file-image'), h('span', { class: 'lgc-upl__fn' }, 'hero.png'), h('span', { class: 'lgc-upl__bar' }, [h('span', { class: 'lgc-upl__fill' })])]),
   ]);
-  return glassPanel('lgc-upl', [inner], { radius: 18, bezel: 14, blur: 3.5, refraction: 0.3 });
+  return glassPanel('lgc-upl', [inner], { material: 'deepFrost', radius: 18, bezel: 14 });
 }
 
 export function glassEditor() {
@@ -995,7 +1025,7 @@ export function glassEditor() {
     h('div', { class: 'lgc-ed__bar' }, [tb('<b>B</b>', true), tb('<i>I</i>'), tb('<span style="text-decoration:underline">U</span>'), h('span', { class: 'lgc-ed__sep' }), tb('<i class="fa-solid fa-list-ul"></i>'), tb('<i class="fa-solid fa-quote-right"></i>'), tb('<i class="fa-solid fa-code"></i>')]),
     h('div', { class: 'lgc-ed__body' }, [h('b', {}, 'Release notes'), h('p', {}, 'The new glass engine ships a crisp specular rim and faster displacement maps.')]),
   ]);
-  return glassPanel('lgc-ed', [inner], { radius: 16, bezel: 13, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-ed', [inner], { material: 'satin', radius: 16, bezel: 13 });
 }
 
 export function glassSettings() {
@@ -1006,7 +1036,7 @@ export function glassSettings() {
     row('Notifications', 'Email me about activity', false),
     row('Compact density', 'Tighter spacing', true),
   ]);
-  return glassPanel('lgc-set', [inner], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-set', [inner], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 export function glassDataGrid() {
@@ -1019,7 +1049,7 @@ export function glassChartCard() {
     h('div', { class: 'lgc-chart__h' }, [h('div', {}, [h('b', {}, 'Revenue'), h('span', { class: 'lgc-chart__sub' }, 'Last 7 days')]), h('span', { class: 'lgc-chart__delta' }, [fa('arrow-trend-up'), h('span', {}, '18%')])]),
     h('div', { class: 'lgc-chart__bars' }, bars.map((v, i) => h('span', { class: 'lgc-chart__bar' + (i === 5 ? ' is-on' : ''), style: `height:${v}%` }))),
   ]);
-  return glassPanel('lgc-chart', [inner], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-chart', [inner], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 export function glassScheduler() {
@@ -1030,13 +1060,13 @@ export function glassScheduler() {
     h('div', { class: 'lgc-sch__h' }, [h('b', {}, 'June 15 – 19'), h('span', { class: 'lgc-sch__nav' }, [fa('chevron-left'), fa('chevron-right')])]),
     h('div', { class: 'lgc-sch__grid' }, cols),
   ]);
-  return glassPanel('lgc-sch', [inner], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-sch', [inner], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 export function glassKanban() {
   const col = (title, cards) => h('div', { class: 'lgc-kan__col' }, [h('div', { class: 'lgc-kan__ct' }, [h('span', {}, title), h('span', { class: 'lgc-kan__cn' }, String(cards.length))]), ...cards.map((c) => h('div', { class: 'lgc-kan__card' }, c))]);
   const inner = h('div', { class: 'lgc-kan__in' }, [col('To do', ['Design rim', 'Spec maps']), col('Doing', ['Build engine']), col('Done', ['Hero lens'])]);
-  return glassPanel('lgc-kan', [inner], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-kan', [inner], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 export function glassFacets() {
@@ -1045,24 +1075,24 @@ export function glassFacets() {
     h('div', { class: 'lgc-fac__chips' }, [h('span', { class: 'lgc-fac__chip' }, ['Active', fa('xmark')]), h('span', { class: 'lgc-fac__chip' }, ['Glass', fa('xmark')])]),
     group('Status', [['Active', true], ['Archived', false]]), group('Type', [['Public', true], ['Private', false]]),
   ]);
-  return glassPanel('lgc-fac', [inner], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-fac', [inner], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 export function glassComments() {
   const c = (initials, name, time, text, depth) => h('div', { class: 'lgc-cmt__i', style: `margin-left:${depth * 22}px` }, [h('span', { class: 'lgc-cmt__av' }, initials), h('div', { class: 'lgc-cmt__b' }, [h('div', { class: 'lgc-cmt__meta' }, [h('b', {}, name), h('span', {}, time)]), h('p', {}, text)])]);
   const inner = h('div', { class: 'lgc-cmt__in' }, [c('JA', 'Jane', '2m', 'Love the new specular rim — looks crisp!', 0), c('MK', 'Milo', '1m', 'Agreed, the directional highlight is perfect.', 1)]);
-  return glassPanel('lgc-cmt', [inner], { radius: 16, bezel: 13, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-cmt', [inner], { material: 'satin', radius: 16, bezel: 13 });
 }
 
 export function glassGallery() {
   const inner = h('div', { class: 'lgc-gal__in' }, Array.from({ length: 6 }, (_, i) => h('span', { class: 'lgc-gal__t lgc-gal__t--' + (i % 3) })));
-  return glassPanel('lgc-gal', [inner], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-gal', [inner], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 export function glassCarousel() {
   const inner = h('div', { class: 'lgc-car__in' }, [h('button', { class: 'lgc-car__nav', type: 'button' }, [fa('chevron-left')]), h('span', { class: 'lgc-car__slide' }), h('button', { class: 'lgc-car__nav', type: 'button' }, [fa('chevron-right')])]);
   const dots = h('div', { class: 'lgc-car__dots' }, [0, 1, 2].map((i) => h('span', { class: 'lgc-car__dot' + (i === 0 ? ' is-on' : '') })));
-  return glassPanel('lgc-car', [inner, dots], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-car', [inner, dots], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 export function glassProfileCard() {
@@ -1073,7 +1103,7 @@ export function glassProfileCard() {
     h('div', { class: 'lgc-prof__stats' }, [['128', 'Posts'], ['8.4k', 'Followers'], ['312', 'Following']].map(([n, l]) => h('div', {}, [h('b', {}, n), h('span', {}, l)]))),
     h('div', { class: 'lgc-prof__row' }, [h('button', { class: 'lgc-prof__btn lgc-prof__btn--p', type: 'button' }, 'Follow'), h('button', { class: 'lgc-prof__btn', type: 'button' }, 'Message')]),
   ]);
-  return glassPanel('lgc-prof', [inner], { radius: 18, bezel: 15, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-prof', [inner], { material: 'satin', radius: 18, bezel: 15 });
 }
 
 export function glassCart() {
@@ -1084,7 +1114,7 @@ export function glassCart() {
     h('div', { class: 'lgc-cart__total' }, [h('span', {}, 'Total'), h('b', {}, '$177')]),
     h('button', { class: 'lgc-cart__cta', type: 'button' }, 'Checkout'),
   ]);
-  return glassPanel('lgc-cart', [inner], { radius: 18, bezel: 14, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-cart', [inner], { material: 'satin', radius: 18, bezel: 14 });
 }
 
 export function glassCheckout() {
@@ -1096,7 +1126,7 @@ export function glassCheckout() {
     h('div', { class: 'lgc-co__total' }, [h('span', {}, 'Total due'), h('b', {}, '$177')]),
     h('button', { class: 'lgc-co__cta', type: 'button' }, 'Pay $177'),
   ]);
-  return glassPanel('lgc-co', [inner], { radius: 18, bezel: 15, blur: 3, refraction: 0.3 });
+  return glassPanel('lgc-co', [inner], { material: 'satin', radius: 18, bezel: 15 });
 }
 
 /* --- registry: inventory demo key → live builder ------------------------- */
