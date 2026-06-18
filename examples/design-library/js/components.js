@@ -134,9 +134,8 @@ export function glassSwitch({ on = true, forced = false } = {}) {
   }, [track, knob]);
 
   const RADIUS = 21.95;
-  let refractionInsetRatio = 0.2;
-  let refractionBase = 80;
-  const glass = attachGlass(knob, { material: 'clear', surface: 'lip', radius: 'pill', refractionInset: RADIUS * refractionInsetRatio });
+  const REFRACTION = 80;
+  const glass = attachGlass(knob, { material: 'clear', surface: 'lip', radius: 'pill', refractionInset: RADIUS * 0.2 });
   const trackColor = mixColor('#5f6674D9', '#2FA84FEE'); // gray → green
 
   // kube proportions scaled 0.477612 (track height 32px) to match other controls;
@@ -163,14 +162,14 @@ export function glassSwitch({ on = true, forced = false } = {}) {
   B.onChange(renderKnob); A.onChange(renderKnob);
   C.onChange(paintAlpha);
   T.onChange((v) => (track.style.background = trackColor(v)));
-  Q.onChange((v) => (glass.refraction = refractionBase * v));
+  Q.onChange((v) => (glass.refraction = REFRACTION * v));
 
   const S = () => (forcedState || g > 0.5 ? 1 : 0);
   const sync = () => {
     const s = S();
     B.set(g > 0.5 ? h2 : f);
     applyGlassMaterial(glass, s > 0.5 ? 'optic' : 'clear');
-    glass.refraction = refractionBase * Q.get();
+    glass.refraction = REFRACTION * Q.get();
     paintAlpha(C.get());
     C.set(lerp(ACTIVATION.glassAlphaRest, ACTIVATION.glassAlphaActive, s));
     A.set(lerp(REST, ACTIVE, s));
@@ -200,19 +199,6 @@ export function glassSwitch({ on = true, forced = false } = {}) {
   el.addEventListener('keydown', (e) => {
     if ((e.key === ' ' || e.key === 'Enter') && !forcedState) { e.preventDefault(); f = f > 0.5 ? 0 : 1; sync(); }
   });
-  el._lgcTune = {
-    radius: RADIUS,
-    get refractionInsetRatio() { return refractionInsetRatio; },
-    setRefractionInsetRatio(v) {
-      refractionInsetRatio = clamp01(v);
-      glass.refractionInset = RADIUS * refractionInsetRatio;
-    },
-    get refraction() { return refractionBase; },
-    setRefraction(v) {
-      refractionBase = v;
-      glass.refraction = refractionBase * Q.get();
-    },
-  };
   renderKnob(); sync();
   return el;
 }
@@ -228,9 +214,8 @@ export function glassSlider({ value = 0.4, forced = false } = {}) {
   const el = h('div', { class: 'lgc-slider' }, [trackEl, thumb]);
 
   const RADIUS = 20;
-  let refractionInsetRatio = 0.4;
-  let refractionBase = 80;
-  const glass = attachGlass(thumb, { material: 'clear', surface: 'convex', radius: 'pill', refractionInset: RADIUS * refractionInsetRatio });
+  const REFRACTION = 80;
+  const glass = attachGlass(thumb, { material: 'clear', surface: 'convex', radius: 'pill', refractionInset: RADIUS * 0.4 });
   // kube proportions scaled 0.667 to fit the UI: 220x40 rig, 60x40 convex thumb
   // on a ~9px track, shrinking to 0.6 at rest (the original aspect ratio).
   const REST = 0.6, ACTIVE = 1;
@@ -246,7 +231,7 @@ export function glassSlider({ value = 0.4, forced = false } = {}) {
   };
   A.onChange((v) => (thumb.style.transform = `translateX(-50%) scale(${v.toFixed(3)})`));
   X.onChange(paintAlpha);
-  Q.onChange((v) => (glass.refraction = refractionBase * v));
+  Q.onChange((v) => (glass.refraction = REFRACTION * v));
 
   const PAD = 18; // thumb centre clamps 18px from each track end (27*0.667)
   const layout = () => {
@@ -264,7 +249,7 @@ export function glassSlider({ value = 0.4, forced = false } = {}) {
   const sync = () => {
     const s = S();
     applyGlassMaterial(glass, s > 0.5 ? 'optic' : 'clear');
-    glass.refraction = refractionBase * Q.get();
+    glass.refraction = REFRACTION * Q.get();
     paintAlpha(X.get());
     A.set(lerp(REST, ACTIVE, s));
     X.set(lerp(ACTIVATION.glassAlphaRest, ACTIVATION.glassAlphaActive, s));
@@ -284,54 +269,8 @@ export function glassSlider({ value = 0.4, forced = false } = {}) {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { val = clamp01(val - step); layout(); }
   });
   new ResizeObserver(layout).observe(el);
-  el._lgcTune = {
-    radius: RADIUS,
-    get refractionInsetRatio() { return refractionInsetRatio; },
-    setRefractionInsetRatio(v) {
-      refractionInsetRatio = clamp01(v);
-      glass.refractionInset = RADIUS * refractionInsetRatio;
-    },
-    get refraction() { return refractionBase; },
-    setRefraction(v) {
-      refractionBase = v;
-      glass.refraction = refractionBase * Q.get();
-    },
-  };
   requestAnimationFrame(layout); sync();
   return el;
-}
-
-function glassTuningPanel(title, control) {
-  const api = control._lgcTune;
-  const insetPercent = Math.round(api.refractionInsetRatio * 100);
-  const insetValue = h('span', { class: 'lgc-tune__value' }, `${insetPercent}%`);
-  const refValue = h('span', { class: 'lgc-tune__value' }, String(api.refraction));
-  const inset = h('input', {
-    class: 'lgc-tune__range', type: 'range', min: '0', max: '100', step: '1', value: String(insetPercent),
-    'aria-label': `${title} refraction inset percent of radius`,
-  });
-  const refraction = h('input', {
-    class: 'lgc-tune__range', type: 'range', min: '8', max: '120', step: '1', value: String(api.refraction),
-    'aria-label': `${title} refraction`,
-  });
-  inset.addEventListener('input', () => {
-    const percent = Number(inset.value);
-    api.setRefractionInsetRatio(percent / 100);
-    insetValue.textContent = `${percent}%`;
-  });
-  refraction.addEventListener('input', () => {
-    const value = Number(refraction.value);
-    api.setRefraction(value);
-    refValue.textContent = String(value);
-  });
-  return h('div', { class: 'lgc-tune', role: 'group', 'aria-label': `${title} glass tuning` }, [
-    h('label', { class: 'lgc-tune__control' }, [h('span', {}, ['Refraction inset', insetValue]), inset]),
-    h('label', { class: 'lgc-tune__control' }, [h('span', {}, ['Refraction', refValue]), refraction]),
-  ]);
-}
-
-function glassTunableControl(title, control) {
-  return h('div', { class: 'lgc-tuned' }, [control, glassTuningPanel(title, control)]);
 }
 
 /* ============================================================================
@@ -1258,8 +1197,8 @@ export function glassCheckout() {
 /* --- registry: inventory demo key → live builder ------------------------- */
 export const MOUNTS = {
   materialLab: () => glassMaterialLab(),
-  toggle: () => glassTunableControl('Switch', glassSwitch({ on: true })),
-  slider: () => glassTunableControl('Slider', glassSlider({ value: 0.4 })),
+  toggle: () => glassSwitch({ on: true }),
+  slider: () => glassSlider({ value: 0.4 }),
   button: () => h('div', { class: 'lgc-row' }, [glassButton({ label: 'Primary', variant: 'accent' }), glassButton({ label: 'Glass' }), glassButton({ label: 'Save', icon: 'check' })]),
   iconButton: () => h('div', { class: 'lgc-row' }, [glassIconButton({ icon: 'plus' }), glassIconButton({ icon: 'heart' }), glassIconButton({ icon: 'share-nodes' })]),
   fab: () => glassFab({ icon: 'plus' }),
