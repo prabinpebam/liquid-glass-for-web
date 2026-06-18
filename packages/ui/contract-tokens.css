@@ -1,0 +1,30 @@
+/* ============================================================
+   Contract tokens (--lgc-*) — the stable, library-agnostic boundary.
+   Apps and higher-level tools should consume THESE, so a different
+   glass implementation could be swapped in behind the same contract.
+   Each maps onto this library's --lg-* tokens. (architecture-spec §7)
+   ============================================================ */
+:root {
+  --lgc-accent: var(--lg-color-accent);
+  --lgc-accent-hover: var(--lg-color-accent-hover);
+  --lgc-accent-pressed: var(--lg-color-accent-pressed);
+  --lgc-on-accent: var(--lg-color-on-accent);
+
+  --lgc-text-primary: var(--lg-color-on-glass);
+  --lgc-text-secondary: var(--lg-color-on-glass-dim);
+
+  --lgc-surface-radius: var(--lg-radius-lg);
+  --lgc-surface-tint: var(--lg-tint-base);
+  --lgc-surface-stroke: var(--lg-stroke-base);
+  --lgc-surface-shadow: var(--lg-shadow-rest);
+
+  --lgc-space-s: var(--lg-space-2);
+  --lgc-space-m: var(--lg-space-4);
+  --lgc-space-l: var(--lg-space-6);
+
+  --lgc-motion-fast: var(--lg-motion-fast);
+  --lgc-motion-normal: var(--lg-motion-medium);
+
+  --lgc-font-family: var(--lg-font-family);
+  --lgc-font-size-body: var(--lg-text-body-size);
+}

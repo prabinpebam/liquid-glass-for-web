@@ -1,0 +1,63 @@
+/* ============================================================
+   Component (L2): lg-button
+   Variants: standard / accent / subtle
+   States: rest, hover, pressed, focus, disabled
+   State-class pairing: each :state has a matching .is-* utility.
+   ============================================================ */
+.lg-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lg-space-2);
+  min-height: var(--lg-size-control-md);
+  padding: 0 var(--lg-space-5);
+  border-radius: var(--lg-surface-radius, var(--lg-radius-md));
+  border: var(--lg-stroke-width) solid var(--lg-stroke-base);
+  background: var(--lg-tint-base);
+  color: var(--lg-color-on-glass);
+  font-family: var(--lg-font-family);
+  font-size: var(--lg-text-body-size);
+  line-height: var(--lg-text-body-line);
+  font-weight: var(--lg-font-weight-medium);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--lg-motion-fast), transform var(--lg-motion-fast);
+}
+
+.lg-button:hover,
+.lg-button.is-hover { background: color-mix(in srgb, var(--lg-tint-base) 70%, white 8%); }
+
+.lg-button:active,
+.lg-button.is-pressed { transform: scale(0.97); }
+
+.lg-button:focus-visible,
+.lg-button.is-focus {
+  outline: var(--lg-focus-width) solid var(--lg-focus-color);
+  outline-offset: var(--lg-focus-offset);
+}
+
+.lg-button:disabled,
+.lg-button.is-disabled {
+  color: var(--lg-color-on-glass-dim);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Variant: accent */
+.lg-button--accent {
+  background: var(--lg-color-accent);
+  border-color: transparent;
+  color: var(--lg-color-on-accent);
+}
+.lg-button--accent:hover,
+.lg-button--accent.is-hover { background: var(--lg-color-accent-hover); }
+.lg-button--accent:active,
+.lg-button--accent.is-pressed { background: var(--lg-color-accent-pressed); }
+
+/* Variant: subtle */
+.lg-button--subtle {
+  background: transparent;
+  border-color: transparent;
+}
+.lg-button--subtle:hover,
+.lg-button--subtle.is-hover { background: var(--lg-tint-base); }

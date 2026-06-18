@@ -1,0 +1,17 @@
+/* ============================================================
+   Atom (L1): lg-icon — masked monochrome glyph.
+   Glyph source is set via the --lg-icon-url custom property and
+   tinted with currentColor. Size from sizing tokens.
+   ============================================================ */
+.lg-icon {
+  display: inline-block;
+  flex: none;
+  width: var(--lg-icon-md);
+  height: var(--lg-icon-md);
+  background-color: currentColor;
+  -webkit-mask: var(--lg-icon-url) center / contain no-repeat;
+  mask: var(--lg-icon-url) center / contain no-repeat;
+}
+
+.lg-icon--sm { width: var(--lg-icon-sm); height: var(--lg-icon-sm); }
+.lg-icon--lg { width: var(--lg-icon-lg); height: var(--lg-icon-lg); }

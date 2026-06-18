@@ -1,0 +1,21 @@
+/* ============================================================
+   Liquid Glass — Typography tokens (L0, primitive)
+   Type ramp + families.
+   ============================================================ */
+:root {
+  --lg-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --lg-font-mono: 'Cascadia Code', 'SF Mono', 'Fira Code', Consolas, monospace;
+
+  --lg-font-weight-regular: 400;
+  --lg-font-weight-medium: 500;
+  --lg-font-weight-semibold: 600;
+
+  --lg-text-caption-size: 12px;
+  --lg-text-caption-line: 16px;
+  --lg-text-body-size: 14px;
+  --lg-text-body-line: 20px;
+  --lg-text-subtitle-size: 18px;
+  --lg-text-subtitle-line: 24px;
+  --lg-text-title-size: 28px;
+  --lg-text-title-line: 34px;
+}

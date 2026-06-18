@@ -1,0 +1,18 @@
+/* ============================================================
+   Atom (L1): lg-text — typographic primitive.
+   Variants map to the type ramp; all values are tokens.
+   ============================================================ */
+.lg-text {
+  margin: 0;
+  font-family: var(--lg-font-family);
+  font-size: var(--lg-text-body-size);
+  line-height: var(--lg-text-body-line);
+  font-weight: var(--lg-font-weight-regular);
+  color: var(--lg-color-on-glass);
+}
+
+.lg-text--caption  { font-size: var(--lg-text-caption-size);  line-height: var(--lg-text-caption-line); }
+.lg-text--subtitle { font-size: var(--lg-text-subtitle-size); line-height: var(--lg-text-subtitle-line); font-weight: var(--lg-font-weight-medium); }
+.lg-text--title    { font-size: var(--lg-text-title-size);    line-height: var(--lg-text-title-line);    font-weight: var(--lg-font-weight-semibold); }
+
+.lg-text--dim { color: var(--lg-color-on-glass-dim); }

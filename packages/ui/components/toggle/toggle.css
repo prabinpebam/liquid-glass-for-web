@@ -1,0 +1,39 @@
+/* ============================================================
+   Component (L2): lg-toggle — switch control.
+   States: off (rest), on (.is-on), focus, disabled.
+   Knob motion uses motion tokens; the playground spring physics
+   can drive the knob position by reading --lg-motion-spring-knob-*.
+   ============================================================ */
+.lg-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 52px;          /* instance dim: unique switch track length (no scale fits) */
+  height: 28px;         /* instance dim: paired with track length */
+  padding: var(--lg-space-1);
+  border-radius: var(--lg-radius-pill);
+  border: var(--lg-stroke-width) solid var(--lg-stroke-base);
+  background: color-mix(in srgb, var(--lg-color-neutral-500) 40%, transparent);
+  cursor: pointer;
+  transition: background var(--lg-motion-medium) var(--lg-motion-ease-standard);
+}
+
+.lg-toggle__knob {
+  width: 20px;          /* instance dim: knob = track height - 2x padding */
+  height: 20px;
+  border-radius: var(--lg-radius-pill);
+  background: var(--lg-color-neutral-0);
+  box-shadow: var(--lg-shadow-rest);
+  transition: transform var(--lg-motion-medium) var(--lg-motion-ease-emphasized);
+}
+
+.lg-toggle.is-on { background: var(--lg-color-accent); border-color: transparent; }
+.lg-toggle.is-on .lg-toggle__knob { transform: translateX(24px); /* instance dim: track - knob - 2x padding */ }
+
+.lg-toggle:focus-visible,
+.lg-toggle.is-focus {
+  outline: var(--lg-focus-width) solid var(--lg-focus-color);
+  outline-offset: var(--lg-focus-offset);
+}
+
+.lg-toggle.is-disabled { opacity: 0.6; cursor: not-allowed; }

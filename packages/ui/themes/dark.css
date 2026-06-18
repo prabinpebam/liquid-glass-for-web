@@ -1,0 +1,12 @@
+/* ============================================================
+   Theme: dark (default). Token overrides only (LG-P6).
+   Components never branch on theme — they consume these tokens.
+   ============================================================ */
+[data-lg-theme="dark"],
+:root {
+  --lg-color-on-glass: #f4f6fb;
+  --lg-color-on-glass-dim: rgba(244, 246, 251, 0.66);
+  --lg-tint-base: rgba(255, 255, 255, 0.10);
+  --lg-stroke-base: rgba(255, 255, 255, 0.32);
+  --lg-tint-solid: rgba(20, 22, 27, 0.92);
+}

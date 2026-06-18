@@ -1,0 +1,29 @@
+/* ============================================================
+   Compound (L3): lg-searchbar
+   Composes: surface (L1) + icon (L1) + input field + button (L2).
+   A compound only LAYS OUT lower layers — it owns no new visual
+   values beyond layout, and never reaches into a child's internals.
+   ============================================================ */
+.lg-searchbar {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  min-height: var(--lg-size-control-lg);
+  padding: 0 var(--lg-space-3);
+  /* glassiness comes from the composed .lg-surface root */
+}
+
+.lg-searchbar__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--lg-color-on-glass);
+  font-family: var(--lg-font-family);
+  font-size: var(--lg-text-body-size);
+  line-height: var(--lg-text-body-line);
+  outline: none;
+}
+.lg-searchbar__field::placeholder { color: var(--lg-color-on-glass-dim); }
+
+.lg-searchbar__icon { color: var(--lg-color-on-glass-dim); }

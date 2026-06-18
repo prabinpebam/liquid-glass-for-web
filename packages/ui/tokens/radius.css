@@ -1,0 +1,13 @@
+/* ============================================================
+   Liquid Glass — Radius tokens (L0, primitive)
+   Corner rounding scale.
+   ============================================================ */
+:root {
+  --lg-radius-0: 0;
+  --lg-radius-sm: 8px;
+  --lg-radius-md: 12px;  /* default control */
+  --lg-radius-lg: 18px;  /* surfaces / cards */
+  --lg-radius-xl: 24px;  /* panels / sheets */
+  --lg-radius-2xl: 32px; /* large floating surfaces */
+  --lg-radius-pill: 9999px; /* capsules, knobs */
+}

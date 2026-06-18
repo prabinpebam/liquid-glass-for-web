@@ -1,0 +1,31 @@
+/* ============================================================
+   Liquid Glass — Shared semantic tokens (L0)
+   Human-named aliases reused across components or re-pointed by
+   theme / density / contrast. Each MUST resolve to a primitive
+   token (LG-P2). Component-local semantics stay in component CSS.
+   Loaded right after the primitives (see tokens/index.css).
+   ============================================================ */
+:root {
+  --lg-control-height: var(--lg-size-control-md);
+  --lg-control-padding-x: var(--lg-space-5);
+
+  /* Focus ring (LG-P9) */
+  --lg-focus-color: var(--lg-color-focus);
+  --lg-focus-width: var(--lg-stroke-width-focus);
+  --lg-focus-offset: 2px;
+
+  --lg-surface-radius-default: var(--lg-radius-lg);
+}
+
+/* Density: re-points spacing-derived semantics (LG-P6). */
+[data-lg-density="compact"] {
+  --lg-control-height: var(--lg-size-control-sm);
+  --lg-control-padding-x: var(--lg-space-3);
+}
+
+/* High contrast: opaque, high-legibility surfaces (LG-P9). */
+[data-lg-contrast="high"] {
+  --lg-tint-base: var(--lg-tint-solid);
+  --lg-stroke-base: var(--lg-color-on-glass);
+  --lg-specular-opacity: 0;
+}

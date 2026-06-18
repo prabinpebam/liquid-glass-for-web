@@ -1,0 +1,27 @@
+/* ============================================================
+   Liquid Glass — Motion tokens (L0, primitive)
+   Durations, easings, and spring constants. Reduced-motion
+   collapses these so components never branch on motion.
+   ============================================================ */
+:root {
+  --lg-motion-fast: 120ms;
+  --lg-motion-medium: 200ms;
+  --lg-motion-slow: 320ms;
+
+  --lg-motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --lg-motion-ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+
+  /* Spring constants read by the physics layer (stiffness/damping). */
+  --lg-motion-spring-knob-stiffness: 2000;
+  --lg-motion-spring-knob-damping: 80;
+  --lg-motion-spring-lens-stiffness: 340;
+  --lg-motion-spring-lens-damping: 20;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --lg-motion-fast: 0ms;
+    --lg-motion-medium: 0ms;
+    --lg-motion-slow: 0ms;
+  }
+}

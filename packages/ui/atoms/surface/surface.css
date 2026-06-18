@@ -1,0 +1,55 @@
+/* ============================================================
+   Atom (L1): lg-surface — THE glass shell + engine attach point.
+   Every glassy thing in the library is "a surface with content".
+   The runtime engine (core/material.js) attaches ONLY here.
+
+   This file is THE surface catalog: the single, CLOSED source of
+   glass optics (LG-P13). The named materials below are the only
+   glass-parameter bundles in the system; they are enumerated in
+   library.manifest.json `materials`. Components select a surface
+   BY NAME (data-lg-material) and never set --lg-surface-* tokens
+   themselves. Adding a surface = a reviewed catalog + manifest edit.
+   ============================================================ */
+.lg-surface {
+  /* Semantic surface tokens — the material contract (tokens → engine). */
+  --lg-surface-radius: var(--lg-radius-lg);
+  --lg-surface-bezel: var(--lg-bezel-md);
+  --lg-surface-thickness: var(--lg-thickness);
+  --lg-surface-blur: var(--lg-blur-md);
+  --lg-surface-refraction: var(--lg-refraction-regular);
+  --lg-surface-specular-opacity: var(--lg-specular-opacity);
+  --lg-surface-specular-saturation: var(--lg-specular-saturation);
+
+  position: relative;
+  border-radius: var(--lg-surface-radius);
+  background: var(--lg-tint-base);
+  border: var(--lg-stroke-width) solid var(--lg-stroke-base);
+  box-shadow: var(--lg-shadow-rest);
+  color: var(--lg-color-on-glass);
+  isolation: isolate;
+}
+
+/* Material variants — data-driven token overrides only. */
+.lg-surface[data-lg-material="clear"] {
+  --lg-surface-refraction: var(--lg-refraction-strong);
+  --lg-surface-blur: var(--lg-blur-sm);
+}
+.lg-surface[data-lg-material="frosted"] {
+  --lg-surface-refraction: var(--lg-refraction-subtle);
+  --lg-surface-blur: var(--lg-blur-lg);
+}
+
+/* Fallback: engine sets data-lg-fallback="blur" when refraction is
+   unsupported (non-Chromium). Tint/blur tokens take over; no JS in components. */
+.lg-surface[data-lg-fallback="blur"] {
+  background: var(--lg-tint-base);
+  backdrop-filter: blur(var(--lg-surface-blur));
+  -webkit-backdrop-filter: blur(var(--lg-surface-blur));
+}
+
+/* Transparency off → solid tint (set on root by personalization). */
+[data-lg-transparency="off"] .lg-surface {
+  background: var(--lg-tint-solid);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}

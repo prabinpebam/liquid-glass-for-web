@@ -1,0 +1,17 @@
+/* ============================================================
+   Liquid Glass — Spacing tokens (L0, primitive)
+   4px-based scale. Density overrides re-point these.
+   ============================================================ */
+:root {
+  --lg-space-0: 0;
+  --lg-space-px: 1px;
+  --lg-space-1: 4px;
+  --lg-space-2: 8px;
+  --lg-space-3: 12px;
+  --lg-space-4: 16px;
+  --lg-space-5: 20px;
+  --lg-space-6: 24px;
+  --lg-space-8: 32px;
+  --lg-space-10: 40px;
+  --lg-space-12: 48px;
+}

@@ -1,0 +1,10 @@
+/* ============================================================
+   Theme: light. Token overrides only (LG-P6).
+   ============================================================ */
+[data-lg-theme="light"] {
+  --lg-color-on-glass: #1a1c22;
+  --lg-color-on-glass-dim: rgba(26, 28, 34, 0.62);
+  --lg-tint-base: rgba(255, 255, 255, 0.55);
+  --lg-stroke-base: rgba(255, 255, 255, 0.7);
+  --lg-tint-solid: rgba(248, 249, 250, 0.94);
+}

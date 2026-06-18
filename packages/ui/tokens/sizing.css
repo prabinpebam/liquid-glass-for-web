@@ -1,0 +1,16 @@
+/* ============================================================
+   Liquid Glass — Sizing tokens (L0, primitive)
+   Control heights and icon sizes.
+   ============================================================ */
+:root {
+  --lg-size-control-sm: 28px;
+  --lg-size-control-md: 36px; /* default control height */
+  --lg-size-control-lg: 44px;
+
+  --lg-icon-sm: 16px;
+  --lg-icon-md: 20px;
+  --lg-icon-lg: 24px;
+
+  --lg-stroke-width: 1px;
+  --lg-stroke-width-focus: 2px;
+}

@@ -1,0 +1,50 @@
+{
+  "id": "liquid-glass",
+  "name": "Liquid Glass UI",
+  "version": "0.1.0",
+  "entry": "index.js",
+  "engine": "@liquid-glass/core",
+  "contractTokens": "contract-tokens.css",
+  "tokenContract": "1.0",
+  "baseDependencies": ["tokens/index.css"],
+
+  "layers": {
+    "L0": "tokens",
+    "L1": "atoms",
+    "L2": "components",
+    "L3": "compound",
+    "L4": "layouts"
+  },
+
+  "styles": [
+    "tokens/index.css",
+    "contract-tokens.css",
+    "themes/dark.css",
+    "themes/light.css",
+    "atoms/surface/surface.css",
+    "atoms/text/text.css",
+    "atoms/icon/icon.css",
+    "components/button/button.css",
+    "components/toggle/toggle.css",
+    "compound/searchbar/searchbar.css"
+  ],
+
+  "theme": {
+    "attribute": "data-lg-theme",
+    "default": "dark",
+    "modes": ["light", "dark"]
+  },
+
+  "materials": ["regular", "clear", "frosted"],
+
+  "capabilities": ["theme", "accent", "density", "transparency"],
+
+  "factories": {
+    "surface":   { "layer": "L1", "required": ["children"] },
+    "text":      { "layer": "L1", "required": ["content"] },
+    "icon":      { "layer": "L1", "required": ["name"] },
+    "button":    { "layer": "L2", "required": ["label"] },
+    "toggle":    { "layer": "L2", "required": [] },
+    "searchbar": { "layer": "L3", "required": [] }
+  }
+}

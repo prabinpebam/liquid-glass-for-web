@@ -1,0 +1,34 @@
+/* ============================================================
+   Liquid Glass — Color tokens (L0, primitive)
+   Neutral ramp, accent, status, and on-glass text.
+   Theme files (themes/*.css) override the semantic on-glass /
+   tint values per mode; accent is set by personalization.
+   ============================================================ */
+:root {
+  /* Neutral ramp */
+  --lg-color-neutral-0: #ffffff;
+  --lg-color-neutral-100: #f1f3f5;
+  --lg-color-neutral-300: #ced4da;
+  --lg-color-neutral-500: #868e96;
+  --lg-color-neutral-700: #343a40;
+  --lg-color-neutral-900: #14161b;
+  --lg-color-neutral-1000: #000000;
+
+  /* Accent (overridden by personalization.applyAccent) */
+  --lg-color-accent: #4dabf7;
+  --lg-color-accent-hover: #74c0fc;
+  --lg-color-accent-pressed: #339af0;
+  --lg-color-on-accent: #ffffff;
+
+  /* Status */
+  --lg-color-success: #51cf66;
+  --lg-color-warning: #ffd43b;
+  --lg-color-danger: #ff6b6b;
+
+  /* Text on glass (default = dark theme; themes/*.css override) */
+  --lg-color-on-glass: #f4f6fb;
+  --lg-color-on-glass-dim: rgba(244, 246, 251, 0.66);
+
+  /* Focus ring color */
+  --lg-color-focus: var(--lg-color-accent);
+}

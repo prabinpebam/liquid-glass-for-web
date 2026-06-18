@@ -1,0 +1,12 @@
+/* ============================================================
+   Liquid Glass — Z-index tokens (L0, primitive)
+   Named stacking levels. No magic numbers in components.
+   ============================================================ */
+:root {
+  --lg-z-base: 0;
+  --lg-z-raised: 10;
+  --lg-z-sticky: 100;
+  --lg-z-overlay: 1000;
+  --lg-z-popup: 1100;
+  --lg-z-toast: 1200;
+}

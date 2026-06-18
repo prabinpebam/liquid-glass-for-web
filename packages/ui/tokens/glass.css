@@ -1,0 +1,40 @@
+/* ============================================================
+   Liquid Glass — Glass material tokens (L0, primitive)   ★ signature ★
+   These scales drive BOTH the CSS look and the runtime refraction
+   engine (via core/material.js). Tuning glass = editing this file.
+
+   - bezel        → engine `bezel` (px width of the refractive rim)
+   - thickness    → engine `thickness` (refractive index, ~1.5 = glass)
+   - blur         → engine `blur` (backdrop blur px)
+   - refraction   → engine `scale` (0..1 effect strength)
+   - tint/stroke/shadow/specular → surface look + engine specular
+   ============================================================ */
+:root {
+  /* Refractive rim width */
+  --lg-bezel-sm: 12px;
+  --lg-bezel-md: 18px;
+  --lg-bezel-lg: 26px;
+
+  /* Refractive index */
+  --lg-thickness: 1.5;
+
+  /* Backdrop blur */
+  --lg-blur-sm: 6px;
+  --lg-blur-md: 12px;
+  --lg-blur-lg: 20px;
+
+  /* Refraction strength (engine scale, 0..1) */
+  --lg-refraction-subtle: 0.4;
+  --lg-refraction-regular: 0.7;
+  --lg-refraction-strong: 1;
+
+  /* Surface tint / stroke / specular */
+  --lg-tint-base: rgba(255, 255, 255, 0.10);
+  --lg-stroke-base: rgba(255, 255, 255, 0.32);
+  --lg-specular-opacity: 0.5;
+  --lg-specular-saturation: 1;
+
+  /* Solid fallback used when transparency is off or refraction
+     is unsupported (set by themes/transparency overrides). */
+  --lg-tint-solid: rgba(28, 30, 38, 0.92);
+}

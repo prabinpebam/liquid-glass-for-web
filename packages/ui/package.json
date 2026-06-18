@@ -1,0 +1,38 @@
+{
+  "name": "@liquid-glass/ui",
+  "version": "0.1.0",
+  "description": "Token-driven, layered design library for the liquid glass effect, built on @liquid-glass/core.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./manifest": "./library.manifest.json",
+    "./tokens": "./tokens/index.css",
+    "./contract-tokens": "./contract-tokens.css",
+    "./*": "./*"
+  },
+  "files": [
+    "index.js",
+    "library.manifest.json",
+    "contract-tokens.css",
+    "core",
+    "tokens",
+    "themes",
+    "atoms",
+    "components",
+    "compound",
+    "layouts",
+    "README.md"
+  ],
+  "dependencies": {
+    "@liquid-glass/core": "workspace:*"
+  },
+  "keywords": [
+    "liquid-glass",
+    "design-system",
+    "design-tokens",
+    "ui-library",
+    "glass"
+  ],
+  "license": "MIT"
+}
