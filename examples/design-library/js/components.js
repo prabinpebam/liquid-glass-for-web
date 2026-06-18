@@ -86,8 +86,8 @@ function attachGlass(el, shape = {}) {
 
 /* ============================================================================
    Switch — faithful port of the kube switch state machine.
-   Activation S = forced || grabbing drives: knob glass alpha 1→0.1 (opaque →
-   glass), knob scale, refraction 0.4→0.9, track gray→green; tap toggles, drag
+  Activation S = forced || grabbing drives: knob material, knob scale,
+  track gray→green; tap toggles, drag
    slides with rubber-band overshoot, keyboard toggles.
    ========================================================================== */
 export function glassSwitch({ on = true } = {}) {
@@ -105,13 +105,10 @@ export function glassSwitch({ on = true } = {}) {
   // active scale lifts the knob to 52px (the expanded state) and overhangs the track.
   const REST = 0.65, ACTIVE = 1.1845;
   const TRAVEL = 27.65, MARGIN = -10.48; // 57.9*0.477612 ; -21.95*0.477612
-  const SHADOW = '0 4px 22px rgba(0, 0, 0, 0.1)';
-  const INSET = ', inset 2px 7px 24px rgba(0, 0, 0, 0.09), inset -2px -7px 24px rgba(255, 255, 255, 0.09)';
   const B = spring('glide', on ? 1 : 0);  // position 0..1   {1000,80}
-  const C = spring('snap', 1);            // knob bg alpha    {2000,80}
   const A = spring('snap', on ? ACTIVE : REST); // knob scale  {2000,80}
   const T = spring('glide', on ? 1 : 0);  // track colour     {1000,80}
-  const Q = spring('settle', 0.4);        // refraction       {170,26}
+  const Q = spring('settle', 0);          // material state    {170,26}
 
   let f = on ? 1 : 0, g = 0, h2 = f, forced = false, grabX = 0, moved = false;
 
@@ -120,7 +117,6 @@ export function glassSwitch({ on = true } = {}) {
     knob.style.transform = `translateY(-50%) translateX(${(B.get() * TRAVEL).toFixed(2)}px) scale(${A.get().toFixed(3)})`;
   };
   B.onChange(renderKnob); A.onChange(renderKnob);
-  C.onChange((v) => (knob.style.background = `rgba(255,255,255,${v.toFixed(3)})`));
   T.onChange((v) => (track.style.background = trackColor(v)));
   Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
 
@@ -128,12 +124,10 @@ export function glassSwitch({ on = true } = {}) {
   const sync = () => {
     const s = S();
     B.set(g > 0.5 ? h2 : f);
-    C.set(1 - 0.9 * s);
     A.set(lerp(REST, ACTIVE, s));
     T.set(g > 0.5 ? (h2 > 0.5 ? 1 : 0) : f);
     applyGlassMaterial(glass, s > 0.5 ? 'optic' : 'clear');
     Q.set(s);
-    knob.style.boxShadow = SHADOW + (s > 0.5 ? INSET : '');
     el.setAttribute('aria-checked', String(f > 0.5));
   };
 
@@ -162,8 +156,8 @@ export function glassSwitch({ on = true } = {}) {
 }
 
 /* ============================================================================
-   Slider — faithful port of the kube slider thumb. Grab activates the glass
-   (scale 0.62→1, alpha 1→0.1, refraction 0.4→0.9); drag from thumb or track.
+  Slider — faithful port of the kube slider thumb. Grab switches the material
+  and scales the thumb; drag from thumb or track.
    ========================================================================== */
 export function glassSlider({ value = 0.4 } = {}) {
   const fill = h('span', { class: 'lgc-slider__fill' });
@@ -176,12 +170,10 @@ export function glassSlider({ value = 0.4 } = {}) {
   // on a ~9px track, shrinking to 0.6 at rest (the original aspect ratio).
   const REST = 0.6, ACTIVE = 1;
   const A = spring('snap', REST);
-  const X = spring('snap', 1);
   const Q = spring('settle', 0.4);
 
   let val = clamp01(value), n = 0, grabOffset = 0;
   A.onChange((v) => (thumb.style.transform = `translateX(-50%) scale(${v.toFixed(3)})`));
-  X.onChange((v) => (thumb.style.background = `rgba(255,255,255,${v.toFixed(3)})`));
   Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
 
   const PAD = 18; // thumb centre clamps 18px from each track end (27*0.667)
@@ -197,7 +189,7 @@ export function glassSlider({ value = 0.4 } = {}) {
     layout();
   };
   const S = () => (n > 0.5 ? 1 : 0);
-  const sync = () => { const s = S(); A.set(lerp(REST, ACTIVE, s)); X.set(1 - 0.9 * s); applyGlassMaterial(glass, s > 0.5 ? 'optic' : 'clear'); Q.set(s); thumb.classList.toggle('is-active', s > 0.5); };
+  const sync = () => { const s = S(); A.set(lerp(REST, ACTIVE, s)); applyGlassMaterial(glass, s > 0.5 ? 'optic' : 'clear'); Q.set(s); thumb.classList.toggle('is-active', s > 0.5); };
 
   thumb.addEventListener('pointerdown', (e) => { n = 1; const tr = thumb.getBoundingClientRect(); grabOffset = e.clientX - (tr.left + tr.width / 2); thumb.setPointerCapture(e.pointerId); sync(); });
   trackEl.addEventListener('pointerdown', (e) => { n = 1; grabOffset = 0; sync(); setFromX(e.clientX); });
@@ -276,20 +268,20 @@ export function glassLens() {
 }
 
 /* ============================================================================
-   Button — glass pill. Press = activation (refraction boost + scale dip + glass
-   alpha lift); hover lifts. Optional leading Font Awesome icon.
+  Button — glass pill. Press = material activation + scale dip; optional leading
+  Font Awesome icon.
    ========================================================================== */
 export function glassButton({ label = 'Button', icon = null, variant = 'standard' } = {}) {
   const el = h('button', { class: `lgc-btn lgc-btn--${variant}`, type: 'button' },
     [icon ? fa(icon) : null, h('span', {}, label)]);
-  if (variant === 'accent') return el; // accent is a solid tinted fill, no glass
 
-  const glass = attachGlass(el, { material: 'clear', surface: 'convex', radius: 'pill', bezel: 12 });
+  const baseMaterial = variant === 'accent' ? 'optic' : 'clear';
+  const glass = attachGlass(el, { material: baseMaterial, surface: 'convex', radius: 'pill', bezel: 12 });
   const Q = spring('settle', 0.4), A = spring('snap', 1);
-  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'clear'));
+  Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : baseMaterial));
   A.onChange((v) => (el.style.transform = `scale(${v.toFixed(3)})`));
   const down = () => { applyGlassMaterial(glass, 'optic'); Q.set(1); A.set(0.96); el.classList.add('is-active'); };
-  const up = () => { applyGlassMaterial(glass, 'clear'); Q.set(0); A.set(1); el.classList.remove('is-active'); };
+  const up = () => { applyGlassMaterial(glass, baseMaterial); Q.set(0); A.set(1); el.classList.remove('is-active'); };
   el.addEventListener('pointerdown', down);
   el.addEventListener('pointerup', up);
   el.addEventListener('pointerleave', up);

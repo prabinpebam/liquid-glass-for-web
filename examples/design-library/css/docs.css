@@ -533,6 +533,7 @@ body {
    elevation is not part of the glass effect, the rim is. */
 .lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-card, .lgc-toast,
 .lgc-seg, .lgc-seg__ind, .lgc-check__box, .lgc-radio__disc,
+.lgc-switch__knob, .lgc-slider__thumb,
 .lgc-lens__capsule,
 .lgc-field, .lgc-otp__cell, .lgc-tabs__ind, .lgc-pager__b, .lgc-tooltip,
 .lgc-menu, .lgc-acc, .lgc-stat, .lgc-list, .lgc-tbl, .lgc-nav, .lgc-side,
@@ -547,6 +548,9 @@ body {
   box-shadow: 0 7px 20px rgba(0, 0, 0, 0.18);
 }
 .lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-card, .lgc-toast,
+.lgc-seg, .lgc-seg__ind, .lgc-check__box, .lgc-radio__disc,
+.lgc-switch__knob, .lgc-slider__thumb,
+.lgc-lens__capsule,
 .lgc-field, .lgc-otp__cell, .lgc-tooltip, .lgc-menu, .lgc-acc, .lgc-stat,
 .lgc-list, .lgc-tbl, .lgc-nav, .lgc-side, .lgc-modal, .lgc-cmd, .lgc-tool,
 .lgc-prod, .lgc-auth, .lgc-cal, .lgc-media, .lgc-chat__b--them, .lgc-price,
@@ -556,7 +560,8 @@ body {
 .lgc-tl, .lgc-mo, .lgc-ph, .lgc-foot, .lgc-drawer, .lgc-notif, .lgc-coach,
 .lgc-form, .lgc-wiz, .lgc-upl, .lgc-ed, .lgc-set, .lgc-chart, .lgc-sch,
 .lgc-kan, .lgc-fac, .lgc-cmt, .lgc-gal, .lgc-car, .lgc-prof, .lgc-cart, .lgc-co {
-  background: rgba(255, 255, 255, 0.14);
+  border: 0;
+  background: var(--lgc-material-tint, rgba(255, 255, 255, 0.14));
 }
 
 /* buttons */
@@ -569,7 +574,6 @@ body {
 .lgc-btn i { font-size: 14px; }
 .lgc-btn--accent {
   background: linear-gradient(180deg, #5cb8ff, #4d7cff); border-color: transparent;
-  box-shadow: 0 8px 20px rgba(77, 124, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 .lgc-iconbtn {
   width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
@@ -587,14 +591,14 @@ body {
 .lgc-switch { position: relative; width: 76.4px; height: 32px; border: 0; padding: 0; background: none; cursor: pointer; border-radius: 16px; -webkit-tap-highlight-color: transparent; touch-action: none; }
 .lgc-switch:focus-visible { outline: 2px solid #7aa2ff; outline-offset: 4px; }
 .lgc-switch__track { position: absolute; inset: 0; border-radius: 16px; background: rgba(120, 120, 128, 0.36); }
-.lgc-switch__knob { position: absolute; top: 50%; left: 0; width: 69.7px; height: 43.9px; border-radius: 21.95px; transform-origin: center; transform: translateY(-50%); background: #fff; box-shadow: 0 3px 14px rgba(0, 0, 0, 0.1); pointer-events: none; will-change: transform, background; }
+.lgc-switch__knob { position: absolute; top: 50%; left: 0; width: 69.7px; height: 43.9px; border-radius: 21.95px; transform-origin: center; transform: translateY(-50%); background: var(--lgc-material-tint, rgba(255, 255, 255, 0.045)); pointer-events: none; will-change: transform, background; }
 
 /* slider — kube proportions scaled 0.667: 220x40 rig, ~9px track, 60x40 convex
    glass thumb that shrinks to scale 0.6 at rest. */
 .lgc-slider { position: relative; width: 220px; max-width: 100%; height: 40px; touch-action: none; }
 .lgc-slider__track { position: absolute; left: 0; top: 15.33px; width: 100%; height: 9.33px; border-radius: 4.67px; background: rgba(137, 137, 143, 0.4); overflow: hidden; cursor: pointer; }
 .lgc-slider__fill { display: block; height: 9.33px; width: 40%; border-radius: 4px; background: #0377f7; }
-.lgc-slider__thumb { position: absolute; top: 0; width: 60px; height: 40px; border-radius: 20px; transform-origin: center; transform: translateX(-50%); background: #fff; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1); cursor: grab; will-change: transform, background; }
+.lgc-slider__thumb { position: absolute; top: 0; width: 60px; height: 40px; border-radius: 20px; transform-origin: center; transform: translateX(-50%); background: var(--lgc-material-tint, rgba(255, 255, 255, 0.045)); cursor: grab; will-change: transform, background; }
 .lgc-slider__thumb.is-active { cursor: grabbing; }
 
 /* segmented control */
@@ -667,7 +671,7 @@ body {
 /* OTP */
 .lgc-otp { display: flex; gap: 10px; }
 .lgc-otp__cell { width: 46px; height: 54px; border-radius: 12px; display: grid; place-items: center; color: #fff; font-size: 22px; font-weight: 650; }
-.lgc-otp__cell.is-active { box-shadow: 0 0 0 2px rgba(122, 162, 255, 0.9), 0 7px 20px rgba(0, 0, 0, 0.18); }
+.lgc-otp__cell.is-active { color: #fff; }
 
 /* tabs */
 .lgc-tabs { position: relative; display: inline-flex; gap: 2px; padding: 5px; border-radius: 13px; background: rgba(255, 255, 255, 0.12); }
@@ -825,7 +829,7 @@ body {
 /* pricing */
 .lgc-price-row { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; justify-content: center; }
 .lgc-price { width: 150px; padding: 18px; border-radius: 18px; color: #fff; }
-.lgc-price.is-hot { box-shadow: 0 0 0 1.5px rgba(122, 162, 255, 0.7), 0 10px 28px rgba(0, 0, 0, 0.22); }
+.lgc-price.is-hot { transform: translateY(-1px); }
 .lgc-price__name { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.8); }
 .lgc-price__p { display: flex; align-items: baseline; gap: 3px; margin: 6px 0 12px; }
 .lgc-price__p b { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
@@ -888,7 +892,7 @@ body {
 
 .lgc-tglbtn { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 0; border-radius: 12px; background: none; color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .lgc-tglbtn i { opacity: 0.85; }
-.lgc-tglbtn.is-on { box-shadow: inset 0 0 0 999px rgba(122, 162, 255, 0.28); }
+.lgc-tglbtn.is-on { color: #fff; }
 
 .lgc-split { display: inline-flex; align-items: stretch; border-radius: 12px; overflow: hidden; color: #fff; }
 .lgc-split__main { padding: 9px 16px; border: 0; background: none; color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
