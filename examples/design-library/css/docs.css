@@ -573,7 +573,7 @@ body {
 .lgc-btn span { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
 .lgc-btn i { font-size: 14px; }
 .lgc-btn--accent {
-  background: linear-gradient(180deg, #5cb8ff, #4d7cff); border-color: transparent;
+  color: #fff;
 }
 .lgc-iconbtn {
   width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
@@ -611,10 +611,10 @@ body {
 .lgc-check, .lgc-radio { border: 0; background: none; padding: 0; cursor: pointer; }
 .lgc-check__box { position: relative; width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.16); color: #fff; transition: background 0.2s; }
 .lgc-check__mark { font-size: 16px; transform: scale(0); }
-.lgc-check.is-on .lgc-check__box { background: rgba(77, 124, 255, 0.5); }
+.lgc-check.is-on .lgc-check__box { color: #fff; }
 .lgc-radio__disc { position: relative; display: block; width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); transition: background 0.2s; }
 .lgc-radio__dot { position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%) scale(0); box-shadow: 0 0 8px rgba(255, 255, 255, 0.6); }
-.lgc-radio.is-on .lgc-radio__disc { background: rgba(77, 124, 255, 0.5); }
+.lgc-radio.is-on .lgc-radio__disc { color: #fff; }
 
 /* search */
 .lgc-search { display: flex; align-items: center; gap: 10px; width: 240px; height: 46px; padding: 0 16px; border-radius: 999px; color: #fff; }
@@ -688,7 +688,7 @@ body {
 /* pagination */
 .lgc-pager { display: inline-flex; gap: 6px; }
 .lgc-pager__b { width: 38px; height: 38px; border: 0; border-radius: 10px; display: grid; place-items: center; color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
-.lgc-pager__b.is-on { background: rgba(122, 162, 255, 0.45); }
+.lgc-pager__b.is-on { color: #fff; }
 .lgc-pager__b.is-gap { background: none; box-shadow: none; cursor: default; opacity: 0.7; }
 
 /* tooltip */

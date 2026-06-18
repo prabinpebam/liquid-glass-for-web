@@ -259,16 +259,17 @@ function supportsBackdropUrl() {
  * attachGlass(el, opts) — generate maps for the element's box and apply the
  * kube filter chain. Returns a live handle.
  *
- * opts: { surface, radius|'pill', bezel, thickness(index), blur, refraction,
- *         saturation, specular, light, fallbackBlur }
+ * opts: { surface, radius|'pill', refractionInset|'radius'|bezel, thickness(index),
+ *         blur, refraction, saturation, specular, light, fallbackBlur }
  * ------------------------------------------------------------------------- */
 export function attachGlass(el, opts = {}) {
   const id = nextId();
   const o = {
-    surface: 'convex', radius: 'pill', bezel: 14, thickness: 1.5,
-    blur: 0.4, refraction: 1, saturation: 6, specular: 1,
+    surface: 'convex', radius: 'pill', refractionInset: 'radius', thickness: 1.5,
+    blur: 0.4, refraction: null, saturation: 6, specular: 1,
     light: -Math.PI / 4, fallbackBlur: 8, ...opts,
   };
+  if (opts.refractionInset == null && opts.bezel != null) o.refractionInset = opts.bezel;
 
   const filter = svg('filter', { id, x: '-35%', y: '-35%', width: '170%', height: '170%', 'color-interpolation-filters': 'sRGB' });
   const blur = svg('feGaussianBlur', { in: 'SourceGraphic', stdDeviation: o.blur, result: 'src' });
@@ -298,28 +299,28 @@ export function attachGlass(el, opts = {}) {
     // misaligns the displacement map with the actual shape.
     const nw = el.offsetWidth, nh = el.offsetHeight;
     if (nw <= 0 || nh <= 0) return;
-    if (nw === w && nh === h && field) { applyScale(); return; }
+    const radius = o.radius === 'pill' ? Math.min(nw, nh) / 2 : o.radius;
+    const requestedInset = o.refractionInset === 'radius' ? radius : o.refractionInset;
+    const nextInset = Math.min(requestedInset, Math.min(nw, nh) / 2);
+    if (nw === w && nh === h && nextInset === curBezel && field) { applyScale(); return; }
     w = nw; h = nh;
-    const radius = o.radius === 'pill' ? Math.min(w, h) / 2 : o.radius;
-    const bezel = Math.min(o.bezel, Math.min(w, h) / 2);
-    curBezel = bezel;
-    field = buildField(o.surface, bezel, o.thickness);
-    const geo = { width: w, height: h, radius, bezel };
+    const refractionInset = nextInset;
+    curBezel = refractionInset;
+    field = buildField(o.surface, refractionInset, o.thickness);
+    const geo = { width: w, height: h, radius, bezel: refractionInset };
     dispImg.setAttribute('href', displacementURL(field, geo));
     dispImg.setAttribute('width', w); dispImg.setAttribute('height', h);
     specImg.setAttribute('href', specularURL(geo, o.light));
     specImg.setAttribute('width', w); specImg.setAttribute('height', h);
     applyScale();
   };
-  // Displacement scale = bend strength, in px (feDisplacementMap `scale`).
-  //   • scaleBase given  → scale = scaleBase × refraction   (reference values:
-  //     the kube switch/slider/lens use 55.65 / 83.88 / 98.25 at their sizes).
-  //   • otherwise        → scale = 3.2 × refraction × bezel  (bezel-proportional
-  //     fallback for the generic controls, tuned to the reference strength).
+  // Refraction is the displacement strength in px (feDisplacementMap `scale`).
+  // Refraction inset is the absolute px width of the shape edge region used to
+  // generate the displacement map. Changing it rebuilds the map geometry.
   const applyScale = () => {
     if (!field) return;
-    const base = o.scaleBase != null ? o.scaleBase : 3.2 * Math.max(curBezel, 1);
-    disp.setAttribute('scale', String(base * o.refraction));
+    const refraction = o.refraction != null ? o.refraction : 3.2 * Math.max(curBezel, 1);
+    disp.setAttribute('scale', String(refraction));
   };
 
   if (supportsBackdropUrl()) {
@@ -336,10 +337,10 @@ export function attachGlass(el, opts = {}) {
 
   return {
     el,
+    set refractionInset(v) { o.refractionInset = v; rebuild(); },
+    get refractionInset() { return curBezel || o.refractionInset; },
     set refraction(v) { o.refraction = v; applyScale(); },
-    get refraction() { return o.refraction; },
-    set distortion(v) { o.scaleBase = v; applyScale(); },
-    get distortion() { return o.scaleBase != null ? o.scaleBase : 3.2 * Math.max(curBezel, 1); },
+    get refraction() { return o.refraction != null ? o.refraction : 3.2 * Math.max(curBezel, 1); },
     set saturation(v) { o.saturation = v; sat.setAttribute('values', String(v)); },
     set specular(v) { o.specular = v; funcA.setAttribute('slope', String(v)); },
     set blur(v) { o.blur = v; blur.setAttribute('stdDeviation', String(v)); },

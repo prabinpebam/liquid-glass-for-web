@@ -45,7 +45,7 @@ reference, not yet implemented.
 | Sizing | Control heights, icon sizes, stroke widths | built |
 | Radius | Corner radii incl. `pill` | built |
 | Elevation | Shadow scale (rest→raised→lifted) | built |
-| Glass / material | Bezel, thickness, blur, refraction, tint, stroke, specular | built |
+| Glass / material | Bezel, thickness, blur, refraction inset (px), refraction, tint, stroke, specular | built |
 | Motion | Durations, easings, spring families, activation, presets | built |
 | Z‑index | Stacking scale (base→popup→toast) | built |
 | Semantic | Control height/padding, focus ring, default surface radius | built |
