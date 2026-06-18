@@ -369,7 +369,7 @@ const DEFAULTS = {
   blur: 1,
   saturation: 1.6,
   specular: 0.5,
-  light: -Math.PI / 3,
+  light: -Math.PI / 4,
   chromatic: 0,
   mode: 'backdrop', // 'backdrop' | 'filter'
 };

@@ -185,7 +185,7 @@ function displacementURL(field, geo) {
  *     edge and peaks just inside → a thin tube line, never a fuzzy gradient.
  * This is the only mechanism that draws the lit edge; never use a CSS border or
  * a static box-shadow rim. */
-function specularURL(geo, light = -Math.PI / 3) {
+function specularURL(geo, light = -Math.PI / 4) {
   const l = 2;                                 // supersample scale (reference i = 2)
   const cw = Math.max(1, Math.round(geo.width * l));
   const ch = Math.max(1, Math.round(geo.height * l));
@@ -267,7 +267,7 @@ export function attachGlass(el, opts = {}) {
   const o = {
     surface: 'convex', radius: 'pill', bezel: 14, thickness: 1.5,
     blur: 0.4, refraction: 1, saturation: 6, specular: 1,
-    light: -Math.PI / 3, fallbackBlur: 8, ...opts,
+    light: -Math.PI / 4, fallbackBlur: 8, ...opts,
   };
 
   const filter = svg('filter', { id, x: '-35%', y: '-35%', width: '170%', height: '170%', 'color-interpolation-filters': 'sRGB' });
