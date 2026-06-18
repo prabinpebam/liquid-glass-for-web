@@ -120,15 +120,15 @@ body {
 /* Alternating diagonal stripes */
 [data-bg='stripes'] .hero__demo,
 [data-bg='stripes'] .spec__demo {
-  background-color: #11162a;
+  background-color: #151820;
   background-repeat: repeat;
-  background-image: repeating-linear-gradient(135deg, #141c36 0 18px, #25355e 18px 36px, #4d7cff 36px 40px, #25355e 40px 44px);
+  background-image: repeating-linear-gradient(135deg, #171a22 0 18px, #222630 18px 36px, #2d323e 36px 38px, #222630 38px 42px);
   background-size: 62px 62px;
 }
 [data-theme='light'][data-bg='stripes'] .hero__demo,
 [data-theme='light'][data-bg='stripes'] .spec__demo {
-  background-color: #e9edf6;
-  background-image: repeating-linear-gradient(135deg, #f7f9ff 0 18px, #dbe5f7 18px 36px, #74c0fc 36px 40px, #dbe5f7 40px 44px);
+  background-color: #edf0f4;
+  background-image: repeating-linear-gradient(135deg, #f4f6f8 0 18px, #e1e5ea 18px 36px, #cfd5dd 36px 38px, #e1e5ea 38px 42px);
 }
 
 /* Photo backgrounds — rotated to landscape */
