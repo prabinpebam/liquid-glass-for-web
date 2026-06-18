@@ -367,18 +367,25 @@ function renderHeroStats() {
     `<div class="stat"><div class="stat__n">${n}</div><div class="stat__l">${l}</div></div>`).join('');
 }
 
+/* Wide live demos span two gallery columns so horizontal compounds fit. */
+const WIDE = new Set([
+  'navbar', 'mediaPlayer', 'toolbar', 'commandPalette', 'modal', 'authForm',
+  'datePicker', 'chatThread', 'dataTable', 'table', 'pricingTable', 'productCard',
+]);
+
 function renderSections() {
   document.getElementById('sections').innerHTML = INVENTORY.map((cat) => {
     const groups = cat.groups.map((g) => {
       const cards = g.items.map(([name, status, purpose, demo]) => {
         const id = itemId(cat.id, name);
         const live = demo && MOUNTS[demo];
+        const wide = live && WIDE.has(demo);
         const preview = live
           ? `<div class="pv pv--live" data-mount="${demo}"></div>`
           : demo && DEMOS[demo]
             ? `<div class="pv">${DEMOS[demo]}</div>`
             : `<div class="placeholder"><i class="fa-regular fa-square-full" aria-hidden="true"></i><span>Preview soon</span></div>`;
-        return `<article class="spec" id="${id}" data-name="${name.toLowerCase()}" data-purpose="${purpose.toLowerCase()}">
+        return `<article class="spec${wide ? ' spec--wide' : ''}" id="${id}" data-name="${name.toLowerCase()}" data-purpose="${purpose.toLowerCase()}">
           <div class="spec__demo">${preview}</div>
           <div class="spec__body">
             <div class="spec__name">${name}<span class="chip chip--${status}">${status}</span></div>

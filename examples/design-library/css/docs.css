@@ -263,6 +263,8 @@ body {
 .group__title::after { content: ''; flex: 1; height: 1px; background: var(--d-line); }
 
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.spec--wide { grid-column: span 2; }
+@media (max-width: 560px) { .spec--wide { grid-column: auto; } }
 
 .spec {
   display: flex; flex-direction: column;
@@ -276,7 +278,7 @@ body {
 .spec:hover { transform: translateY(-3px); border-color: var(--d-line-strong); }
 .spec__demo {
   position: relative; min-height: 132px; display: grid; place-items: center;
-  padding: 22px; overflow: hidden;
+  padding: 22px; overflow: visible;
 }
 .spec__body { padding: 14px 16px 16px; border-top: 1px solid var(--d-line); }
 .spec__name { font-size: 14.5px; font-weight: 650; display: flex; align-items: center; gap: 8px; }
@@ -482,10 +484,10 @@ body {
    + fine grid so the displacement (refraction) is clearly visible.
    ========================================================================== */
 .pv--live {
-  position: absolute; inset: 0; display: grid; place-items: center;
-  padding: 16px; overflow: hidden;
+  position: relative; width: 100%; display: grid; place-items: center;
+  padding: 16px; overflow: visible;
 }
-.pv--live > * { position: relative; z-index: 1; }
+.pv--live > * { position: relative; z-index: 1; max-width: 100%; }
 .lgc-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: center; }
 
 /* shared glass body for the live controls — NO css border and NO css rim. The
@@ -495,10 +497,17 @@ body {
    elevation is not part of the glass effect, the rim is. */
 .lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-card, .lgc-toast,
 .lgc-seg, .lgc-seg__ind, .lgc-check__box, .lgc-radio__disc,
-.lgc-lens__capsule {
+.lgc-lens__capsule,
+.lgc-field, .lgc-otp__cell, .lgc-tabs__ind, .lgc-pager__b, .lgc-tooltip,
+.lgc-menu, .lgc-acc, .lgc-stat, .lgc-list, .lgc-tbl, .lgc-nav, .lgc-side,
+.lgc-modal, .lgc-cmd, .lgc-tool, .lgc-prod, .lgc-auth, .lgc-cal, .lgc-media,
+.lgc-chat__b--them, .lgc-price {
   box-shadow: 0 7px 20px rgba(0, 0, 0, 0.18);
 }
-.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-card, .lgc-toast {
+.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-card, .lgc-toast,
+.lgc-field, .lgc-otp__cell, .lgc-tooltip, .lgc-menu, .lgc-acc, .lgc-stat,
+.lgc-list, .lgc-tbl, .lgc-nav, .lgc-side, .lgc-modal, .lgc-cmd, .lgc-tool,
+.lgc-prod, .lgc-auth, .lgc-cal, .lgc-media, .lgc-chat__b--them, .lgc-price {
   background: rgba(255, 255, 255, 0.14);
 }
 
@@ -591,3 +600,190 @@ body {
   position: absolute; left: 16px; bottom: 14px; z-index: 2; display: flex; align-items: center; gap: 8px;
   font-size: 12.5px; color: rgba(255, 255, 255, 0.9); text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45); pointer-events: none;
 }
+
+/* ===========================================================================
+   The rest of the library — every part is ONE glass surface (engine attach
+   point) holding flat content. Content uses translucent on-glass styling only;
+   the rim + refraction come entirely from the shared engine, never CSS borders.
+   ======================================================================== */
+
+/* text entry */
+.lgc-field { display: flex; align-items: center; gap: 10px; width: 240px; max-width: 100%; height: 46px; padding: 0 16px; border-radius: 12px; color: #fff; }
+.lgc-field__i { font-size: 14px; opacity: 0.8; }
+.lgc-field input { flex: 1; min-width: 0; border: 0; background: none; outline: none; color: #fff; font: inherit; font-size: 14px; }
+.lgc-field input::placeholder { color: rgba(255, 255, 255, 0.65); }
+.lgc-field--area { height: 92px; align-items: stretch; padding: 12px 14px; border-radius: 14px; }
+.lgc-field--area textarea { flex: 1; border: 0; background: none; outline: none; resize: none; color: #fff; font: inherit; font-size: 14px; line-height: 1.5; }
+.lgc-field--area textarea::placeholder { color: rgba(255, 255, 255, 0.65); }
+
+/* OTP */
+.lgc-otp { display: flex; gap: 10px; }
+.lgc-otp__cell { width: 46px; height: 54px; border-radius: 12px; display: grid; place-items: center; color: #fff; font-size: 22px; font-weight: 650; }
+.lgc-otp__cell.is-active { box-shadow: 0 0 0 2px rgba(122, 162, 255, 0.9), 0 7px 20px rgba(0, 0, 0, 0.18); }
+
+/* tabs */
+.lgc-tabs { position: relative; display: inline-flex; gap: 2px; padding: 5px; border-radius: 13px; background: rgba(255, 255, 255, 0.12); }
+.lgc-tabs__ind { position: absolute; top: 5px; bottom: 5px; left: 0; border-radius: 9px; pointer-events: none; will-change: transform, width; }
+.lgc-tabs__t { position: relative; z-index: 1; border: 0; background: none; padding: 8px 16px; border-radius: 9px; color: rgba(255, 255, 255, 0.75); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.lgc-tabs__t.is-on { color: #fff; }
+
+/* menu / list shared rows */
+.lgc-menu { width: 200px; padding: 6px; border-radius: 14px; color: #fff; }
+.lgc-menu__i { padding: 9px 12px; border-radius: 9px; font-size: 13.5px; cursor: pointer; transition: background 0.16s; }
+.lgc-menu__i:hover { background: rgba(255, 255, 255, 0.1); }
+.lgc-menu__i.is-on { background: rgba(122, 162, 255, 0.32); }
+
+/* pagination */
+.lgc-pager { display: inline-flex; gap: 6px; }
+.lgc-pager__b { width: 38px; height: 38px; border: 0; border-radius: 10px; display: grid; place-items: center; color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.lgc-pager__b.is-on { background: rgba(122, 162, 255, 0.45); }
+.lgc-pager__b.is-gap { background: none; box-shadow: none; cursor: default; opacity: 0.7; }
+
+/* tooltip */
+.lgc-tooltip { display: inline-flex; align-items: center; padding: 9px 14px; border-radius: 10px; color: #fff; font-size: 12.5px; font-weight: 500; }
+
+/* accordion */
+.lgc-acc { width: 240px; padding: 6px; border-radius: 14px; color: #fff; overflow: hidden; }
+.lgc-acc__row + .lgc-acc__row { border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.lgc-acc__h { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 10px; border: 0; background: none; color: #fff; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.lgc-acc__i { font-size: 12px; opacity: 0.8; }
+.lgc-acc__b { max-height: 0; overflow: hidden; transition: max-height 0.26s ease; }
+.lgc-acc__row.is-open .lgc-acc__b { max-height: 80px; }
+.lgc-acc__b p { margin: 0 10px 11px; font-size: 12.5px; color: rgba(255, 255, 255, 0.75); }
+
+/* stat */
+.lgc-stat { width: 180px; padding: 16px 18px; border-radius: 16px; color: #fff; }
+.lgc-stat__l { font-size: 12.5px; color: rgba(255, 255, 255, 0.75); }
+.lgc-stat__n { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-top: 4px; }
+.lgc-stat__d { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 12.5px; color: #6ee79a; }
+
+/* list */
+.lgc-list { width: 220px; padding: 6px; border-radius: 14px; color: #fff; }
+.lgc-list__i { display: flex; align-items: center; gap: 11px; padding: 9px 11px; border-radius: 9px; font-size: 13.5px; cursor: pointer; transition: background 0.16s; }
+.lgc-list__i:hover { background: rgba(255, 255, 255, 0.1); }
+.lgc-list__ic { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.16); font-size: 12px; flex: none; }
+.lgc-list__t { flex: 1; }
+.lgc-list__n { font-size: 11.5px; color: rgba(255, 255, 255, 0.7); background: rgba(255, 255, 255, 0.14); border-radius: 999px; padding: 1px 8px; }
+
+/* table */
+.lgc-tbl { width: 240px; padding: 6px; border-radius: 16px; color: #fff; }
+.lgc-tbl__r { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 8px; padding: 9px 12px; font-size: 12.5px; }
+.lgc-tbl__r + .lgc-tbl__r { border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.lgc-tbl__r--h { color: rgba(255, 255, 255, 0.65); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+.lgc-tbl__r span:last-child { color: rgba(255, 255, 255, 0.8); }
+
+/* form field */
+.lgc-formfield { display: grid; gap: 7px; justify-items: start; }
+.lgc-formfield__l { font-size: 12.5px; color: rgba(255, 255, 255, 0.85); }
+.lgc-formfield__h { font-size: 11.5px; color: rgba(255, 255, 255, 0.6); }
+
+/* navbar */
+.lgc-nav { width: 100%; padding: 0 8px; height: 52px; border-radius: 16px; color: #fff; }
+.lgc-nav__in { display: flex; align-items: center; gap: 10px; height: 100%; padding: 0 8px; }
+.lgc-nav__brand { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.lgc-nav__dot { width: 18px; height: 18px; border-radius: 6px; background: linear-gradient(135deg, #74c0fc, #4d7cff); flex: none; }
+.lgc-nav__links { display: flex; gap: 2px; margin-left: auto; }
+.lgc-nav__a { padding: 6px 10px; border-radius: 8px; font-size: 12.5px; color: rgba(255, 255, 255, 0.75); text-decoration: none; }
+.lgc-nav__a.is-on { color: #fff; background: rgba(255, 255, 255, 0.14); }
+.lgc-nav__cta { padding: 6px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: linear-gradient(180deg, #5cb8ff, #4d7cff); color: #fff; }
+.lgc-nav__avatar { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #74c0fc, #4d7cff); }
+
+/* sidebar */
+.lgc-side { width: 190px; padding: 8px; border-radius: 16px; color: #fff; }
+.lgc-side__i { display: flex; align-items: center; gap: 11px; padding: 10px 11px; border-radius: 10px; font-size: 13.5px; cursor: pointer; transition: background 0.16s; }
+.lgc-side__i:hover { background: rgba(255, 255, 255, 0.08); }
+.lgc-side__i.is-on { background: rgba(122, 162, 255, 0.32); }
+.lgc-side__ic { width: 24px; text-align: center; opacity: 0.9; }
+
+/* toolbar */
+.lgc-tool { display: inline-block; padding: 6px; border-radius: 14px; color: #fff; }
+.lgc-tool__in { display: flex; align-items: center; gap: 3px; }
+.lgc-tool__b { width: 34px; height: 34px; border: 0; border-radius: 9px; background: none; color: #fff; font: inherit; font-size: 14px; cursor: pointer; }
+.lgc-tool__b:hover { background: rgba(255, 255, 255, 0.1); }
+.lgc-tool__b.is-on { background: rgba(122, 162, 255, 0.4); }
+.lgc-tool__sep { width: 1px; height: 22px; margin: 0 4px; background: rgba(255, 255, 255, 0.18); }
+
+/* command palette */
+.lgc-cmd { width: 280px; max-width: 100%; padding: 10px; border-radius: 18px; color: #fff; }
+.lgc-cmd__field { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 11px; background: rgba(255, 255, 255, 0.1); margin-bottom: 8px; }
+.lgc-cmd__si { opacity: 0.7; }
+.lgc-cmd__sp { flex: 1; font-size: 13px; color: rgba(255, 255, 255, 0.6); }
+.lgc-cmd__i { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 9px; font-size: 13.5px; cursor: pointer; }
+.lgc-cmd__i:hover { background: rgba(255, 255, 255, 0.08); }
+.lgc-cmd__i.is-on { background: rgba(122, 162, 255, 0.3); }
+.lgc-cmd__ic { width: 22px; text-align: center; opacity: 0.85; font-size: 12px; }
+.lgc-cmd__t { flex: 1; }
+.lgc-cmd kbd, .lgc-cmd__field kbd { font-family: var(--d-mono); font-size: 11px; color: rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 1px 6px; }
+
+/* modal */
+.lgc-modal { width: 260px; max-width: 100%; padding: 22px; border-radius: 20px; color: #fff; text-align: center; }
+.lgc-modal__in { display: grid; justify-items: center; gap: 6px; }
+.lgc-modal__icon { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 138, 138, 0.28); color: #ff8a8a; font-size: 18px; margin-bottom: 4px; }
+.lgc-modal__t { font-size: 16px; font-weight: 650; }
+.lgc-modal__d { font-size: 12.5px; color: rgba(255, 255, 255, 0.75); line-height: 1.5; }
+.lgc-modal__row { display: flex; gap: 10px; margin-top: 12px; }
+.lgc-modal__btn { padding: 9px 18px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.16); color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.lgc-modal__btn--danger { background: linear-gradient(180deg, #ff7a7a, #f0454f); }
+
+/* auth form */
+.lgc-auth { width: 240px; max-width: 100%; padding: 22px; border-radius: 20px; color: #fff; }
+.lgc-auth__in { display: grid; gap: 10px; }
+.lgc-auth__t { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; text-align: center; }
+.lgc-auth__d { font-size: 12.5px; color: rgba(255, 255, 255, 0.7); text-align: center; margin-top: -4px; margin-bottom: 4px; }
+.lgc-auth__f { display: flex; align-items: center; gap: 10px; padding: 11px 13px; border-radius: 11px; background: rgba(255, 255, 255, 0.12); font-size: 13px; color: rgba(255, 255, 255, 0.85); }
+.lgc-auth__f i { opacity: 0.7; font-size: 13px; }
+.lgc-auth__cta { margin-top: 4px; padding: 11px; border: 0; border-radius: 11px; background: linear-gradient(180deg, #5cb8ff, #4d7cff); color: #fff; font: inherit; font-size: 13.5px; font-weight: 600; text-align: center; cursor: pointer; }
+
+/* date picker */
+.lgc-cal { width: 250px; max-width: 100%; padding: 16px; border-radius: 18px; color: #fff; }
+.lgc-cal__h { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; font-weight: 600; margin-bottom: 12px; }
+.lgc-cal__nav { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; font-size: 12px; cursor: pointer; opacity: 0.85; }
+.lgc-cal__nav:hover { background: rgba(255, 255, 255, 0.12); }
+.lgc-cal__dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 4px; }
+.lgc-cal__dow span { text-align: center; font-size: 10px; color: rgba(255, 255, 255, 0.55); padding: 3px 0; }
+.lgc-cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.lgc-cal__d { aspect-ratio: 1; border: 0; border-radius: 8px; background: none; color: rgba(255, 255, 255, 0.85); font: inherit; font-size: 12px; cursor: pointer; }
+.lgc-cal__d:hover { background: rgba(255, 255, 255, 0.1); }
+.lgc-cal__d.is-on { background: linear-gradient(180deg, #5cb8ff, #4d7cff); color: #fff; }
+
+/* media player */
+.lgc-media { width: 100%; padding: 12px 14px; border-radius: 16px; color: #fff; }
+.lgc-media__in { display: grid; gap: 10px; }
+.lgc-media__top { display: flex; align-items: center; gap: 12px; }
+.lgc-media__play { width: 38px; height: 38px; border: 0; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(180deg, #5cb8ff, #4d7cff); color: #fff; font-size: 13px; cursor: pointer; flex: none; }
+.lgc-media__meta { display: grid; gap: 1px; flex: 1; min-width: 0; }
+.lgc-media__meta b { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lgc-media__meta span { font-size: 11px; color: rgba(255, 255, 255, 0.65); }
+.lgc-media__track { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.22); overflow: hidden; }
+.lgc-media__fill { display: block; width: 42%; height: 100%; border-radius: 3px; background: #fff; }
+.lgc-media__time { font-size: 11px; color: rgba(255, 255, 255, 0.7); flex: none; }
+
+/* chat */
+.lgc-chat { display: grid; gap: 10px; width: 230px; max-width: 100%; }
+.lgc-chat__b { max-width: 80%; padding: 10px 14px; font-size: 13px; line-height: 1.4; color: #fff; }
+.lgc-chat__b--them { justify-self: start; border-radius: 16px 16px 16px 5px; }
+.lgc-chat__b--me { justify-self: end; border-radius: 16px 16px 5px 16px; background: linear-gradient(180deg, #5cb8ff, #4d7cff); box-shadow: 0 7px 20px rgba(77, 124, 255, 0.4); }
+
+/* product card */
+.lgc-prod { width: 200px; max-width: 100%; padding: 14px; border-radius: 18px; color: #fff; }
+.lgc-prod__media { height: 96px; border-radius: 12px; background: linear-gradient(135deg, #ffd6a5, #ff8fab 55%, #c77dff); margin-bottom: 12px; }
+.lgc-prod__t { font-size: 15px; font-weight: 650; }
+.lgc-prod__sub { font-size: 12px; color: rgba(255, 255, 255, 0.7); margin-top: 1px; }
+.lgc-prod__row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.lgc-prod__row b { font-size: 17px; }
+.lgc-prod__add { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; background: linear-gradient(180deg, #5cb8ff, #4d7cff); font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.lgc-prod__add i { font-size: 10px; }
+
+/* pricing */
+.lgc-price-row { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; justify-content: center; }
+.lgc-price { width: 150px; padding: 18px; border-radius: 18px; color: #fff; }
+.lgc-price.is-hot { box-shadow: 0 0 0 1.5px rgba(122, 162, 255, 0.7), 0 10px 28px rgba(0, 0, 0, 0.22); }
+.lgc-price__name { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.8); }
+.lgc-price__p { display: flex; align-items: baseline; gap: 3px; margin: 6px 0 12px; }
+.lgc-price__p b { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+.lgc-price__p span { font-size: 12px; color: rgba(255, 255, 255, 0.6); }
+.lgc-price__f { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
+.lgc-price__f li { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: rgba(255, 255, 255, 0.85); }
+.lgc-price__f i { font-size: 10px; color: #6ee79a; }
+.lgc-price__cta { display: block; padding: 9px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: 600; background: rgba(255, 255, 255, 0.16); cursor: pointer; }
+.lgc-price__cta.is-hot { background: linear-gradient(180deg, #5cb8ff, #4d7cff); }
