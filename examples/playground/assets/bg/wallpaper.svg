@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1179" height="2556" viewBox="0 0 1179 2556" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#3a1c71"/>
+      <stop offset="0.5" stop-color="#5b2c8f"/>
+      <stop offset="1" stop-color="#11204a"/>
+    </linearGradient>
+    <radialGradient id="b1" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ff7eb3"/>
+      <stop offset="1" stop-color="#ff7eb3" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b2" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#42e6c8"/>
+      <stop offset="1" stop-color="#42e6c8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b3" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd166"/>
+      <stop offset="1" stop-color="#ffd166" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b4" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#4d9bff"/>
+      <stop offset="1" stop-color="#4d9bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b5" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#c77dff"/>
+      <stop offset="1" stop-color="#c77dff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+  </defs>
+
+  <rect width="1179" height="2556" fill="url(#sky)"/>
+
+  <g filter="url(#soft)">
+    <circle cx="240" cy="380" r="420" fill="url(#b1)"/>
+    <circle cx="980" cy="640" r="520" fill="url(#b4)"/>
+    <circle cx="160" cy="1280" r="480" fill="url(#b2)"/>
+    <circle cx="1050" cy="1560" r="560" fill="url(#b5)"/>
+    <circle cx="520" cy="2000" r="520" fill="url(#b3)"/>
+    <circle cx="900" cy="2320" r="460" fill="url(#b1)"/>
+    <circle cx="600" cy="1120" r="360" fill="url(#b4)"/>
+  </g>
+
+  <g opacity="0.5">
+    <path d="M0 1700 C 300 1600 600 1820 1179 1660 L 1179 2556 L 0 2556 Z" fill="#0c1330" opacity="0.55"/>
+    <path d="M0 1980 C 360 1900 720 2080 1179 1940 L 1179 2556 L 0 2556 Z" fill="#070a1f" opacity="0.7"/>
+  </g>
+
+  <g fill="#ffffff">
+    <circle cx="320" cy="520" r="3" opacity="0.8"/>
+    <circle cx="760" cy="300" r="2.4" opacity="0.7"/>
+    <circle cx="1020" cy="900" r="2.6" opacity="0.6"/>
+    <circle cx="180" cy="980" r="2.2" opacity="0.7"/>
+    <circle cx="540" cy="760" r="2" opacity="0.6"/>
+    <circle cx="880" cy="1180" r="2.8" opacity="0.6"/>
+    <circle cx="420" cy="1500" r="2.2" opacity="0.5"/>
+  </g>
+</svg>

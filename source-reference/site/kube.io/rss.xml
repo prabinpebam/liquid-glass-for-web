@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>kube.io</title>
+    <link>https://kube.io</link>
+    <description>Articles and notes</description>
+    <lastBuildDate>Sat, 20 Sep 2025 01:27:48 GMT</lastBuildDate>
+
+  <item>
+    <title>Liquid Glass in the Browser: Refraction with CSS and SVG</title>
+    <link>https://kube.io/blog/liquid-glass-css-svg</link>
+    <guid>https://kube.io/blog/liquid-glass-css-svg</guid>
+    <pubDate>Sat, 04 Oct 2025 00:00:00 GMT</pubDate>
+    <description>Explore how to recreate Apple&apos;s stunning Liquid Glass effect using CSS, SVG Displacement Maps, and refraction calculations.</description>
+  </item>
+
+  <item>
+    <title>It&apos;s Been Ten Years</title>
+    <link>https://kube.io/blog/its-been-ten-years</link>
+    <guid>https://kube.io/blog/its-been-ten-years</guid>
+    <pubDate>Sun, 28 Sep 2025 00:00:00 GMT</pubDate>
+    <description>A quick intro to my blog.</description>
+  </item>
+  </channel>
+</rss>

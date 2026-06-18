@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Liquid Glass — Playground</title>
+    <link rel="stylesheet" href="./css/playground.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="intro">
+        <h1>Liquid Glass</h1>
+        <p>
+          Browser refraction with CSS and SVG. Every demo reproduces the kube.io
+          article using its own pre-baked displacement / specular maps and the
+          exact SVG filter chains — drag the lens, flip the switch, slide the
+          thumb, and tune each demo's own parameters live.
+        </p>
+      </header>
+
+      <!-- ============================ PRECISION LENS ===================== -->
+      <section class="demo">
+        <h2 class="demo__eyebrow">Precision Lens</h2>
+        <div class="stage stage--lens">
+          <div class="lens-card">
+            <div class="lens-card__text">
+              <span class="lens-card__kicker">Optical rig</span>
+              <h3>Liquid Glass<br />Precision Lens</h3>
+              <p>Drag the capsule to bend the page. This lens is a compact SVG
+                displacement rig that refracts whatever sits beneath it.</p>
+              <p>Pixels are pushed along the bezel gradient, then topped with a
+                subtle specular bloom for depth. Sweep across strong edges —
+                high contrast makes the bend snap.</p>
+            </div>
+            <div class="lens-card__photo"></div>
+          </div>
+          <div class="lens" id="lens" aria-label="Draggable lens"></div>
+        </div>
+
+        <div class="params" data-params="lens">
+          <strong class="params__title">Parameters</strong>
+          <label class="param"><span>Specular opacity</span><i data-out="lens-specular">0.50</i>
+            <input type="range" data-k="specular" min="0" max="1" step="0.01" value="0.5" /></label>
+          <label class="param"><span>Specular saturation</span><i data-out="lens-saturation">9</i>
+            <input type="range" data-k="saturation" min="0" max="50" step="1" value="9" /></label>
+          <label class="param"><span>Refraction level</span><i data-out="lens-refraction">1.00</i>
+            <input type="range" data-k="refraction" min="0" max="1" step="0.01" value="1" /></label>
+        </div>
+      </section>
+
+      <!-- ============================ SEARCHBOX ========================== -->
+      <section class="demo">
+        <h2 class="demo__eyebrow">Searchbox</h2>
+        <div class="stage stage--search" id="search-stage">
+          <div class="searchbox" id="searchbox">
+            <span class="ico ico--search"></span>
+            <span class="searchbox__ph">Search</span>
+          </div>
+          <label class="stage__toggle">
+            <input type="checkbox" id="search-bg" /> Use image background
+          </label>
+        </div>
+
+        <div class="params" data-params="search">
+          <strong class="params__title">Parameters</strong>
+          <label class="param"><span>Specular opacity</span><i data-out="search-specular">0.20</i>
+            <input type="range" data-k="specular" min="0" max="1" step="0.01" value="0.2" /></label>
+          <label class="param"><span>Specular saturation</span><i data-out="search-saturation">4</i>
+            <input type="range" data-k="saturation" min="0" max="50" step="1" value="4" /></label>
+          <label class="param"><span>Refraction level</span><i data-out="search-refraction">0.70</i>
+            <input type="range" data-k="refraction" min="0" max="1" step="0.01" value="0.7" /></label>
+          <label class="param"><span>Blur level</span><i data-out="search-blur">1.0</i>
+            <input type="range" data-k="blur" min="0" max="40" step="0.1" value="1" /></label>
+        </div>
+      </section>
+
+      <!-- ============================== SWITCH =========================== -->
+      <section class="demo">
+        <h2 class="demo__eyebrow">Switch</h2>
+        <p class="demo__note">A lip-bezel toggle — convex on the outside, concave
+          in the middle. The glass knob magnifies the track as it slides. Click it
+          to flip, or force it on.</p>
+
+        <div class="stage stage--kube" id="switch-stage" data-bg="art">
+          <div class="kswitch" id="switch-el" role="switch" aria-checked="false" tabindex="0">
+            <div class="kswitch__knob" id="switch-knob"></div>
+          </div>
+          <label class="stage__toggle">
+            <input type="checkbox" id="switch-force" /> Force active
+          </label>
+        </div>
+
+        <div class="params" data-params="switch">
+          <strong class="params__title">Parameters</strong>
+          <label class="param"><span>Specular opacity</span><i data-out="switch-specular">0.50</i>
+            <input type="range" data-k="specular" min="0" max="1" step="0.01" value="0.5" /></label>
+          <label class="param"><span>Specular saturation</span><i data-out="switch-saturation">6</i>
+            <input type="range" data-k="saturation" min="0" max="50" step="1" value="6" /></label>
+          <label class="param"><span>Refraction level</span><i data-out="switch-refraction">1.00</i>
+            <input type="range" data-k="refraction" min="0" max="2" step="0.01" value="1" /></label>
+          <label class="param"><span>Blur level</span><i data-out="switch-blur">0.2</i>
+            <input type="range" data-k="blur" min="0" max="10" step="0.1" value="0.2" /></label>
+        </div>
+      </section>
+
+      <!-- ============================== SLIDER =========================== -->
+      <section class="demo">
+        <h2 class="demo__eyebrow">Slider</h2>
+        <p class="demo__note">A convex glass thumb riding a track. Drag it — the
+          thumb refracts the fill and background beneath as it moves.</p>
+
+        <div class="stage stage--kube" id="slider-stage" data-bg="art">
+          <div class="kslider" id="slider-el">
+            <div class="kslider__track">
+              <div class="kslider__fill" id="slider-fill"></div>
+            </div>
+            <div class="kslider__thumb" id="slider-thumb"></div>
+          </div>
+          <label class="stage__toggle">
+            <input type="checkbox" id="slider-force" /> Force active
+          </label>
+        </div>
+
+        <div class="params" data-params="slider">
+          <strong class="params__title">Parameters</strong>
+          <label class="param"><span>Specular opacity</span><i data-out="slider-specular">0.40</i>
+            <input type="range" data-k="specular" min="0" max="1" step="0.01" value="0.4" /></label>
+          <label class="param"><span>Specular saturation</span><i data-out="slider-saturation">7</i>
+            <input type="range" data-k="saturation" min="0" max="50" step="1" value="7" /></label>
+          <label class="param"><span>Refraction level</span><i data-out="slider-refraction">1.00</i>
+            <input type="range" data-k="refraction" min="0" max="2" step="0.01" value="1" /></label>
+          <label class="param"><span>Blur level</span><i data-out="slider-blur">0.0</i>
+            <input type="range" data-k="blur" min="0" max="10" step="0.1" value="0" /></label>
+        </div>
+      </section>
+
+      <!-- =========================== MUSIC PLAYER ======================== -->
+      <section class="demo">
+        <h2 class="demo__eyebrow">Music Player</h2>
+        <p class="demo__note">A convex glass control bar floating over the
+          wallpaper, exactly as in the article. Press play to animate the
+          progress bar.</p>
+
+        <div class="stage stage--kube stage--player" id="player-stage" data-bg="art">
+          <div class="kplayer" id="player-el">
+            <div class="kplayer__controls">
+              <button type="button" class="kbtn" aria-label="Shuffle"><span class="ico ico--shuffle"></span></button>
+              <button type="button" class="kbtn" aria-label="Previous"><span class="ico ico--prev"></span></button>
+              <button type="button" class="kbtn kbtn--play" id="player-play" aria-label="Play"><span class="ico ico--play"></span></button>
+              <button type="button" class="kbtn" aria-label="Next"><span class="ico ico--next"></span></button>
+              <button type="button" class="kbtn" aria-label="Repeat"><span class="ico ico--repeat"></span></button>
+            </div>
+            <div class="kplayer__progress"><div class="kplayer__progress-fill" id="player-progress"></div></div>
+            <div class="kplayer__controls">
+              <button type="button" class="kbtn" aria-label="List"><span class="ico ico--list"></span></button>
+              <button type="button" class="kbtn" aria-label="Volume"><span class="ico ico--volume"></span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="params" data-params="player">
+          <strong class="params__title">Parameters</strong>
+          <label class="param"><span>Specular opacity</span><i data-out="player-specular">0.40</i>
+            <input type="range" data-k="specular" min="0" max="1" step="0.01" value="0.4" /></label>
+          <label class="param"><span>Specular saturation</span><i data-out="player-saturation">4</i>
+            <input type="range" data-k="saturation" min="0" max="50" step="1" value="4" /></label>
+          <label class="param"><span>Refraction level</span><i data-out="player-refraction">1.00</i>
+            <input type="range" data-k="refraction" min="0" max="2" step="0.01" value="1" /></label>
+          <label class="param"><span>Blur level</span><i data-out="player-blur">0.2</i>
+            <input type="range" data-k="blur" min="0" max="10" step="0.1" value="0.2" /></label>
+        </div>
+      </section>
+
+      <footer class="foot">
+        Clean-room reproduction of the technique documented at
+        kube.io/blog/liquid-glass-css-svg. Every demo reuses the article's own
+        displacement / specular maps. See <code>docs/attribution.md</code>.
+      </footer>
+    </main>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

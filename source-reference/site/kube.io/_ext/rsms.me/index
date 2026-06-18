@@ -1,0 +1,237 @@
+<!DOCTYPE HTML>
+<html lang="en" prefix="og:http://ogp.me/ns#" class="home">
+  <head>
+    <meta charset="utf-8">
+    <title>rsms</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" media="all" href="/_ext/rsms.me/inter/inter.css" type="text/css">
+    <link rel="stylesheet" media="all" href="/_ext/rsms.me/inter/inter-display.css" type="text/css">
+    <link rel="stylesheet" media="all" href="/res/fonts/ibm-plex-mono.css?v=20260427014245" type="text/css">
+    <link rel="stylesheet" media="all" href="/res/base.css?v=20260427014245" type="text/css">
+    <link rel="alternate" type="application/atom+xml" title="Rasmus Andersson" href="/atom.xml">
+    <link rel="shortcut icon" href="/favicon.ico?v=20260427014248">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="/res/icon.svg?v=20260427014248">
+    <link rel="apple-touch-icon" href="/res/icon-ios.png?v=20260427014248">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@rsms">
+    <meta name="twitter:creator" content="@rsms">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="RSMS">
+    <meta property="fb:admins" content="728642302">
+    <meta property="fb:app_id" content="38027689216">
+    <meta property="og:image" content="">
+    <meta name="twitter:image" content="">
+    <meta property="og:url" content="/_ext/rsms.me/index">
+    <meta property="og:site_name" content="rsms.me">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="en_GB" />
+    </head>
+  <body>
+    <r-grid class="main" columns=6 columns-s=4 columns-xs=2>
+
+  <r-cell order="-10" span=4 span-s=2>
+    <h1>Hello, I'm Rasmus</h1>
+  </r-cell>
+
+  <r-cell order="-9" class="menu" span=2 span-s=2>
+    <div class='focus0'>
+      <a href="/">&#x25CF;</a>
+      <a href="/about/">About</a>
+      <a href="/projects/">Projects</a>
+      <a href="/work/">Work</a>
+      <a href="/photos/">Photography</a>
+      <a href="https://shop.rsms.me/">Shop</a>
+    </div>
+  </r-cell>
+
+  <r-cell span=2>
+  <h2 class="margin-b-4"><a href="/projects/">Projects</a></h2>
+  
+  
+    <h3><a href="/_ext/rsms.me/hophop/index">hophop</a></h3>
+    <p>Simple programming language
+</p>
+  
+  
+  
+    <h3><a href="https://d.rsms.me/stuff/">stuff</a></h3>
+    <p>Random media I’ve collected since the early 2000s, restored from an old hard drive. I’ve added some new stuff, too.
+</p>
+  
+  
+  
+    <h3><a href="https://github.com/rsms/llvmbox">llvmbox</a></h3>
+    <p>Portable, self contained llvm tools &amp; libs with cross-compilation capability
+</p>
+  
+  
+  
+    <h3><a href="/rsm/">rsm</a></h3>
+    <p>Virtual computer
+</p>
+  
+  
+  
+    <h3><a href="/projects/webgl-texture-loading/">WebGL compressed texture loading demo</a></h3>
+    <p>Demonstrates loading high-resolution photos into WebGL with compressed textures vs “naïve” uncompressed textures from JPEG images
+</p>
+  
+  
+  
+    <h3><a href="/etc/handmade-seattle-2021/">Quality in Software</a></h3>
+    <p>Keynote talk at Handmade Seattle 2021
+</p>
+  
+  
+  
+    <h3><a href="/etc/xsys-demo/">xsys browser demo</a></h3>
+    <p>Proof of concept to implement a virtual OS interface as a syscall that works on many platforms
+</p>
+  
+  
+  
+    <h3><a href="/llvm-coro-example/">LLVM 13 coroutine example</a></h3>
+    <p>Minimal C &amp; LLVM IR program compiled to WASM, demonstrating the new coroutine intrinsics in LLVM 13
+</p>
+  
+  
+  
+    <h3><a href="http://1998.rsms.me/">1998.rsms.me</a></h3>
+    <p>Homepage for old software (no SSL)
+</p>
+  
+  
+  
+    <h3><a href="/projects/browser-rounding/">Browser pixel-rounding playground</a></h3>
+    <p>Tests how different web browsers round geometry to pixels, dp, etc.
+</p>
+  
+  
+  
+    <h3><a href="https://github.com/rsms/estrella">Estrella</a></h3>
+    <p>Light-weight runner for the esbuild compiler
+</p>
+  
+  
+  
+    <h3><a href="/projects/pointer-latency/">Pointer latency playground</a></h3>
+    <p>Explore web browser input pointer latency and try predictive tracking
+</p>
+  
+  
+  
+    <h3><a href="/bezier-tangent/">Bézier tangent</a></h3>
+    <p>Toy that derives the tangent and normal from an arbitrary point of a Bézier curve
+</p>
+  
+  
+  
+    <h3><a href="/markdown-wasm/">Markdown WASM</a></h3>
+    <p>Fast Markdown parser and HTML renderer implemented in WebAssembly
+</p>
+  
+  
+  
+    <h3><a href="/projects/chaitin/">Chaitin-Briggs visualization</a></h3>
+    <p>Interactive visualization of the Chaitin-Briggs “graph coloring” approach to register allocation
+</p>
+  
+  
+
+  <h3><a href="/projects/" class="dimmed">See all 74 projects &rarr;</a></h3>
+</r-cell>
+
+<r-cell order-s="-1" order-xs="-1" span=2>
+  <h2 class="margin-b-4"><a href="/archive/">Thoughts &amp; ideas</a></h2><h3><a href="/wasm-intro"
+           class="post-excerpt">Introduction to WebAssembly</a></h3>
+    
+      <p>
+        
+        WebAssembly is a new technology for running portable programs in a safe and efficient manner, represented by a low-level virtual-machine assembly, primarily aimed at the web platform. This article gives a practical introduction to WebAssembly.
+
+        
+        <time datetime=''>
+          Jan 2017
+        </time>
+      </p><h3><a href="/gotalk"
+           class="post-excerpt">Gotalk</a></h3>
+    
+      <p>
+        
+        Gotalk exists to make it easy for programs to talk with one another over the internet, like a web app coordinating with a web server, or a bunch of programs dividing work amongst eachother.
+
+        
+        <time datetime=''>
+          Jan 2015
+        </time>
+      </p><h3><a href="/1950s-called-wanted-toolbox-back"
+           class="post-excerpt">The 1950s called and wanted their toolbox back</a></h3>
+    
+      <p>
+        
+        Your favourite fancy-pants modern programming language is from the 1950s. Pretty much any programming language used today is a derivative of Fortran or Lisp, both born in the 1950s. Okay, reality check: It’s 2013—yes, 60 years later—and we have cars that drive themselves on the street, robots roaming the surface of alien planets and tiny networked devices with interactive surfaces that we keep in our pockets, which are orders of magnitude more powerful than the computers of the 1950s.
+
+        
+        <time datetime=''>
+          Jan 2013
+        </time>
+      </p><h3><a href="/eames-definition-of-design"
+           class="post-excerpt">The Definition of Design</a></h3>
+    
+      <p>
+        
+        Q&amp;A with Charles Eames
+
+        
+        <time datetime=''>
+          Dec 2012
+        </time>
+      </p><h3><a href="/sol-a-sunny-little-virtual-machine"
+           class="post-excerpt">Sol — a sunny little virtual machine</a></h3>
+    
+      <p>
+        
+        During this weekend, together with a few evenings earlier this week, I created a rather simple virtual machine dubbed Sol, after the Swedish word for sun. It’s register based with multitasking and timers.
+
+        
+        <time datetime=''>
+          Oct 2012
+        </time>
+      </p>
+
+  <h3><a href="/archive/" class="dimmed">Browse all 512 articles &rarr;</a></h3>
+</r-cell>
+
+<r-cell class="intro" order-s="-2" order-xs="-2" span=2 span-s=3 span-xs=row>
+  <p>
+    I’m a Swedish he/him living in San&nbsp;Francisco, California.
+    Software is the medium through which I express myself.
+  </p>
+  <div class="quick-links">
+    <a href="/_ext/rsms.me/inter/index">
+      AaBbCc123<br>
+      The Inter typeface family &rarr;
+    </a>
+    <a href="https://shop.rsms.me/">Buy a nice poster &rarr;</a>
+  </div>
+</r-cell>
+
+
+
+</r-grid>
+
+    <script async src="/res/main.js?v=20260427014245"></script>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-105091131-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+  </body>
+</html>
