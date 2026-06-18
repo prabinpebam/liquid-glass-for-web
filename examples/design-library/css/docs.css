@@ -117,6 +117,20 @@ body {
     linear-gradient(90deg, rgba(28, 40, 75, 0.16) 1px, transparent 1px);
 }
 
+/* Alternating diagonal stripes */
+[data-bg='stripes'] .hero__demo,
+[data-bg='stripes'] .spec__demo {
+  background-color: #11162a;
+  background-repeat: repeat;
+  background-image: repeating-linear-gradient(135deg, #141c36 0 18px, #25355e 18px 36px, #4d7cff 36px 40px, #25355e 40px 44px);
+  background-size: 62px 62px;
+}
+[data-theme='light'][data-bg='stripes'] .hero__demo,
+[data-theme='light'][data-bg='stripes'] .spec__demo {
+  background-color: #e9edf6;
+  background-image: repeating-linear-gradient(135deg, #f7f9ff 0 18px, #dbe5f7 18px 36px, #74c0fc 36px 40px, #dbe5f7 40px 44px);
+}
+
 /* Photo backgrounds — rotated to landscape */
 [data-bg='img1'] .hero__demo, [data-bg='img1'] .spec__demo { background-image: url('../assets/bg/bg-1.jpg'); }
 [data-bg='img2'] .hero__demo, [data-bg='img2'] .spec__demo { background-image: url('../assets/bg/bg-2.jpg'); }
