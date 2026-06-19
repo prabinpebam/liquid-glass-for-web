@@ -17,6 +17,7 @@
   --lg-surface-thickness: var(--lg-thickness);
   --lg-surface-blur: var(--lg-blur-md);
   --lg-surface-refraction: var(--lg-refraction-regular);
+  --lg-surface-chromatic-aberration: var(--lg-chromatic-aberration);
   --lg-surface-specular-opacity: var(--lg-specular-opacity);
   --lg-surface-specular-saturation: var(--lg-specular-saturation);
 

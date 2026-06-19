@@ -11,21 +11,24 @@
   gap: var(--lg-space-2);
   min-height: var(--lg-size-control-md);
   padding: 0 var(--lg-space-5);
-  border-radius: var(--lg-surface-radius, var(--lg-radius-md));
-  border: var(--lg-stroke-width) solid var(--lg-stroke-base);
-  background: var(--lg-tint-base);
-  color: var(--lg-color-on-glass);
+  --lg-surface-radius: var(--lg-radius-md);
   font-family: var(--lg-font-family);
   font-size: var(--lg-text-body-size);
-  line-height: var(--lg-text-body-line);
+  line-height: 1;
   font-weight: var(--lg-font-weight-medium);
   cursor: pointer;
   user-select: none;
   transition: background var(--lg-motion-fast), transform var(--lg-motion-fast);
 }
 
+.lg-button__label {
+  display: block;
+  line-height: 1;
+  transform: translateY(-0.055em);
+}
+
 .lg-button:hover,
-.lg-button.is-hover { background: color-mix(in srgb, var(--lg-tint-base) 70%, var(--lg-color-neutral-0) 8%); }
+.lg-button.is-hover { box-shadow: var(--lg-shadow-raised); }
 
 .lg-button:active,
 .lg-button.is-pressed { transform: scale(0.97); }
@@ -45,19 +48,18 @@
 
 /* Variant: accent */
 .lg-button--accent {
-  background: var(--lg-color-accent);
-  border-color: transparent;
+  background: color-mix(in srgb, var(--lg-color-accent) 48%, var(--lg-tint-base));
   color: var(--lg-color-on-accent);
 }
 .lg-button--accent:hover,
-.lg-button--accent.is-hover { background: var(--lg-color-accent-hover); }
+.lg-button--accent.is-hover { background: color-mix(in srgb, var(--lg-color-accent-hover) 54%, var(--lg-tint-base)); }
 .lg-button--accent:active,
-.lg-button--accent.is-pressed { background: var(--lg-color-accent-pressed); }
+.lg-button--accent.is-pressed { background: color-mix(in srgb, var(--lg-color-accent-pressed) 58%, var(--lg-tint-base)); }
 
 /* Variant: subtle */
 .lg-button--subtle {
   background: transparent;
-  border-color: transparent;
+  box-shadow: none;
 }
 .lg-button--subtle:hover,
-.lg-button--subtle.is-hover { background: var(--lg-tint-base); }
+.lg-button--subtle.is-hover { background: var(--lg-tint-base); box-shadow: var(--lg-shadow-rest); }

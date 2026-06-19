@@ -255,6 +255,58 @@ function supportsBackdropUrl() {
     (CSS.supports('backdrop-filter', 'url(#x)') || CSS.supports('-webkit-backdrop-filter', 'url(#x)'));
 }
 
+const RED_ONLY = '1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0';
+const GREEN_ONLY = '0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0';
+const BLUE_ONLY = '0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0';
+const CHROMATIC_SPREAD_RATIO = 0.2;
+
+function chromaticDisplacementNodes(input, map) {
+  return [
+    svg('feDisplacementMap', { in: input, in2: map, scale: 0, xChannelSelector: 'R', yChannelSelector: 'G', result: 'r_d', 'data-lg-channel': 'r' }),
+    svg('feColorMatrix', { in: 'r_d', type: 'matrix', values: RED_ONLY, result: 'rch' }),
+    svg('feDisplacementMap', { in: input, in2: map, scale: 0, xChannelSelector: 'R', yChannelSelector: 'G', result: 'g_d', 'data-lg-channel': 'g' }),
+    svg('feColorMatrix', { in: 'g_d', type: 'matrix', values: GREEN_ONLY, result: 'gch' }),
+    svg('feDisplacementMap', { in: input, in2: map, scale: 0, xChannelSelector: 'R', yChannelSelector: 'G', result: 'b_d', 'data-lg-channel': 'b' }),
+    svg('feColorMatrix', { in: 'b_d', type: 'matrix', values: BLUE_ONLY, result: 'bch' }),
+    svg('feBlend', { in: 'rch', in2: 'gch', mode: 'screen', result: 'rg' }),
+    svg('feBlend', { in: 'rg', in2: 'bch', mode: 'screen', result: 'displaced' }),
+  ];
+}
+
+function setDisplacementScales(nodes, scale, chromatic) {
+  const spread = Math.abs(scale) * CHROMATIC_SPREAD_RATIO * chromatic;
+  for (const node of nodes) {
+    if (node.localName !== 'feDisplacementMap') continue;
+    const channel = node.getAttribute('data-lg-channel');
+    if (channel === 'r') node.setAttribute('scale', String(Math.max(0, scale - spread)));
+    else if (channel === 'b') node.setAttribute('scale', String(scale + spread));
+    else node.setAttribute('scale', String(scale));
+  }
+}
+
+function cssRadiusPx(value, size) {
+  const token = String(value || '').trim().split(/\s+/)[0];
+  if (!token) return 0;
+  if (token.endsWith('%')) return (parseFloat(token) / 100) * size;
+  return parseFloat(token) || 0;
+}
+
+function resolveRadius(el, requested, width, height) {
+  const maxRadius = Math.min(width, height) / 2;
+  if (requested === 'pill') return maxRadius;
+  if (requested === 'css') {
+    const cs = getComputedStyle(el);
+    const radii = [
+      cssRadiusPx(cs.borderTopLeftRadius, Math.min(width, height)),
+      cssRadiusPx(cs.borderTopRightRadius, Math.min(width, height)),
+      cssRadiusPx(cs.borderBottomRightRadius, Math.min(width, height)),
+      cssRadiusPx(cs.borderBottomLeftRadius, Math.min(width, height)),
+    ];
+    return Math.min(maxRadius, Math.max(...radii));
+  }
+  return Math.min(maxRadius, Number(requested) || 0);
+}
+
 /* ----------------------------------------------------------------------------
  * attachGlass(el, opts) — generate maps for the element's box and apply the
  * kube filter chain. Returns a live handle.
@@ -266,7 +318,7 @@ export function attachGlass(el, opts = {}) {
   const id = nextId();
   const o = {
     surface: 'convex', radius: 'pill', refractionInset: 'radius', thickness: 1.5,
-    blur: 0.4, refraction: null, saturation: 6, specular: 1,
+    blur: 0.4, refraction: null, chromatic: 1, saturation: 6, specular: 1,
     light: -Math.PI / 4, fallbackBlur: 8, ...opts,
   };
   if (opts.refractionInset == null && opts.bezel != null) o.refractionInset = opts.bezel;
@@ -276,12 +328,15 @@ export function attachGlass(el, opts = {}) {
   // x:0,y:0 are required — without them the feImage subregion defaults to the
   // filter region origin (-35%,-35%), shifting the maps off the element box.
   const dispImg = svg('feImage', { x: 0, y: 0, result: 'dmap', preserveAspectRatio: 'none' });
-  const disp = svg('feDisplacementMap', { in: 'src', in2: 'dmap', scale: 0, xChannelSelector: 'R', yChannelSelector: 'G', result: 'displaced' });
+  let chromatic = Math.max(0, Number(o.chromatic) || 0);
+  const displacementNodes = chromatic > 0
+    ? chromaticDisplacementNodes('src', 'dmap')
+    : [svg('feDisplacementMap', { in: 'src', in2: 'dmap', scale: 0, xChannelSelector: 'R', yChannelSelector: 'G', result: 'displaced', 'data-lg-channel': 'base' })];
   const sat = svg('feColorMatrix', { in: 'displaced', type: 'saturate', values: o.saturation, result: 'sat' });
   const specImg = svg('feImage', { x: 0, y: 0, result: 'smap', preserveAspectRatio: 'none' });
   const funcA = svg('feFuncA', { type: 'linear', slope: o.specular });
   filter.append(
-    blur, dispImg, disp, sat, specImg,
+    blur, dispImg, ...displacementNodes, sat, specImg,
     svg('feComposite', { in: 'sat', in2: 'smap', operator: 'in', result: 'spec_sat' }),
     svg('feComponentTransfer', { in: 'smap', result: 'spec_faded' }, [funcA]),
     svg('feBlend', { in: 'spec_sat', in2: 'displaced', mode: 'normal', result: 'withSat' }),
@@ -299,7 +354,7 @@ export function attachGlass(el, opts = {}) {
     // misaligns the displacement map with the actual shape.
     const nw = el.offsetWidth, nh = el.offsetHeight;
     if (nw <= 0 || nh <= 0) return;
-    const radius = o.radius === 'pill' ? Math.min(nw, nh) / 2 : o.radius;
+    const radius = resolveRadius(el, o.radius, nw, nh);
     const requestedInset = o.refractionInset === 'radius' ? radius : o.refractionInset;
     const nextInset = Math.min(requestedInset, Math.min(nw, nh) / 2);
     if (nw === w && nh === h && nextInset === curBezel && field) { applyScale(); return; }
@@ -320,7 +375,7 @@ export function attachGlass(el, opts = {}) {
   const applyScale = () => {
     if (!field) return;
     const refraction = o.refraction != null ? o.refraction : 3.2 * Math.max(curBezel, 1);
-    disp.setAttribute('scale', String(refraction));
+    setDisplacementScales(displacementNodes, refraction, chromatic);
   };
 
   if (supportsBackdropUrl()) {
@@ -341,6 +396,8 @@ export function attachGlass(el, opts = {}) {
     get refractionInset() { return curBezel || o.refractionInset; },
     set refraction(v) { o.refraction = v; applyScale(); },
     get refraction() { return o.refraction != null ? o.refraction : 3.2 * Math.max(curBezel, 1); },
+    set chromatic(v) { chromatic = Math.max(0, Number(v) || 0); o.chromatic = chromatic; applyScale(); },
+    get chromatic() { return chromatic; },
     set saturation(v) { o.saturation = v; sat.setAttribute('values', String(v)); },
     set specular(v) { o.specular = v; funcA.setAttribute('slope', String(v)); },
     set blur(v) { o.blur = v; blur.setAttribute('stdDeviation', String(v)); },

@@ -167,6 +167,9 @@ the key and lifecycle.)
 - **Bind-after-mount.** `getComputedStyle` is empty before mount; `bind()` warns
   if the node is disconnected, and `bindWhenConnected(node)` defers attachment
   until it joins the document.
+- **Composed trees.** `bindTree(root)` binds every `.lg-surface` at or below a
+  root, so compounds can compose canonical surfaces without inventing their own
+  material attach path.
 - **Size is the engine's job.** `@liquid-glass/core` already auto-syncs
   width/height via its own `ResizeObserver` — the binder does **not** duplicate
   it.
@@ -212,7 +215,7 @@ export default {
     button, toggle,
     searchbar,
   },
-  material: { bind, unbind, bindWhenConnected, refresh, refreshAll },
+  material: { bind, unbind, bindWhenConnected, bindTree, unbindTree, refresh, refreshAll },
   behaviors: { attachToggle, attachSlider /* … */ }, // optional, tree-shakeable
   icons: { register, resolve },   // name → url registry (§13)
   personalization: {              // token-override helpers on :root (or a subtree)

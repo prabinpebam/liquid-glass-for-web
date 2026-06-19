@@ -11,9 +11,9 @@
  *   material    — tokens → engine binder
  *   personalization — token-override helpers on :root
  */
-import manifest from './library.manifest.json' assert { type: 'json' };
+import manifest from './library.manifest.json' with { type: 'json' };
 
-import { el, icon, bind, unbind, bindWhenConnected, refresh, refreshAll } from './core/index.js';
+import { el, icon, bind, unbind, bindWhenConnected, bindTree, unbindTree, refresh, refreshAll } from './core/index.js';
 
 // L1 atoms
 import { createSurface } from './atoms/surface/surface.js';
@@ -89,7 +89,7 @@ export default {
     toggle: createToggle,
     searchbar: createSearchbar,
   },
-  material: { bind, unbind, bindWhenConnected, refresh, refreshAll },
+  material: { bind, unbind, bindWhenConnected, bindTree, unbindTree, refresh, refreshAll },
   motion: { Spring, createSpring, readSpring, activation, elastics, prefersReducedMotion },
   behaviors: { attachToggle },
   personalization: { applyTheme, applyDensity, applyTransparency, applyContrast, applyAccent, applyMotion },

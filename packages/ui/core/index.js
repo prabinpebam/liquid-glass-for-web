@@ -3,7 +3,7 @@
  * Re-exports the DOM primitive, the icon helper, and the material binder.
  */
 export { el } from './el.js';
-export { bind, unbind, bindWhenConnected, refresh, refreshAll, readMaterialOptions, materialKey } from './material.js';
+export { bind, unbind, bindWhenConnected, bindTree, unbindTree, refresh, refreshAll, readMaterialOptions, materialKey } from './material.js';
 
 /**
  * icon(name) — a masked monochrome glyph atom helper.

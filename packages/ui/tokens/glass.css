@@ -28,6 +28,9 @@
   --lg-refraction-regular: 0.7;
   --lg-refraction-strong: 1;
 
+   /* RGB refraction split; 1 = default +/-20% channel spread */
+   --lg-chromatic-aberration: 1;
+
   /* Surface tint / stroke / specular */
   --lg-tint-base: rgba(255, 255, 255, 0.10);
   --lg-stroke-base: rgba(255, 255, 255, 0.32);

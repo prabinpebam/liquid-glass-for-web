@@ -9,9 +9,10 @@ import { el } from '../../core/index.js';
  * @param {Object} props
  * @param {string} props.name semantic icon name (e.g. 'search')
  * @param {string} [props.size] 'sm' | 'md' | 'lg'
+ * @param {string} [props.class] extra classes for the icon slot
  * @returns {HTMLElement}
  */
-export function createIcon({ name, size = 'md' } = {}) {
-  const cls = size === 'md' ? 'lg-icon' : `lg-icon lg-icon--${size}`;
+export function createIcon({ name, size = 'md', class: extra = '' } = {}) {
+  const cls = [size === 'md' ? 'lg-icon' : `lg-icon lg-icon--${size}`, extra].filter(Boolean).join(' ');
   return el('span', { class: cls, 'data-lg-icon': name, 'aria-hidden': 'true' });
 }

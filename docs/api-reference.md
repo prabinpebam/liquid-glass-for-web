@@ -25,6 +25,7 @@ function liquidGlass(
 | `thickness` | `number` | `1.5` | Refractive index (glass ≈ 1.5). |
 | `surface` | `SurfaceKind` | `'convex'` | Bezel cross-section profile or custom fn. |
 | `scale` | `number` | `1` | Effect strength, `0..1`. |
+| `chromatic` | `number` | `1` | RGB refraction split. The default maps red/blue to +/-20% of the displacement strength. |
 | `blur` | `number` | `0` | Backdrop blur (px). |
 | `specular` | `SpecularOptions` | see below | Rim-light settings. |
 | `mode` | `'filter' \| 'backdrop'` | `'backdrop'` | Apply mode. `backdrop` is Chromium-only. |
@@ -72,7 +73,7 @@ const LiquidGlass: React.FC<LiquidGlassOptions & { as?: keyof JSX.IntrinsicEleme
 ## Web component — `@liquid-glass/web-component`
 
 `<liquid-glass>` reflects options as attributes: `radius`, `bezel`, `thickness`,
-`surface`, `scale`, `blur`, `mode`, `specular-opacity`, `specular-saturation`,
+`surface`, `scale`, `chromatic`, `blur`, `mode`, `specular-opacity`, `specular-saturation`,
 `specular-angle`.
 
 ## Low-level (advanced)

@@ -11,9 +11,8 @@
   width: 52px;          /* instance dim: unique switch track length (no scale fits) */
   height: 28px;         /* instance dim: paired with track length */
   padding: var(--lg-space-1);
-  border-radius: var(--lg-radius-pill);
-  border: var(--lg-stroke-width) solid var(--lg-stroke-base);
-  background: color-mix(in srgb, var(--lg-color-neutral-500) 40%, transparent);
+  --lg-surface-radius: var(--lg-radius-pill);
+  background: color-mix(in srgb, var(--lg-color-neutral-500) 40%, var(--lg-tint-base));
   cursor: pointer;
   transition: background var(--lg-motion-medium) var(--lg-motion-ease-standard);
 }
@@ -27,7 +26,7 @@
   transition: transform var(--lg-motion-medium) var(--lg-motion-ease-emphasized);
 }
 
-.lg-toggle.is-on { background: var(--lg-color-accent); border-color: transparent; }
+.lg-toggle.is-on { background: color-mix(in srgb, var(--lg-color-accent) 58%, var(--lg-tint-base)); }
 .lg-toggle.is-on .lg-toggle__knob { transform: translateX(24px); /* instance dim: track - knob - 2x padding */ }
 
 .lg-toggle:focus-visible,

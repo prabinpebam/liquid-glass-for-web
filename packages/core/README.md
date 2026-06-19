@@ -24,7 +24,8 @@ const handle = liquidGlass(card, {
   radius: 24,
   bezel: 16,
   thickness: 1.5,   // refractive index (glass ≈ 1.5)
-  surface: 'convex',
+   surface: 'convex',
+   chromatic: 1,     // visible RGB split; +/-20% channel spread by default
   blur: 2,
   mode: 'backdrop', // Chromium-only; falls back to blur elsewhere
 });
@@ -43,8 +44,9 @@ handle.dispose();     // remove filter + release shared resources
    normalized displacement field.
 3. **Maps** — the field is rasterized into an RGBA displacement map (R = X,
    G = Y) plus an optional specular rim-light map.
-4. **Filter** — an SVG `<filter>` graph (`feImage` → `feDisplacementMap` →
-   `feBlend`) is generated and shared in a single hidden `<defs>` host.
+4. **Filter** — an SVG `<filter>` graph (`feImage` → `feDisplacementMap` or
+   RGB-split displacement → `feBlend`) is generated and shared in a single
+   hidden `<defs>` host.
 5. **Apply** — the filter is attached via `backdrop-filter: url(#id)` (Chromium)
    or `filter: url(#id)` (cross-browser).
 

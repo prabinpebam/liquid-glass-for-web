@@ -19,16 +19,18 @@ export const SURFACES = ['regular', 'clear', 'frosted'];
  * @param {string} [props.material] one of SURFACES ('regular' | 'clear' | 'frosted')
  * @param {string} [props.tag] host tag (default 'div')
  * @param {string} [props.class] extra classes (e.g. a component root class)
+ * @param {Record<string, string|number|boolean|null|undefined>} [props.attrs] host attributes
  * @param {Array<Node|string>} [props.children]
  * @returns {HTMLElement}
  */
-export function createSurface({ material = 'regular', tag = 'div', class: extra = '', children = [] } = {}) {
+export function createSurface({ material = 'regular', tag = 'div', class: extra = '', attrs = {}, children = [] } = {}) {
   if (!SURFACES.includes(material)) {
     console.error(`[liquid-glass] unknown surface "${material}"; pick one of ${SURFACES.join(', ')} (LG-P13). Falling back to "regular".`);
     material = 'regular';
   }
-  const cls = extra ? `lg-surface ${extra}` : 'lg-surface';
-  const attrs = { class: cls };
-  if (material !== 'regular') attrs['data-lg-material'] = material;
-  return el(tag, attrs, ...children);
+  const { class: attrClass, ...rest } = attrs;
+  const cls = ['lg-surface', extra, attrClass].filter(Boolean).join(' ');
+  const surfaceAttrs = { ...rest, class: cls };
+  if (material !== 'regular') surfaceAttrs['data-lg-material'] = material;
+  return el(tag, surfaceAttrs, ...children);
 }

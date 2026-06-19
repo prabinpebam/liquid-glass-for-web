@@ -13,6 +13,7 @@
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const XLINK = 'http://www.w3.org/1999/xlink';
+const CHROMATIC_SPREAD_RATIO = 0.2;
 
 let _uid = 0;
 const nextId = () => `lg-${(_uid++).toString(36)}`;
@@ -269,10 +270,10 @@ function buildFilterEl(id, geo, disp, spec, o) {
         svg('feColorMatrix', { in: `${result}_d`, type: 'matrix', values: color, result }),
       );
     };
-    const spread = baseScale * 0.06 * ca;
-    ch('R', baseScale + spread, '1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0', 'rch');
+    const spread = baseScale * CHROMATIC_SPREAD_RATIO * ca;
+    ch('R', Math.max(0, baseScale - spread), '1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0', 'rch');
     ch('G', baseScale, '0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0', 'gch');
-    ch('B', baseScale - spread, '0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0', 'bch');
+    ch('B', baseScale + spread, '0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0', 'bch');
     f.appendChild(svg('feBlend', { in: 'rch', in2: 'gch', mode: 'screen', result: 'rg' }));
     f.appendChild(svg('feBlend', { in: 'rg', in2: 'bch', mode: 'screen', result: 'displaced' }));
   } else {
@@ -370,7 +371,7 @@ const DEFAULTS = {
   saturation: 1.6,
   specular: 0.5,
   light: -Math.PI / 4,
-  chromatic: 0,
+  chromatic: 1,
   mode: 'backdrop', // 'backdrop' | 'filter'
 };
 

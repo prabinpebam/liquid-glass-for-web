@@ -48,10 +48,11 @@ index.js           default export: { primitives, factories, material, motion, be
 
   const bar = ui.factories.searchbar({ placeholder: 'Search', action: true });
   document.body.appendChild(bar);
-  ui.material.bind(bar);          // light up the glass after mounting
+  ui.material.bindTree(bar);      // light up every surface in the composed tree
 
   const toggle = ui.factories.toggle({ label: 'Transparency' });
   document.body.appendChild(toggle);
+  ui.material.bind(toggle);       // a single surface can still be bound directly
   ui.behaviors.attachToggle(toggle); // attach interaction separately
 
   ui.personalization.applyTheme('light');

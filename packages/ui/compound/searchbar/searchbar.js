@@ -17,7 +17,7 @@ import { createButton } from '../../components/button/button.js';
  */
 export function createSearchbar({ placeholder = 'Search', material = 'regular', action = false } = {}) {
   const children = [
-    createIcon({ name: 'search', size: 'sm' }),
+    createIcon({ name: 'search', size: 'sm', class: 'lg-searchbar__leading-icon' }),
     el('input', { class: 'lg-searchbar__field', type: 'search', placeholder, 'aria-label': placeholder }),
   ];
   if (action) children.push(createButton({ label: 'Search', variant: 'accent' }));

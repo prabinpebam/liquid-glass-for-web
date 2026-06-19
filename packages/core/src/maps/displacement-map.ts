@@ -131,21 +131,23 @@ interface Canvas2D {
 }
 
 function createCanvas(w: number, h: number): Canvas2D {
+  // Prefer a real DOM canvas when available so toDataUrl() can produce a
+  // synchronous data URL (OffscreenCanvas only exposes async convertToBlob).
+  if (typeof document !== 'undefined') {
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('liquid-glass: 2D context unavailable');
+    return { canvas, ctx };
+  }
   if (typeof OffscreenCanvas !== 'undefined') {
     const canvas = new OffscreenCanvas(w, h);
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('liquid-glass: 2D context unavailable');
     return { canvas, ctx };
   }
-  if (typeof document === 'undefined') {
-    throw new Error('liquid-glass: map generation requires a DOM or OffscreenCanvas');
-  }
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('liquid-glass: 2D context unavailable');
-  return { canvas, ctx };
+  throw new Error('liquid-glass: map generation requires a DOM or OffscreenCanvas');
 }
 
 function toDataUrl(canvas: HTMLCanvasElement | OffscreenCanvas): string {

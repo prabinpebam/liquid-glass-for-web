@@ -5,7 +5,7 @@ import {
   type SurfaceKind,
 } from '@liquid-glass/core';
 
-const NUMERIC_ATTRS = ['radius', 'bezel', 'thickness', 'scale', 'blur'] as const;
+const NUMERIC_ATTRS = ['radius', 'bezel', 'thickness', 'scale', 'chromatic', 'blur'] as const;
 
 /**
  * `<liquid-glass>` custom element. Wraps slotted content and applies the

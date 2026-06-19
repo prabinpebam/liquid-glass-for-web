@@ -30,6 +30,7 @@ const TOKEN_MAP = [
   ['--lg-surface-thickness', 'thickness', num],
   ['--lg-surface-blur', 'blur', px],
   ['--lg-surface-refraction', 'scale', num],
+  ['--lg-surface-chromatic-aberration', 'chromatic', num],
 ];
 
 const SPECULAR_MAP = [
@@ -63,7 +64,7 @@ export function readMaterialOptions(node) {
  */
 export function materialKey(opts) {
   const s = opts.specular || {};
-  return [opts.radius, opts.bezel, opts.thickness, opts.blur, opts.scale, s.opacity, s.saturation].join('|');
+  return [opts.radius, opts.bezel, opts.thickness, opts.blur, opts.scale, opts.chromatic, s.opacity, s.saturation].join('|');
 }
 
 /** Bound surfaces. WeakMap keeps bindings idempotent without touching the node. */
@@ -132,6 +133,20 @@ export function bindWhenConnected(node) {
     else raf = requestAnimationFrame(check);
   });
   return () => { cancelAnimationFrame(raf); unbind(node); };
+}
+
+/** Bind every surface atom at or below a root node. */
+export function bindTree(root) {
+  const surfaces = root.matches?.('.lg-surface') ? [root] : [];
+  surfaces.push(...root.querySelectorAll?.('.lg-surface') || []);
+  const disposers = surfaces.map((surface) => bindWhenConnected(surface));
+  return () => disposers.forEach((dispose) => dispose());
+}
+
+/** Detach every bound surface atom at or below a root node. */
+export function unbindTree(root) {
+  if (root.matches?.('.lg-surface')) unbind(root);
+  root.querySelectorAll?.('.lg-surface').forEach((surface) => unbind(surface));
 }
 
 /** Re-read one bound surface's tokens and rebuild if its material changed. */

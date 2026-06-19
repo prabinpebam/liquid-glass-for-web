@@ -29,6 +29,7 @@ pnpm add @liquid-glass/element @liquid-glass/core
 | `bezel` | number | refractive rim width (px) |
 | `thickness` | number | refractive index |
 | `scale` | number | effect strength 0..1 |
+| `chromatic` | number | RGB refraction split; `1` is the default +/-20% channel spread |
 | `blur` | number | backdrop blur (px) |
 | `surface` | `convex` \| `concave` \| `lip` \| `flat` | bezel profile |
 | `mode` | `backdrop` \| `filter` | apply mode |

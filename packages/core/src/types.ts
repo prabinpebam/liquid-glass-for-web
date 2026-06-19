@@ -53,6 +53,8 @@ export interface LiquidGlassOptions {
   surface?: SurfaceKind;
   /** Effect strength, 0..1. */
   scale?: number;
+  /** RGB refraction split, normalized against displacement strength. */
+  chromatic?: number;
   /** Backdrop blur (px). */
   blur?: number;
   /** Rim-light settings. */

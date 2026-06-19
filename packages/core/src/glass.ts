@@ -7,7 +7,7 @@ import { resolveSurface } from './surface/index.js';
 import { buildDisplacementField } from './refraction/displacement-field.js';
 import { toDisplacementMap, type MapGeometry } from './maps/displacement-map.js';
 import { toSpecularMap } from './maps/specular-map.js';
-import { buildFilter, nextFilterId } from './filter/svg-filter.js';
+import { CHROMATIC_SPREAD_RATIO, buildFilter, nextFilterId } from './filter/svg-filter.js';
 
 const DEFAULTS: ResolvedOptions = {
   width: 0,
@@ -17,6 +17,7 @@ const DEFAULTS: ResolvedOptions = {
   thickness: 1.5,
   surface: 'convex',
   scale: 1,
+  chromatic: 1,
   blur: 2,
   mode: 'backdrop',
   fallback: 'blur',
@@ -28,8 +29,8 @@ function resolveOptions(el: HTMLElement, opts: LiquidGlassOptions): ResolvedOpti
   return {
     ...DEFAULTS,
     ...opts,
-    width: opts.width ?? Math.round(rect.width) || DEFAULTS.width,
-    height: opts.height ?? Math.round(rect.height) || DEFAULTS.height,
+    width: opts.width ?? (Math.round(rect.width) || DEFAULTS.width),
+    height: opts.height ?? (Math.round(rect.height) || DEFAULTS.height),
     specular: { ...DEFAULTS.specular, ...(opts.specular ?? {}) },
   };
 }
@@ -141,6 +142,7 @@ export function liquidGlass(el: HTMLElement, options: LiquidGlassOptions = {}): 
       displacement,
       specular,
       scale: field.maxDisplacement * currentScale,
+      chromatic: resolved.chromatic,
       blur: resolved.blur,
     });
 
@@ -175,15 +177,12 @@ export function liquidGlass(el: HTMLElement, options: LiquidGlassOptions = {}): 
     setScale(scale) {
       if (disposed || !filterEl) return;
       currentScale = scale;
-      const dm = filterEl.querySelector('feDisplacementMap');
-      if (dm) {
-        const field = buildDisplacementField(
-          resolveSurface(resolved.surface),
-          resolved.bezel,
-          resolved.thickness,
-        );
-        dm.setAttribute('scale', String(field.maxDisplacement * scale));
-      }
+      const field = buildDisplacementField(
+        resolveSurface(resolved.surface),
+        resolved.bezel,
+        resolved.thickness,
+      );
+      setFilterDisplacementScale(filterEl, field.maxDisplacement * scale, resolved.chromatic);
     },
     dispose() {
       if (disposed) return;
@@ -197,4 +196,21 @@ export function liquidGlass(el: HTMLElement, options: LiquidGlassOptions = {}): 
       releaseDefs();
     },
   };
+}
+
+function setFilterDisplacementScale(filterEl: SVGFilterElement, scale: number, chromatic: number): void {
+  const spread = Math.abs(scale) * CHROMATIC_SPREAD_RATIO * Math.max(0, chromatic);
+  const r = filterEl.querySelector('feDisplacementMap[data-lg-channel="r"]');
+  const g = filterEl.querySelector('feDisplacementMap[data-lg-channel="g"]');
+  const b = filterEl.querySelector('feDisplacementMap[data-lg-channel="b"]');
+  if (r && g && b) {
+    r.setAttribute('scale', String(Math.max(0, scale - spread)));
+    g.setAttribute('scale', String(scale));
+    b.setAttribute('scale', String(scale + spread));
+    return;
+  }
+
+  const base = filterEl.querySelector('feDisplacementMap[data-lg-channel="base"]') ??
+    filterEl.querySelector('feDisplacementMap');
+  base?.setAttribute('scale', String(scale));
 }

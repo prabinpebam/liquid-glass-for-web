@@ -26,4 +26,4 @@
 }
 .lg-searchbar__field::placeholder { color: var(--lg-color-on-glass-dim); }
 
-.lg-searchbar__icon { color: var(--lg-color-on-glass-dim); }
+.lg-searchbar__leading-icon { color: var(--lg-color-on-glass-dim); }
