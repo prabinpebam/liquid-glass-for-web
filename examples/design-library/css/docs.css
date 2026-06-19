@@ -24,6 +24,14 @@
 /* Dark theme (default) */
 [data-theme='dark'] {
   color-scheme: dark;
+  --lgc-on-glass: #fff;
+  --lgc-on-glass-muted: rgba(255, 255, 255, 0.72);
+  --lgc-demo-ink: #fff;
+  --lgc-demo-muted: rgba(255, 255, 255, 0.72);
+  --lgc-range-track: rgba(255, 255, 255, 0.12);
+  --lgc-range-fill: rgba(116, 192, 252, 0.58);
+  --lgc-range-thumb: #86ccff;
+  --lgc-range-thumb-border: rgba(255, 255, 255, 0.32);
   --d-bg: #0b0d18;
   --d-ink: #eef1f8;
   --d-ink-dim: rgba(238, 241, 248, 0.62);
@@ -44,6 +52,14 @@
 /* Light theme */
 [data-theme='light'] {
   color-scheme: light;
+  --lgc-on-glass: #000;
+  --lgc-on-glass-muted: rgba(0, 0, 0, 0.72);
+  --lgc-demo-ink: #000;
+  --lgc-demo-muted: rgba(0, 0, 0, 0.72);
+  --lgc-range-track: rgba(20, 24, 42, 0.12);
+  --lgc-range-fill: rgba(77, 124, 255, 0.46);
+  --lgc-range-thumb: #4dabf7;
+  --lgc-range-thumb-border: rgba(20, 24, 42, 0.14);
   --d-bg: #eef1f7;
   --d-ink: #14182a;
   --d-ink-dim: rgba(20, 24, 42, 0.64);
@@ -531,7 +547,8 @@ body {
    specular feImage blended over the refraction, exactly like the reference).
    CSS only adds a drop shadow so the surface separates from the background;
    elevation is not part of the glass effect, the rim is. */
-.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-card, .lgc-toast,
+.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-taginput__chip, .lgc-card, .lgc-toast,
+.lgc-skel__line,
 .lgc-seg, .lgc-seg__ind, .lgc-check__box, .lgc-radio__disc,
 .lgc-switch__knob, .lgc-slider__thumb,
 .lgc-lens__capsule,
@@ -545,9 +562,28 @@ body {
 .lgc-tl, .lgc-mo, .lgc-ph, .lgc-foot, .lgc-drawer, .lgc-notif, .lgc-coach,
 .lgc-form, .lgc-wiz, .lgc-upl, .lgc-ed, .lgc-set, .lgc-chart, .lgc-sch,
 .lgc-kan, .lgc-fac, .lgc-cmt, .lgc-gal, .lgc-car, .lgc-prof, .lgc-cart, .lgc-co {
-  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.18);
+  position: relative;
+  box-shadow: var(--lgc-drop-shadow, 0 7px 20px rgba(0, 0, 0, 0.18));
 }
-.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-card, .lgc-toast,
+[data-glass-tint]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--lgc-tint-layer);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+[data-glass-tint] {
+  isolation: isolate;
+}
+[data-glass-tint] > * {
+  position: relative;
+  z-index: 1;
+}
+.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-taginput__chip, .lgc-card, .lgc-toast,
+.lgc-skel__line,
 .lgc-seg, .lgc-seg__ind, .lgc-check__box, .lgc-radio__disc,
 .lgc-switch__knob, .lgc-slider__thumb,
 .lgc-lens__capsule,
@@ -570,7 +606,6 @@ body {
   border-radius: 999px; color: #fff; font: inherit; font-weight: 600; font-size: 14px;
   cursor: pointer; position: relative; will-change: transform;
 }
-.lgc-btn span { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
 .lgc-btn i { font-size: 14px; }
 .lgc-btn--accent {
   color: #fff;
@@ -579,7 +614,7 @@ body {
   width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
   color: #fff; cursor: pointer; position: relative; will-change: transform;
 }
-.lgc-iconbtn i { font-size: 17px; }
+.lgc-iconbtn i { display: grid; place-items: center; width: 17px; height: 17px; font-size: 17px !important; line-height: 1; }
 .lgc-fab {
   width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center;
   color: #fff; cursor: pointer; position: relative; will-change: transform;
@@ -603,16 +638,16 @@ body {
 
 /* segmented control */
 .lgc-seg { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.14); }
-.lgc-seg__ind { position: absolute; top: 4px; bottom: 4px; left: 0; border-radius: 999px; pointer-events: none; will-change: transform, width; }
+.lgc-seg__ind { position: absolute; top: 4px; bottom: 4px; left: 0; border-radius: 999px; pointer-events: none; transform-origin: center; will-change: transform, width; }
 .lgc-seg__opt { position: relative; z-index: 1; border: 0; background: none; padding: 8px 16px; border-radius: 999px; color: rgba(255, 255, 255, 0.8); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .lgc-seg__opt.is-on { color: #fff; }
 
 /* checkbox + radio */
 .lgc-check, .lgc-radio { border: 0; background: none; padding: 0; cursor: pointer; }
-.lgc-check__box { position: relative; width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.16); color: #fff; transition: background 0.2s; }
+.lgc-check__box { position: relative; width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.16); color: #fff; transform-origin: center; transition: background 0.2s; will-change: transform; }
 .lgc-check__mark { font-size: 16px; transform: scale(0); }
 .lgc-check.is-on .lgc-check__box { color: #fff; }
-.lgc-radio__disc { position: relative; display: block; width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); transition: background 0.2s; }
+.lgc-radio__disc { position: relative; display: block; width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); transform-origin: center; transition: background 0.2s; will-change: transform; }
 .lgc-radio__dot { position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%) scale(0); box-shadow: 0 0 8px rgba(255, 255, 255, 0.6); }
 .lgc-radio.is-on .lgc-radio__disc { color: #fff; }
 
@@ -625,9 +660,23 @@ body {
 .lgc-search.is-focus { border-color: rgba(255, 255, 255, 0.85); }
 
 /* chip */
-.lgc-chip { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 999px; color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
-.lgc-chip__x { font-size: 11px; opacity: 0.8; }
+.lgc-chip { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 999px; color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.lgc-chip > span { display: block; line-height: 1; }
+.lgc-chip__x { display: inline-grid; place-items: center; width: 10px; height: 10px; font-size: 10px !important; line-height: 1; opacity: 0.8; }
 .lgc-chip:not(.is-on) { opacity: 0.5; }
+
+/* skeleton */
+.lgc-skel { width: 170px; display: grid; gap: 10px; }
+.lgc-skel__line { position: relative; height: 14px; border-radius: 999px; overflow: hidden; }
+.lgc-skel__line--short { width: 64%; }
+.lgc-skel__line--mid { width: 82%; }
+.lgc-skel__line::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(100deg, transparent 0 24%, rgba(255, 255, 255, 0.62) 42%, rgba(255, 255, 255, 0.86) 50%, rgba(255, 255, 255, 0.62) 58%, transparent 76%);
+  transform: translateX(-120%); animation: lgc-shimmer 1.25s var(--d-ease) infinite;
+  mix-blend-mode: screen;
+}
+@keyframes lgc-shimmer { to { transform: translateX(120%); } }
 
 /* card + toast */
 .lgc-card { display: flex; align-items: center; gap: 14px; width: 240px; padding: 16px; border-radius: 18px; color: #fff; }
@@ -844,20 +893,36 @@ body {
 .lgc-matlab { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .lgc-mat { display: grid; gap: 10px; min-width: 0; }
 .lgc-mat__sample { position: relative; min-height: 112px; padding: 16px; border-radius: 22px; color: #fff; overflow: hidden; box-shadow: 0 7px 20px rgba(0, 0, 0, 0.18); }
-.lgc-mat__sample--clear { background: rgba(255, 255, 255, 0.045); }
-.lgc-mat__sample--clear-strong { background: rgba(255, 255, 255, 0.065); }
-.lgc-mat__sample--soft { background: rgba(255, 255, 255, 0.13); }
-.lgc-mat__sample--satin { background: rgba(255, 255, 255, 0.18); }
-.lgc-mat__sample--deep { background: rgba(255, 255, 255, 0.24); }
-.lgc-mat__sample--milk { background: rgba(255, 255, 255, 0.31); }
+[data-theme='light'] .lgc-mat__sample { color: #14182a; }
 .lgc-mat__label { position: relative; z-index: 1; display: grid; align-content: end; height: 100%; gap: 3px; }
 .lgc-mat__label b { font-size: 15px; font-weight: 700; letter-spacing: 0; }
 .lgc-mat__label span { font-size: 11.5px; color: rgba(255, 255, 255, 0.72); }
+[data-theme='light'] .lgc-mat__label span { color: rgba(20, 24, 42, 0.64); }
 .lgc-mat__controls { display: grid; gap: 8px; padding: 0 2px; }
 .lgc-mat__control { display: grid; gap: 5px; }
 .lgc-mat__control > span { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11.5px; color: rgba(255, 255, 255, 0.7); }
 .lgc-mat__value { color: #fff; font-variant-numeric: tabular-nums; }
-.lgc-mat__range { width: 100%; height: 18px; accent-color: #74c0fc; cursor: pointer; }
+.lgc-mat__range {
+  --lgc-range-pct: 0%;
+  width: 100%; height: 22px; margin: 0; padding: 0; border: 0; appearance: none; -webkit-appearance: none;
+  background: transparent; accent-color: #74c0fc; cursor: pointer;
+}
+.lgc-mat__range::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 999px; border: 0;
+  background: linear-gradient(90deg, var(--lgc-range-fill) 0 var(--lgc-range-pct), var(--lgc-range-track) var(--lgc-range-pct) 100%);
+}
+.lgc-mat__range::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none; width: 14px; height: 14px; margin-top: -5px; border-radius: 50%;
+  border: 1px solid var(--lgc-range-thumb-border); background: var(--lgc-range-thumb);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+}
+.lgc-mat__range::-moz-range-track { height: 4px; border-radius: 999px; border: 0; background: var(--lgc-range-track); }
+.lgc-mat__range::-moz-range-progress { height: 4px; border-radius: 999px; background: var(--lgc-range-fill); }
+.lgc-mat__range::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1px solid var(--lgc-range-thumb-border); background: var(--lgc-range-thumb);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+}
 .lgc-mat__range:focus-visible { outline: 2px solid rgba(116, 192, 252, 0.65); outline-offset: 3px; border-radius: 999px; }
 @media (max-width: 680px) { .lgc-matlab { grid-template-columns: 1fr; } }
 
@@ -908,8 +973,9 @@ body {
 .lgc-pass__t { color: rgba(255, 255, 255, 0.7); }
 
 .lgc-taginput { flex-wrap: wrap; gap: 6px; }
-.lgc-taginput__chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px; background: rgba(122, 162, 255, 0.3); font-size: 12px; color: #fff; }
-.lgc-taginput__chip i { font-size: 9px; opacity: 0.8; cursor: pointer; }
+.lgc-taginput__chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 12px; line-height: 1; color: #fff; }
+.lgc-taginput__label { display: block; line-height: 1; }
+.lgc-taginput__x { display: inline-grid; place-items: center; width: 7px; height: 7px; font-size: 7px !important; line-height: 1; opacity: 0.82; cursor: pointer; }
 
 .lgc-select { justify-content: space-between; gap: 10px; cursor: pointer; }
 .lgc-select__v { font-size: 13.5px; }
@@ -938,11 +1004,10 @@ body {
 .lgc-combo__i.is-on { background: rgba(122, 162, 255, 0.3); }
 
 .lgc-rg { width: 210px; max-width: 100%; padding: 6px; border-radius: 14px; color: #fff; }
-.lgc-rg__i { display: flex; align-items: center; gap: 11px; padding: 10px 11px; border-radius: 10px; font-size: 13.5px; cursor: pointer; }
+.lgc-rg__i { width: 100%; display: flex; align-items: center; gap: 11px; padding: 8px 11px; border: 0; border-radius: 10px; background: none; color: #fff; font: inherit; font-size: 13.5px; text-align: left; cursor: pointer; }
 .lgc-rg__i:hover { background: rgba(255, 255, 255, 0.06); }
-.lgc-rg__dot { width: 18px; height: 18px; flex: none; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.4); position: relative; }
-.lgc-rg__i.is-on .lgc-rg__dot { border-color: #5cb8ff; }
-.lgc-rg__i.is-on .lgc-rg__dot::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: linear-gradient(180deg, #5cb8ff, #4d7cff); }
+.lgc-rg__disc { width: 24px; height: 24px; flex: none; transform-origin: center; will-change: transform; }
+.lgc-rg__dot { width: 10px; height: 10px; box-shadow: none; }
 
 .lgc-ig { align-items: stretch; padding: 0; overflow: hidden; }
 .lgc-ig__addon { display: flex; align-items: center; padding: 0 12px; background: rgba(255, 255, 255, 0.1); font-size: 12.5px; color: rgba(255, 255, 255, 0.7); }
@@ -1143,7 +1208,7 @@ body {
 .lgc-fac { width: 240px; max-width: 100%; padding: 16px; border-radius: 18px; color: #fff; }
 .lgc-fac__in { display: grid; gap: 14px; }
 .lgc-fac__chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.lgc-fac__chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(122, 162, 255, 0.3); font-size: 11.5px; }
+.lgc-fac__chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: linear-gradient(180deg, rgba(92, 184, 255, 0.8), rgba(77, 124, 255, 0.4)), rgba(255, 255, 255, 0.13); box-shadow: 0 6px 16px rgba(77, 124, 255, 0.4); font-size: 11.5px; }
 .lgc-fac__chip i { font-size: 9px; opacity: 0.8; cursor: pointer; }
 .lgc-fac__g { display: grid; gap: 8px; }
 .lgc-fac__g b { font-size: 11px; color: rgba(255, 255, 255, 0.55); text-transform: uppercase; letter-spacing: 0.06em; }
@@ -1211,3 +1276,26 @@ body {
 .lgc-co__total { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.12); font-size: 13px; }
 .lgc-co__total b { font-size: 17px; }
 .lgc-co__cta { padding: 12px; border: 0; border-radius: 11px; background: linear-gradient(180deg, #5cb8ff, #4d7cff); color: #fff; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+
+/* Canonical on-glass contrast: LG surfaces tint dark in dark mode and light in
+   light mode, so content follows one pure foreground token instead of the page
+   background or per-component hard-coded white. */
+[data-glass-material] {
+  color: var(--lgc-on-glass) !important;
+  text-shadow: none !important;
+}
+[data-glass-material] :is(a, button, input, textarea, label, span, p, b, strong, em, i, kbd, small, div, ul, ol, li) {
+  color: inherit !important;
+  text-shadow: none !important;
+}
+[data-glass-material] :is(input, textarea)::placeholder {
+  color: var(--lgc-on-glass-muted) !important;
+}
+
+/* Live controls that position text around a glass indicator are not themselves
+   the glass surface, but their content still needs the same mode contrast. */
+.pv--live :is(.lgc-mat__control > span, .lgc-mat__value,
+.lgc-seg__opt, .lgc-tabs__t, .lgc-pager__b,
+.lgc-formfield__l, .lgc-formfield__h) {
+  color: var(--lgc-demo-ink) !important;
+}

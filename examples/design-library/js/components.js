@@ -47,30 +47,78 @@ function mixColor(a, b) {
    materials. Component call sites may pass shape/size geometry only; optical
    parameters (blur, refraction inset, refraction, saturation, specular) live here. */
 const GLASS_MATERIALS = {
-  clear: { name: 'Clear', tone: 'Very transparent', cls: 'clear', blur: 0.2, refractionInset: 10, refraction: 80, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.045)' },
-  optic: { name: 'Optic', tone: 'Transparent, higher bend', cls: 'clear-strong', blur: 0.4, refractionInset: 16, refraction: 80, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.065)' },
-  softFrost: { name: 'Soft Frost', tone: 'Slightly frosted', cls: 'soft', blur: 2.4, refractionInset: 14, refraction: 80, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.13)' },
-  satin: { name: 'Satin', tone: 'Balanced frost', cls: 'satin', blur: 4.8, refractionInset: 18, refraction: 80, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.18)' },
-  deepFrost: { name: 'Deep Frost', tone: 'More frosted', cls: 'deep', blur: 8.5, refractionInset: 22, refraction: 80, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.24)' },
-  milk: { name: 'Milk Glass', tone: 'Most frosted', cls: 'milk', blur: 12, refractionInset: 26, refraction: 80, saturation: 5, specular: 1, tint: 'rgba(255, 255, 255, 0.31)' },
+  clear: { name: 'Clear', tone: 'Very transparent', cls: 'clear', blur: 0.2, refractionInset: 10, refraction: 80, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
+  optic: { name: 'Optic', tone: 'Transparent, higher bend', cls: 'clear-strong', blur: 0.4, refractionInset: 16, refraction: 80, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
+  softFrost: { name: 'Soft Frost', tone: 'Slightly frosted', cls: 'soft', blur: 2.4, refractionInset: 14, refraction: 80, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
+  satin: { name: 'Satin', tone: 'Balanced frost', cls: 'satin', blur: 4.8, refractionInset: 18, refraction: 80, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
+  deepFrost: { name: 'Deep Frost', tone: 'More frosted', cls: 'deep', blur: 8.5, refractionInset: 22, refraction: 80, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
+  milk: { name: 'Milk Glass', tone: 'Most frosted', cls: 'milk', blur: 12, refractionInset: 26, refraction: 80, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
 };
 const MATERIAL_NAMES = Object.keys(GLASS_MATERIALS);
 const material = (name = 'softFrost') => GLASS_MATERIALS[name] || GLASS_MATERIALS.softFrost;
-const MATERIAL_HANDLES = new Set();
-const GLASS_TINTS = {
-  primary: 'rgba(77, 124, 255, 0.32)',
-  primarySoft: 'rgba(77, 124, 255, 0.22)',
-  success: 'rgba(55, 194, 74, 0.28)',
-  danger: 'rgba(240, 69, 79, 0.28)',
+const currentTheme = () => document.documentElement.dataset.theme || 'dark';
+const activeTintKey = () => (currentTheme() === 'light' ? 'lightTint' : 'darkTint');
+const activeTintLabel = () => (currentTheme() === 'light' ? 'Light tint' : 'Dark tint');
+const activeTintMax = () => '1';
+const HOVER_TINT_BOOST = 0.08;
+const materialTint = (m, alphaBoost = 0) => {
+  const theme = currentTheme();
+  const alpha = clamp01((theme === 'light' ? m.lightTint : m.darkTint) + alphaBoost);
+  const channel = theme === 'light' ? '255, 255, 255' : '0, 0, 0';
+  return `rgba(${channel}, ${alpha})`;
 };
-const tint = (name) => (name ? GLASS_TINTS[name] || name : null);
+const controlStateProgress = (state) => clamp01((ACTIVATION.glassAlphaRest - state) / (ACTIVATION.glassAlphaRest - ACTIVATION.glassAlphaActive));
+const controlStateTint = (state, m) => {
+  const t = controlStateProgress(state);
+  const light = currentTheme() === 'light';
+  const fg = [255, 255, 255, 1];
+  const surfaceAlpha = light ? m.lightTint : m.darkTint;
+  const surface = light ? [255, 255, 255, surfaceAlpha] : [0, 0, 0, surfaceAlpha];
+  return `rgba(${Math.round(lerp(fg[0], surface[0], t))}, ${Math.round(lerp(fg[1], surface[1], t))}, ${Math.round(lerp(fg[2], surface[2], t))}, ${lerp(fg[3], surface[3], t).toFixed(3)})`;
+};
+const controlStateShadow = (state) => {
+  const t = clamp01((ACTIVATION.glassAlphaRest - state) / (ACTIVATION.glassAlphaRest - ACTIVATION.glassAlphaActive));
+  const alpha = lerp(0.32, 0.18, t);
+  const y = lerp(3, 7, t);
+  const blur = lerp(8, 20, t);
+  return `0 ${y.toFixed(1)}px ${blur.toFixed(1)}px rgba(0, 0, 0, ${alpha.toFixed(3)})`;
+};
+const syncRangeFill = (input) => {
+  const min = Number(input.min || 0);
+  const max = Number(input.max || 100);
+  const value = Number(input.value || min);
+  const pct = max === min ? 0 : clamp01((value - min) / (max - min));
+  input.style.setProperty('--lgc-range-pct', `${(pct * 100).toFixed(2)}%`);
+};
+const MATERIAL_HANDLES = new Set();
+const MATERIAL_TINT_CONTROLS = new Set();
+const GLASS_TINTS = {
+  primary: { tint: 'linear-gradient(180deg, rgba(92, 184, 255, 0.8), rgba(77, 124, 255, 0.4))', shadow: '0 7px 20px rgba(77, 124, 255, 0.42)' },
+  primarySoft: { tint: 'linear-gradient(180deg, rgba(92, 184, 255, 0.32), rgba(77, 124, 255, 0.28))', shadow: '0 7px 20px rgba(77, 124, 255, 0.32)' },
+  success: { tint: 'linear-gradient(180deg, rgba(87, 218, 107, 0.38), rgba(55, 194, 74, 0.32))', shadow: '0 7px 20px rgba(55, 194, 74, 0.32)' },
+  danger: { tint: 'linear-gradient(180deg, rgba(255, 122, 122, 0.38), rgba(240, 69, 79, 0.32))', shadow: '0 7px 20px rgba(240, 69, 79, 0.32)' },
+};
+const tintToken = (name) => (name ? GLASS_TINTS[name] || null : null);
+const tintLayer = (name) => {
+  const token = tintToken(name);
+  return token ? token.tint : name || null;
+};
+const tintShadow = (name) => {
+  const token = tintToken(name);
+  return token ? token.shadow : null;
+};
 function applyGlassTint(glass, tintName = null) {
-  const value = tint(tintName);
-  if (value) glass.el.dataset.glassTint = tintName;
+  const layer = tintLayer(tintName);
+  if (layer) glass.el.dataset.glassTint = tintName;
   else delete glass.el.dataset.glassTint;
   const m = material(glass.el.dataset.glassMaterial);
-  const fill = value || m.tint;
+  const fill = materialTint(m, glass.el._lgcHovered ? HOVER_TINT_BOOST : 0);
   glass.el.style.setProperty('--lgc-material-tint', fill);
+  if (layer) glass.el.style.setProperty('--lgc-tint-layer', layer);
+  else glass.el.style.removeProperty('--lgc-tint-layer');
+  const shadow = tintShadow(tintName);
+  if (shadow) glass.el.style.setProperty('--lgc-drop-shadow', shadow);
+  else glass.el.style.removeProperty('--lgc-drop-shadow');
   glass.el.style.background = fill;
   return glass;
 }
@@ -94,15 +142,35 @@ function updateGlassMaterial(materialName, patch) {
     if (glass.el.dataset.glassMaterial === materialName) applyGlassMaterialValues(glass, m);
   });
 }
+export function refreshGlassMaterials() {
+  MATERIAL_HANDLES.forEach((glass) => {
+    if (!glass.el.isConnected) { MATERIAL_HANDLES.delete(glass); return; }
+    applyGlassMaterialValues(glass, material(glass.el.dataset.glassMaterial));
+    if (glass.el._lgcRefreshMaterialTint) glass.el._lgcRefreshMaterialTint();
+  });
+  MATERIAL_TINT_CONTROLS.forEach((control) => {
+    if (!control.input.isConnected) { MATERIAL_TINT_CONTROLS.delete(control); return; }
+    control.label.textContent = activeTintLabel();
+    control.value.textContent = control.mat[activeTintKey()].toFixed(3);
+    control.input.max = activeTintMax();
+    control.input.value = String(control.mat[activeTintKey()]);
+    control.input.setAttribute('aria-label', `${control.mat.name} ${activeTintLabel().toLowerCase()} alpha`);
+    syncRangeFill(control.input);
+  });
+}
 function attachGlass(el, shape = {}) {
   const materialName = shape.material ?? 'softFrost';
   const m = material(materialName);
   const refractionInset = shape.refractionInset ?? 'radius';
   el.dataset.glassMaterial = materialName;
   el._lgcUseMaterialInset = shape.materialInset === true;
-  const fill = tint(shape.tint) || m.tint;
+  const fill = materialTint(m);
+  const layer = tintLayer(shape.tint);
   if (shape.tint) el.dataset.glassTint = shape.tint;
   el.style.setProperty('--lgc-material-tint', fill);
+  if (layer) el.style.setProperty('--lgc-tint-layer', layer);
+  const shadow = tintShadow(shape.tint);
+  if (shadow) el.style.setProperty('--lgc-drop-shadow', shadow);
   el.style.background = fill;
   const glass = attachGlassEngine(el, {
     surface: shape.surface ?? 'convex',
@@ -116,6 +184,13 @@ function attachGlass(el, shape = {}) {
   MATERIAL_HANDLES.add(glass);
   const dispose = glass.dispose;
   glass.dispose = () => { MATERIAL_HANDLES.delete(glass); dispose(); };
+  const setHover = (hovered) => {
+    el._lgcHovered = hovered;
+    if (el._lgcRefreshMaterialTint) el._lgcRefreshMaterialTint();
+    else applyGlassTint(glass, el.dataset.glassTint || null);
+  };
+  el.addEventListener('pointerenter', () => setHover(true));
+  el.addEventListener('pointerleave', () => setHover(false));
   return glass;
 }
 
@@ -155,10 +230,12 @@ export function glassSwitch({ on = true, forced = false } = {}) {
     knob.style.transform = `translateY(-50%) translateX(${(B.get() * TRAVEL).toFixed(2)}px) scale(${A.get().toFixed(3)})`;
   };
   const paintAlpha = (v) => {
-    const fill = `rgba(255, 255, 255, ${v.toFixed(3)})`;
+    const fill = controlStateTint(v, material(knob.dataset.glassMaterial));
     knob.style.setProperty('--lgc-material-tint', fill);
     knob.style.background = fill;
+    knob.style.boxShadow = controlStateShadow(v);
   };
+  knob._lgcRefreshMaterialTint = () => paintAlpha(C.get());
   B.onChange(renderKnob); A.onChange(renderKnob);
   C.onChange(paintAlpha);
   T.onChange((v) => (track.style.background = trackColor(v)));
@@ -225,10 +302,12 @@ export function glassSlider({ value = 0.4, forced = false } = {}) {
 
   let val = clamp01(value), n = 0, forcedState = forced, grabOffset = 0;
   const paintAlpha = (v) => {
-    const fill = `rgba(255, 255, 255, ${v.toFixed(3)})`;
+    const fill = controlStateTint(v, material(thumb.dataset.glassMaterial));
     thumb.style.setProperty('--lgc-material-tint', fill);
     thumb.style.background = fill;
+    thumb.style.boxShadow = controlStateShadow(v);
   };
+  thumb._lgcRefreshMaterialTint = () => paintAlpha(X.get());
   A.onChange((v) => (thumb.style.transform = `translateX(-50%) scale(${v.toFixed(3)})`));
   X.onChange(paintAlpha);
   Q.onChange((v) => (glass.refraction = REFRACTION * v));
@@ -363,7 +442,7 @@ export function glassIconButton({ icon = 'plus', label = 'Action' } = {}) {
   A.onChange((v) => (el.style.transform = `scale(${v.toFixed(3)})`));
   el.addEventListener('pointerdown', () => { applyGlassMaterial(glass, 'optic'); Q.set(1); A.set(0.92); });
   const up = () => { applyGlassMaterial(glass, 'softFrost'); Q.set(0); A.set(1); };
-  el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up);
+  el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
   return el;
 }
 
@@ -379,9 +458,9 @@ export function glassFab({ icon = 'plus' } = {}) {
 }
 
 /* ============================================================================
-   Segmented control — a single glass indicator that springs between options
-   (snap) and boosts refraction while moving.
-   ========================================================================== */
+  Segmented control — a single glass indicator that glides between options
+  with the switch spring and a lens-like vertical pulse while moving.
+  ========================================================================== */
 export function glassSegmented({ options = ['Day', 'Week', 'Month'], value = 0 } = {}) {
   const indicator = h('span', { class: 'lgc-seg__ind' });
   const segs = options.map((label, i) =>
@@ -389,23 +468,28 @@ export function glassSegmented({ options = ['Day', 'Week', 'Month'], value = 0 }
   const el = h('div', { class: 'lgc-seg', role: 'tablist' }, [indicator, ...segs]);
 
   const glass = attachGlass(indicator, { material: 'softFrost', surface: 'convex', radius: 'pill' });
-  const X = spring('snap', value), W = spring('snap', 0), Q = spring('settle', 0.4);
-  let cur = value, settleTimer = 0;
+  const X = spring('glide', value), W = spring('glide', 0), Q = spring('settle', 0.4);
+  const S = spring('jelly', 0);
+  let cur = value, settleTimer = 0, stretchTimer = 0;
 
   const place = () => {
     const target = segs[cur];
-    indicator.style.transform = `translateX(${X.get()}px)`;
+    const verticalGrow = clamp01(S.get());
+    const scaleY = 1 + verticalGrow;
+    indicator.style.transform = `translateX(${X.get().toFixed(2)}px) scaleX(1) scaleY(${scaleY.toFixed(3)})`;
     indicator.style.width = `${W.get()}px`;
     void target;
   };
-  X.onChange(place); W.onChange(place);
+  X.onChange(place); W.onChange(place); S.onChange(place);
   Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'softFrost'));
 
   const moveTo = (i) => {
+    const t = segs[i];
+    const changed = i !== cur;
     cur = i;
     segs.forEach((s, k) => s.classList.toggle('is-on', k === i));
-    const t = segs[i];
     X.set(t.offsetLeft); W.set(t.offsetWidth);
+    if (changed) { S.set(0.4); clearTimeout(stretchTimer); stretchTimer = setTimeout(() => S.set(0), 160); }
     applyGlassMaterial(glass, 'optic'); Q.set(1); clearTimeout(settleTimer); settleTimer = setTimeout(() => { applyGlassMaterial(glass, 'softFrost'); Q.set(0); }, 260);
   };
   segs.forEach((s, i) => s.addEventListener('click', () => moveTo(i)));
@@ -413,6 +497,26 @@ export function glassSegmented({ options = ['Day', 'Week', 'Month'], value = 0 }
   new ResizeObserver(init).observe(el);
   requestAnimationFrame(init);
   return el;
+}
+
+function activationShapePulse(el) {
+  const scaleX = spring('jelly', 1);
+  const scaleY = spring('jelly', 1);
+  let timer = 0;
+  const render = () => {
+    el.style.transform = `scaleX(${scaleX.get().toFixed(3)}) scaleY(${scaleY.get().toFixed(3)})`;
+  };
+  scaleX.onChange(render);
+  scaleY.onChange(render);
+  return () => {
+    clearTimeout(timer);
+    scaleX.set(1.2);
+    scaleY.set(1.4);
+    timer = setTimeout(() => {
+      scaleX.set(1);
+      scaleY.set(1);
+    }, 150);
+  };
 }
 
 /* ============================================================================
@@ -424,31 +528,43 @@ export function glassCheckbox({ checked = true } = {}) {
   const el = h('button', { class: 'lgc-check', type: 'button', role: 'checkbox', 'aria-checked': String(checked) }, [box]);
   const glass = attachGlass(box, { material: checked ? 'optic' : 'softFrost', tint: checked ? 'primary' : null, surface: 'convex', radius: 8 });
   const P = spring('jelly', checked ? 1 : 0), Q = spring('settle', checked ? 0.9 : 0.4);
+  const pulseShape = activationShapePulse(box);
   P.onChange((v) => { mark.style.transform = `scale(${clamp01(v).toFixed(3)})`; mark.style.opacity = clamp01(v).toFixed(3); });
   Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'softFrost'));
   let on = checked;
-  const set = (v) => { on = v; el.setAttribute('aria-checked', String(on)); el.classList.toggle('is-on', on); applyGlassTint(glass, on ? 'primary' : null); applyGlassMaterial(glass, on ? 'optic' : 'softFrost'); P.set(on ? 1 : 0); Q.set(on ? 1 : 0); };
+  const set = (v, pulse = false) => { on = v; el.setAttribute('aria-checked', String(on)); el.classList.toggle('is-on', on); applyGlassTint(glass, on ? 'primary' : null); applyGlassMaterial(glass, on ? 'optic' : 'softFrost'); P.set(on ? 1 : 0); Q.set(on ? 1 : 0); if (pulse) pulseShape(); };
   set(checked);
-  el.addEventListener('click', () => set(!on));
+  el.addEventListener('click', () => set(!on, true));
   return el;
 }
 
 /* ============================================================================
    Radio — glass disc; inner dot springs in (grab) on selection.
    ========================================================================== */
-export function glassRadio({ checked = true } = {}) {
+export function glassRadio({ checked = true, onSelect = null } = {}) {
   const dot = h('span', { class: 'lgc-radio__dot' });
   const disc = h('span', { class: 'lgc-radio__disc' }, [dot]);
   const el = h('button', { class: 'lgc-radio', type: 'button', role: 'radio', 'aria-checked': String(checked) }, [disc]);
   const glass = attachGlass(disc, { material: checked ? 'optic' : 'softFrost', tint: checked ? 'primary' : null, surface: 'convex', radius: 'pill' });
   const P = spring('grab', checked ? 1 : 0), Q = spring('settle', checked ? 0.9 : 0.4);
+  const pulseShape = activationShapePulse(disc);
   P.onChange((v) => { dot.style.transform = `translate(-50%,-50%) scale(${clamp01(v).toFixed(3)})`; });
   Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'softFrost'));
   let on = checked;
-  const set = (v) => { on = v; el.setAttribute('aria-checked', String(on)); el.classList.toggle('is-on', on); applyGlassTint(glass, on ? 'primary' : null); applyGlassMaterial(glass, on ? 'optic' : 'softFrost'); P.set(on ? 1 : 0); Q.set(on ? 1 : 0); };
+  const set = (v, pulse = false) => { on = v; el.setAttribute('aria-checked', String(on)); el.classList.toggle('is-on', on); applyGlassTint(glass, on ? 'primary' : null); applyGlassMaterial(glass, on ? 'optic' : 'softFrost'); P.set(on ? 1 : 0); Q.set(on ? 1 : 0); if (pulse) pulseShape(); };
+  el._lgcSetRadioChecked = set;
   set(checked);
-  el.addEventListener('click', () => set(true));
+  el.addEventListener('click', () => { if (on) return; if (onSelect) onSelect(el); else set(true, true); });
   return el;
+}
+
+export function glassRadioSet({ value = 0, count = 2 } = {}) {
+  const radios = [];
+  const select = (selected) => {
+    radios.forEach((radio) => radio._lgcSetRadioChecked(radio === selected, radio === selected));
+  };
+  for (let i = 0; i < count; i++) radios.push(glassRadio({ checked: i === value, onSelect: select }));
+  return h('div', { class: 'lgc-row', role: 'radiogroup' }, radios);
 }
 
 /* ============================================================================
@@ -506,6 +622,16 @@ export function glassToast() {
   return el;
 }
 
+export function glassSkeleton() {
+  const lines = [
+    h('span', { class: 'lgc-skel__line' }),
+    h('span', { class: 'lgc-skel__line lgc-skel__line--mid' }),
+    h('span', { class: 'lgc-skel__line lgc-skel__line--short' }),
+  ];
+  lines.forEach((line) => attachGlass(line, { material: 'satin', surface: 'convex', radius: 'pill' }));
+  return h('div', { class: 'lgc-skel', 'aria-label': 'Loading placeholder' }, lines);
+}
+
 /* ============================================================================
   THE REST OF THE LIBRARY — every part below is built on the SAME glass
   construction as the hero lens: one `attachGlass()` surface per part (LG-P7),
@@ -535,16 +661,28 @@ export function glassMaterialLab() {
 
     const insetValue = h('span', { class: 'lgc-mat__value' }, `${mat.refractionInset}px`);
     const refValue = h('span', { class: 'lgc-mat__value' }, String(mat.refraction));
+    const tintLabel = h('span', {}, activeTintLabel());
+    const tintValue = h('span', { class: 'lgc-mat__value' }, mat[activeTintKey()].toFixed(3));
     const inset = h('input', { class: 'lgc-mat__range', type: 'range', min: '4', max: '36', step: '1', value: String(mat.refractionInset), 'aria-label': `${mat.name} refraction inset in pixels` });
     const ref = h('input', { class: 'lgc-mat__range', type: 'range', min: '8', max: '120', step: '1', value: String(mat.refraction), 'aria-label': `${mat.name} refraction` });
-    inset.addEventListener('input', () => { const v = Number(inset.value); glass.refractionInset = v; insetValue.textContent = `${v}px`; });
-    ref.addEventListener('input', () => { const v = Number(ref.value); updateGlassMaterial(materialName, { refraction: v }); refValue.textContent = String(v); });
+    const tint = h('input', { class: 'lgc-mat__range', type: 'range', min: '0', max: activeTintMax(), step: '0.005', value: String(mat[activeTintKey()]), 'aria-label': `${mat.name} ${activeTintLabel().toLowerCase()} alpha` });
+    [inset, ref, tint].forEach(syncRangeFill);
+    inset.addEventListener('input', () => { const v = Number(inset.value); glass.refractionInset = v; insetValue.textContent = `${v}px`; syncRangeFill(inset); });
+    ref.addEventListener('input', () => { const v = Number(ref.value); updateGlassMaterial(materialName, { refraction: v }); refValue.textContent = String(v); syncRangeFill(ref); });
+    tint.addEventListener('input', () => {
+      const v = Number(tint.value);
+      updateGlassMaterial(materialName, { [activeTintKey()]: v });
+      tintValue.textContent = v.toFixed(3);
+      syncRangeFill(tint);
+    });
+    MATERIAL_TINT_CONTROLS.add({ mat, input: tint, label: tintLabel, value: tintValue });
 
     return h('article', { class: 'lgc-mat' }, [
       sample,
       h('div', { class: 'lgc-mat__controls' }, [
         h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Refraction inset', insetValue]), inset]),
         h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Refraction', refValue]), ref]),
+        h('label', { class: 'lgc-mat__control' }, [h('span', {}, [tintLabel, tintValue]), tint]),
       ]),
     ]);
   });
@@ -865,7 +1003,11 @@ export function glassPassword({ value = 'secret123' } = {}) {
 }
 
 export function glassTagInput({ tags = ['design', 'glass'] } = {}) {
-  const chips = tags.map((t) => h('span', { class: 'lgc-taginput__chip' }, [h('span', {}, t), fa('xmark')]));
+  const chips = tags.map((t) => {
+    const chip = h('span', { class: 'lgc-taginput__chip' }, [h('span', { class: 'lgc-taginput__label' }, t), fa('xmark', { cls: 'lgc-taginput__x' })]);
+    attachGlass(chip, { material: 'optic', tint: 'primarySoft', surface: 'convex', radius: 'pill' });
+    return chip;
+  });
   const input = h('input', { type: 'text', placeholder: 'Add tag…', 'aria-label': 'Add tag' });
   const el = h('div', { class: 'lgc-field lgc-taginput' }, [...chips, input]);
   attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 12 });
@@ -916,9 +1058,37 @@ export function glassAutocomplete() {
 }
 
 export function glassRadioGroup({ options = ['Light', 'Dark', 'Auto'], value = 1 } = {}) {
-  const rows = options.map((label, i) => { const r = h('label', { class: 'lgc-rg__i' + (i === value ? ' is-on' : '') }, [h('span', { class: 'lgc-rg__dot' }), h('span', {}, label)]); return r; });
+  let current = value;
+  const radios = options.map((label, i) => {
+    const dot = h('span', { class: 'lgc-radio__dot lgc-rg__dot' });
+    const disc = h('span', { class: 'lgc-radio__disc lgc-rg__disc' }, [dot]);
+    const row = h('button', { class: 'lgc-rg__i', type: 'button', role: 'radio', 'aria-checked': String(i === current) }, [disc, h('span', {}, label)]);
+    const glass = attachGlass(disc, { material: i === current ? 'optic' : 'softFrost', tint: i === current ? 'primary' : null, surface: 'convex', radius: 'pill' });
+    const P = spring('grab', i === current ? 1 : 0);
+    const Q = spring('settle', i === current ? 0.9 : 0.4);
+    const pulseShape = activationShapePulse(disc);
+    P.onChange((v) => { dot.style.transform = `translate(-50%,-50%) scale(${clamp01(v).toFixed(3)})`; });
+    Q.onChange((v) => applyGlassMaterial(glass, v > 0.5 ? 'optic' : 'softFrost'));
+    return { row, glass, P, Q, pulseShape };
+  });
+  const rows = radios.map(({ row }) => row);
   const group = glassPanel('lgc-rg', rows, { material: 'softFrost', radius: 14 });
-  rows.forEach((r, i) => r.addEventListener('click', () => rows.forEach((x, k) => x.classList.toggle('is-on', k === i))));
+  group.setAttribute('role', 'radiogroup');
+  const sync = (next, pulse = false) => {
+    current = next;
+    radios.forEach((radio, i) => {
+      const on = i === current;
+      radio.row.classList.toggle('is-on', on);
+      radio.row.setAttribute('aria-checked', String(on));
+      applyGlassTint(radio.glass, on ? 'primary' : null);
+      applyGlassMaterial(radio.glass, on ? 'optic' : 'softFrost');
+      radio.P.set(on ? 1 : 0);
+      radio.Q.set(on ? 1 : 0);
+    });
+    if (pulse) radios[next].pulseShape();
+  };
+  rows.forEach((row, i) => row.addEventListener('click', () => sync(i, true)));
+  sync(current);
   return group;
 }
 
@@ -1203,9 +1373,10 @@ export const MOUNTS = {
   iconButton: () => h('div', { class: 'lgc-row' }, [glassIconButton({ icon: 'plus' }), glassIconButton({ icon: 'heart' }), glassIconButton({ icon: 'share-nodes' })]),
   fab: () => glassFab({ icon: 'plus' }),
   closeButton: () => glassIconButton({ icon: 'xmark', label: 'Close' }),
+  skeleton: () => glassSkeleton(),
   segmented: () => glassSegmented({ options: ['Day', 'Week', 'Month'], value: 0 }),
   checkbox: () => h('div', { class: 'lgc-row' }, [glassCheckbox({ checked: true }), glassCheckbox({ checked: false })]),
-  radio: () => h('div', { class: 'lgc-row' }, [glassRadio({ checked: true }), glassRadio({ checked: false })]),
+  radio: () => glassRadioSet({ value: 0, count: 2 }),
   search: () => glassSearch(),
   filterChips: () => h('div', { class: 'lgc-row' }, [glassChip({ label: 'Active' }), glassChip({ label: 'Glass' }), glassChip({ label: 'Draft' })]),
   tag: () => h('div', { class: 'lgc-row' }, [glassChip({ label: 'Design' }), glassChip({ label: 'Motion' })]),

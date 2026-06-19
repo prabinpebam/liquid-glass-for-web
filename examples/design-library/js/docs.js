@@ -8,7 +8,7 @@
    they refract the patterned backdrop and animate with spring physics. Icons
    come from Font Awesome. Remaining catalog parts use lightweight CSS mocks.
    ========================================================================== */
-import { MOUNTS, glassLens } from './components.js';
+import { MOUNTS, glassLens, refreshGlassMaterials } from './components.js';
 
 /* --- preview mocks: id -> HTML string (pure CSS visuals, no engine needed) - */
 const DEMOS = {
@@ -601,11 +601,12 @@ function setupChrome() {
 
   // theme
   const saved = localStorage.getItem('lg-docs-theme');
-  if (saved) { html.dataset.theme = saved; html.dataset.lgTheme = saved; }
+  if (saved) { html.dataset.theme = saved; html.dataset.lgTheme = saved; refreshGlassMaterials(); }
   document.getElementById('themeToggle').addEventListener('click', () => {
     const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
     html.dataset.theme = next; html.dataset.lgTheme = next;
     localStorage.setItem('lg-docs-theme', next);
+    refreshGlassMaterials();
   });
 
   // motion preset (sets the @liquid-glass/ui token attribute)

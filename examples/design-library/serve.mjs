@@ -18,11 +18,13 @@ const TYPES = {
   '.jpg': 'image/jpeg',
 };
 
+const NO_STORE = 'no-store, no-cache, must-revalidate, proxy-revalidate';
+
 const server = createServer(async (req, res) => {
   try {
     let rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
     if (rel === '/favicon.svg' || rel === '/favicon.ico') {
-      res.writeHead(200, { 'content-type': 'image/svg+xml', 'cache-control': 'public, max-age=86400' });
+      res.writeHead(200, { 'content-type': 'image/svg+xml', 'cache-control': NO_STORE });
       res.end(FAVICON);
       return;
     }
@@ -33,7 +35,7 @@ const server = createServer(async (req, res) => {
       return;
     }
     const body = await readFile(path);
-    res.writeHead(200, { 'content-type': TYPES[extname(path)] || 'application/octet-stream' });
+    res.writeHead(200, { 'content-type': TYPES[extname(path)] || 'application/octet-stream', 'cache-control': NO_STORE, pragma: 'no-cache', expires: '0' });
     res.end(body);
   } catch {
     res.writeHead(404, { 'content-type': 'text/plain' }).end('Not found');
