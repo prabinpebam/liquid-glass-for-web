@@ -566,7 +566,7 @@ body {
 .lgc-menu, .lgc-acc, .lgc-stat, .lgc-list, .lgc-tbl, .lgc-nav, .lgc-side,
 .lgc-modal, .lgc-cmd, .lgc-tool, .lgc-prod, .lgc-auth, .lgc-cal, .lgc-media,
 .lgc-chat__b--them, .lgc-price,
-.lgc-tglbtn, .lgc-step, .lgc-fileinput, .lgc-rating, .lgc-bg,
+.lgc-tglbtn, .lgc-split, .lgc-step, .lgc-fileinput, .lgc-rating, .lgc-bg,
 .lgc-combo__list, .lgc-rg, .lgc-crumb, .lgc-dd__trigger, .lgc-dd__menu,
 .lgc-steps, .lgc-pop, .lgc-tree, .lgc-banner, .lgc-empty, .lgc-loading,
 .lgc-tl, .lgc-mo, .lgc-ph, .lgc-foot, .lgc-drawer, .lgc-notif, .lgc-coach,
@@ -600,7 +600,7 @@ body {
 .lgc-field, .lgc-otp__cell, .lgc-tooltip, .lgc-menu, .lgc-acc, .lgc-stat,
 .lgc-list, .lgc-tbl, .lgc-nav, .lgc-side, .lgc-modal, .lgc-cmd, .lgc-tool,
 .lgc-prod, .lgc-auth, .lgc-cal, .lgc-media, .lgc-chat__b--them, .lgc-price,
-.lgc-tglbtn, .lgc-step, .lgc-fileinput, .lgc-rating, .lgc-bg,
+.lgc-tglbtn, .lgc-split, .lgc-step, .lgc-fileinput, .lgc-rating, .lgc-bg,
 .lgc-combo__list, .lgc-rg, .lgc-crumb, .lgc-dd__trigger, .lgc-dd__menu,
 .lgc-steps, .lgc-pop, .lgc-tree, .lgc-banner, .lgc-empty, .lgc-loading,
 .lgc-tl, .lgc-mo, .lgc-ph, .lgc-foot, .lgc-drawer, .lgc-notif, .lgc-coach,
@@ -973,11 +973,13 @@ body {
 .lgc-tglbtn i { opacity: 0.85; }
 .lgc-tglbtn.is-on { color: #fff; }
 
-.lgc-split { display: inline-flex; align-items: center; gap: 8px; color: #fff; }
-.lgc-split__main { height: 38px; padding: 0 16px; border-radius: 12px; font-size: 13px; }
-.lgc-split__sep { width: 1px; height: 24px; border-radius: 999px; background: rgba(20, 24, 42, 0.22); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); }
+.lgc-split { display: inline-flex; align-items: stretch; height: 38px; border-radius: 12px; color: #fff; overflow: hidden; }
+.lgc-split__part { border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-grid; place-items: center; min-width: 0; }
+.lgc-split__part:hover { background: rgba(255, 255, 255, 0.12); }
+.lgc-split__main { padding: 0 16px; }
+.lgc-split__sep { align-self: center; width: 1px; height: 24px; border-radius: 999px; background: rgba(20, 24, 42, 0.22); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); }
 [data-theme='dark'] .lgc-split__sep { background: rgba(255, 255, 255, 0.24); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
-.lgc-split__caret { width: 38px; height: 38px; border-radius: 12px; font-size: 11px; }
+.lgc-split__caret { width: 38px; font-size: 11px; }
 
 .lgc-step { display: inline-flex; align-items: center; border-radius: 12px; color: #fff; }
 .lgc-step__b { width: 38px; height: 38px; border-radius: 10px; font-size: 14px; }

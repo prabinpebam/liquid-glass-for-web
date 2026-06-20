@@ -992,11 +992,12 @@ export function glassToggleButton({ label = 'Bold', icon = 'bold', on = true } =
 }
 
 export function glassSplitButton({ label = 'Save' } = {}) {
-  const el = h('div', { class: 'lgc-split' }, [
-    glassButton({ label, variant: 'accent', tint: 'primarySoft', className: 'lgc-split__main' }),
+  const el = h('div', { class: 'lgc-split', role: 'group', 'aria-label': `${label} split button` }, [
+    h('button', { class: 'lgc-split__part lgc-split__main', type: 'button' }, [h('span', { class: 'lgc-btn__label' }, label)]),
     h('span', { class: 'lgc-split__sep' }),
-    glassIconButton({ icon: 'chevron-down', label: 'More actions', material: 'optic', tint: 'primarySoft', className: 'lgc-split__caret' }),
+    h('button', { class: 'lgc-split__part lgc-split__caret', type: 'button', 'aria-label': 'More actions' }, [fa('chevron-down')]),
   ]);
+  attachGlass(el, { material: 'optic', tint: 'primarySoft', surface: 'convex', radius: 12 });
   return el;
 }
 
