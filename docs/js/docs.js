@@ -618,14 +618,25 @@ function setupChrome() {
     },
   });
 
-  // background preset (global) — line grid or a rotated landscape photo
-  const savedBg = localStorage.getItem('lg-docs-bg') || 'grid';
-  html.setAttribute('data-bg', savedBg);
+  // background preset (global) — stripes, line grid, or a rotated landscape photo
+  const DEFAULT_BG = 'stripes';
+  const BG_DEFAULT_VERSION = 'stripes-v1';
+  const savedBg = localStorage.getItem('lg-docs-bg');
+  const savedBgVersion = localStorage.getItem('lg-docs-bg-default-version');
+  const initialBg = savedBg === 'grid' && savedBgVersion !== BG_DEFAULT_VERSION
+    ? DEFAULT_BG
+    : savedBg || html.getAttribute('data-bg') || DEFAULT_BG;
+  if (savedBg === 'grid' && savedBgVersion !== BG_DEFAULT_VERSION) {
+    localStorage.setItem('lg-docs-bg', initialBg);
+    localStorage.setItem('lg-docs-bg-default-version', BG_DEFAULT_VERSION);
+  }
+  html.setAttribute('data-bg', initialBg);
   setupDropdown(document.getElementById('bgSelect'), {
-    value: savedBg,
+    value: initialBg,
     onChange(v) {
       html.setAttribute('data-bg', v);
       localStorage.setItem('lg-docs-bg', v);
+      localStorage.setItem('lg-docs-bg-default-version', BG_DEFAULT_VERSION);
     },
   });
 
