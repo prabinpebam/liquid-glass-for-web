@@ -600,6 +600,12 @@ export function glassChip({ label = 'Design', removable = true } = {}) {
   return el;
 }
 
+export function glassAvatar({ label = 'LG' } = {}) {
+  const el = h('div', { class: 'lgc-avatar', 'aria-label': `${label} avatar` }, [h('span', { class: 'lgc-avatar__label' }, label)]);
+  attachGlass(el, { material: 'optic', tint: 'primary', surface: 'convex', radius: 'pill' });
+  return el;
+}
+
 /* ============================================================================
    Card — a glass surface panel that refracts the backdrop; hover lifts.
    ========================================================================== */
@@ -1388,6 +1394,7 @@ export const MOUNTS = {
   fab: () => glassFab({ icon: 'plus' }),
   closeButton: () => glassIconButton({ icon: 'xmark', label: 'Close' }),
   skeleton: () => glassSkeleton(),
+  avatar: () => glassAvatar(),
   segmented: () => glassSegmented({ options: ['Day', 'Week', 'Month'], value: 0 }),
   checkbox: () => h('div', { class: 'lgc-row' }, [glassCheckbox({ checked: true }), glassCheckbox({ checked: false })]),
   radio: () => glassRadioSet({ value: 0, count: 2 }),
