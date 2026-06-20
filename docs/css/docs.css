@@ -557,7 +557,7 @@ body {
    specular feImage blended over the refraction, exactly like the reference).
    CSS only adds a drop shadow so the surface separates from the background;
    elevation is not part of the glass effect, the rim is. */
-.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-taginput__chip, .lgc-avatar, .lgc-card, .lgc-toast,
+.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-avatar, .lgc-card, .lgc-toast,
 .lgc-skel__line,
 .lgc-seg, .lgc-seg__ind, .lgc-check__box, .lgc-radio__disc,
 .lgc-switch__knob, .lgc-slider__thumb,
@@ -592,7 +592,7 @@ body {
   position: relative;
   z-index: 1;
 }
-.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-taginput__chip, .lgc-avatar, .lgc-card, .lgc-toast,
+.lgc-btn, .lgc-iconbtn, .lgc-fab, .lgc-search, .lgc-chip, .lgc-avatar, .lgc-card, .lgc-toast,
 .lgc-skel__line,
 .lgc-seg, .lgc-seg__ind, .lgc-check__box, .lgc-radio__disc,
 .lgc-switch__knob, .lgc-slider__thumb,
@@ -991,7 +991,8 @@ body {
 .lgc-pass__t .lgc-field__i { pointer-events: none; }
 
 .lgc-taginput { flex-wrap: wrap; gap: 6px; }
-.lgc-taginput__chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 12px; line-height: 1; color: #fff; }
+.lgc-taginput__chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 999px; background: rgba(255, 255, 255, 0.16); color: var(--lgc-on-glass); font-size: 12px; line-height: 1; }
+[data-theme='light'] .lgc-taginput__chip { background: rgba(255, 255, 255, 0.38); }
 .lgc-taginput__label { display: block; line-height: 1; }
 .lgc-taginput__x { display: inline-grid; place-items: center; width: 7px; height: 7px; font-size: 7px !important; line-height: 1; opacity: 0.82; cursor: pointer; }
 

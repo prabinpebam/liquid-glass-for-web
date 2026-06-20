@@ -1027,7 +1027,6 @@ export function glassPassword({ value = 'secret123' } = {}) {
 export function glassTagInput({ tags = ['design', 'glass'] } = {}) {
   const chips = tags.map((t) => {
     const chip = h('span', { class: 'lgc-taginput__chip' }, [h('span', { class: 'lgc-taginput__label' }, t), fa('xmark', { cls: 'lgc-taginput__x' })]);
-    attachGlass(chip, { material: 'softFrost', surface: 'convex', radius: 'pill' });
     return chip;
   });
   const input = h('input', { type: 'text', placeholder: 'Add tag…', 'aria-label': 'Add tag' });
