@@ -1004,11 +1004,11 @@ export function glassSplitButton({ label = 'Save' } = {}) {
 export function glassStepper({ value = 3, min = 0, max = 99 } = {}) {
   let v = value;
   const out = h('span', { class: 'lgc-step__v' }, String(value));
-  const dec = glassIconButton({ icon: 'minus', label: 'Decrease', className: 'lgc-step__b' });
-  const inc = glassIconButton({ icon: 'plus', label: 'Increase', className: 'lgc-step__b' });
+  const dec = h('button', { class: 'lgc-step__b', type: 'button', 'aria-label': 'Decrease' }, [fa('minus')]);
+  const inc = h('button', { class: 'lgc-step__b', type: 'button', 'aria-label': 'Increase' }, [fa('plus')]);
   dec.addEventListener('click', () => { v = Math.max(min, v - 1); out.textContent = String(v); });
   inc.addEventListener('click', () => { v = Math.min(max, v + 1); out.textContent = String(v); });
-  const el = h('div', { class: 'lgc-step' }, [dec, out, inc]);
+  const el = h('div', { class: 'lgc-step', role: 'group', 'aria-label': 'Number stepper' }, [dec, out, inc]);
   attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 12 });
   return el;
 }
