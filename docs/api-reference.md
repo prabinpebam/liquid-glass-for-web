@@ -70,7 +70,7 @@ function useLiquidGlass(
 const LiquidGlass: React.FC<LiquidGlassOptions & { as?: keyof JSX.IntrinsicElements }>;
 ```
 
-## Web component — `@liquid-glass/web-component`
+## Web component — `@liquid-glass/element`
 
 `<liquid-glass>` reflects options as attributes: `radius`, `bezel`, `thickness`,
 `surface`, `scale`, `chromatic`, `blur`, `mode`, `specular-opacity`, `specular-saturation`,

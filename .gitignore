@@ -21,5 +21,5 @@ pnpm-debug.log*
 # Test / coverage
 coverage/
 
-# Source reference is a study artifact; keep it in git but never publish it.
-# (It is excluded from packages via each package's "files" allowlist.)
+# Local scratch artifacts
+.tmp/

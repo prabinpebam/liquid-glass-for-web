@@ -273,13 +273,13 @@ All are **token overrides on root attributes / media queries** (LG-P6/P8):
 ## 9. Build & distribution
 
 - **Dev:** buildless. Serve the package directory; `<link>` the manifest styles
-  and `import` `index.js`. Mirrors `examples/playground/serve.mjs`.
+  and `import` `index.js`. Mirrors `apps/playground/serve.mjs`.
 - **Publish:** ship `tokens/`, `themes/`, `atoms/`, `components/`, `compound/`,
   `layouts/`, `core/`, `contract-tokens.css`, `library.manifest.json`, `index.js`
   as-is (ESM + CSS). Declare `@liquid-glass/core` as a peer/dependency. Optionally
   ship a bundled+minified CSS (`dist/liquid-glass-ui.css`) concatenated in
   `manifest.styles` order for a one-link drop-in.
-- **`source-reference/` is never published** (existing repo rule).
+- **Reference mirrors are not stored in the repo or published**.
 - **Load only what you use.** A consumer can `<link>` just `tokens/index.css`
   plus the specific component CSS it renders (the manifest lists every file), or
   run a build that tree-shakes `styles[]` down to the factories actually
@@ -308,7 +308,7 @@ All are **token overrides on root attributes / media queries** (LG-P6/P8):
 
 ## 11. Migration of the existing playground
 
-The current `examples/playground` hand-writes component HTML/CSS with ad-hoc
+The current `apps/playground` hand-writes component HTML/CSS with ad-hoc
 variables. Migration path (incremental, non-breaking):
 
 1. Land `tokens/` + `surface` atom; point existing `.glass` styling at the new

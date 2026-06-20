@@ -10,7 +10,7 @@
 pnpm add @liquid-glass/core
 # framework wrappers (optional)
 pnpm add @liquid-glass/react
-pnpm add @liquid-glass/web-component
+pnpm add @liquid-glass/element
 ```
 
 ## Vanilla
@@ -64,7 +64,7 @@ function GlassCard() {
 ## Web component
 
 ```html
-<script type="module" src="/node_modules/@liquid-glass/web-component/dist/index.js"></script>
+<script type="module" src="/node_modules/@liquid-glass/element/dist/index.js"></script>
 
 <liquid-glass radius="24" bezel="18" thickness="1.5" mode="backdrop">
   <p>Glass content</p>

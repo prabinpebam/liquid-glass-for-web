@@ -1,59 +1,85 @@
 # Liquid Glass for Web
 
-A reusable, framework-agnostic **liquid glass** (Apple-style refractive glass) effect
-library for any web project. It generates physically-based SVG displacement maps and
-specular highlights and applies them as CSS `filter` / `backdrop-filter`, exposing a
-small API plus framework wrappers and ready-made components.
+Reusable, framework-agnostic **liquid glass** for web projects. The packages in
+this monorepo generate physically based SVG displacement maps and specular
+highlights, then apply them through CSS `filter` / `backdrop-filter` with small
+APIs for vanilla JavaScript, React, custom elements, and token-driven UI.
 
-> Status: **early scaffolding.** See [PROJECT-PLAN.md](PROJECT-PLAN.md) for the roadmap
-> and [docs/](docs/) for concepts and API design.
+The public Design Library is hosted from the docs app and is designed to deploy
+to GitHub Pages.
 
----
+## Repository Layout
 
-## Repository layout
-
-```
+```text
 liquid-glass-for-web/
-├── PROJECT-PLAN.md         Detailed, phased build plan
-├── docs/                   Documentation (concepts, guides, API, compatibility)
-├── packages/               The library (monorepo)
-│   ├── core/               Framework-agnostic engine (TypeScript)
-│   ├── react/              React bindings
-│   └── web-component/      <liquid-glass> custom element
-├── examples/               Runnable demos that consume the library
-└── source-reference/       The faithful OFFLINE reproduction of the original
-                            article used as a study/reference (not shipped)
+├── apps/
+│   ├── docs/              GitHub Pages site + live Design Library
+│   └── playground/        Interactive low-level engine playground
+├── docs/                  Maintainer docs, architecture notes, decisions
+├── examples/              Small consumer-facing integration examples
+├── packages/
+│   ├── core/              Framework-agnostic TypeScript engine
+│   ├── react/             React hook/component bindings
+│   ├── element/           <liquid-glass> custom element
+│   └── ui/                Token-driven Liquid Glass design library package
+├── .github/workflows/     CI and GitHub Pages automation
+├── package.json
+└── pnpm-workspace.yaml
 ```
 
-## What's here today
+## Packages
 
-- **`source-reference/`** — a complete, fully offline reproduction of the original
-  article *"Liquid Glass in the Browser: Refraction with CSS and SVG"* by kube.io.
-  It is the empirical reference we study to build the library. See
-  [source-reference/README.md](source-reference/README.md) to run it.
-- **`docs/`** — the distilled technique (refraction math, surface functions,
-  displacement maps, specular highlight, compositing) plus the planned public API.
-- **`packages/core/`** — the typed skeleton of the engine.
+- [`@liquid-glass/core`](packages/core/README.md): the engine and public
+  `liquidGlass()` API.
+- [`@liquid-glass/react`](packages/react/README.md): React bindings.
+- [`@liquid-glass/element`](packages/element/README.md): custom element wrapper.
+- [`@liquid-glass/ui`](packages/ui/README.md): tokens, atoms, components, and
+  compound UI built on the shared engine.
 
-## Quick start (planned API)
+## Apps
+
+- [`apps/docs`](apps/docs): the public documentation and Design Library site.
+- [`apps/playground`](apps/playground): interactive playground for low-level
+  refraction parameters and engine experiments.
+
+## Development
+
+```bash
+pnpm install
+pnpm build
+pnpm docs:dev
+pnpm playground:dev
+```
+
+Build the GitHub Pages artifact locally:
+
+```bash
+pnpm docs:build
+pnpm docs:preview
+```
+
+## Quick Start
 
 ```ts
 import { liquidGlass } from '@liquid-glass/core';
 
-liquidGlass(document.querySelector('.panel'), {
-  radius: 24,        // corner radius (px)
-  bezel: 18,         // bezel width (px)
-  thickness: 1.5,    // refractive index (glass ≈ 1.5)
-  surface: 'convex', // 'convex' | 'concave' | 'lip' | 'flat'
-  scale: 1,          // effect strength (0..1)
+const handle = liquidGlass(document.querySelector('.panel') as HTMLElement, {
+  radius: 24,
+  bezel: 18,
+  thickness: 1.5,
+  surface: 'convex',
+  scale: 1,
+  chromatic: 1,
   specular: { opacity: 0.4, saturation: 6 },
 });
+
+handle.setScale(0.6);
+handle.dispose();
 ```
 
-## Attribution & licensing
+## Attribution
 
-The original effect, math write-up, and demos are by **kube.io**. The author has
-stated the original code is *not yet open-source licensed*. This repository therefore
-treats the article as a **conceptual reference only** and builds a **clean-room**
-implementation from the documented physics and techniques (which are not
-copyrightable). See [docs/attribution.md](docs/attribution.md) before shipping.
+This project is a clean-room implementation inspired by public writing and demos
+about browser-based refraction with CSS and SVG. See
+[`docs/attribution.md`](docs/attribution.md) for the attribution and licensing
+notes that govern releases.

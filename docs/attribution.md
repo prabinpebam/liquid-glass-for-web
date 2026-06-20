@@ -17,8 +17,8 @@ under an open-source license**.
 ## What this means for this project
 
 - **Do not copy** kube.io's source, bundled JavaScript/CSS, or generated assets into
-  the published library. The mirrored copy in [`../source-reference/`](../source-reference/)
-  exists **for study only** and must be **excluded from any published package**.
+  the published library. The old local source mirror has been removed from this
+  repository; future work should rely on documented concepts and independent code.
 - The **physics and techniques** described in the article — Snell's law, displacement
   maps, specular rim lighting, the SVG filter approach — are **not copyrightable**.
   The library is built as a **clean-room reimplementation** from these documented
@@ -29,10 +29,10 @@ under an open-source license**.
 
 ## Playground demo assets (not part of the published library)
 
-The interactive playground in [`../examples/playground/`](../examples/playground/)
+The interactive playground in [`../apps/playground/`](../apps/playground/)
 reproduces the article's own demos (Precision Lens, Searchbox, Switch, Slider, Music
 Player). To stay visually faithful it **reuses kube.io's pre-baked displacement /
-specular map PNGs**, copied into `examples/playground/assets/maps/`:
+specular map PNGs**, copied into `apps/playground/assets/maps/`:
 
 | Demo          | Maps                                            | Base scale |
 | ------------- | ----------------------------------------------- | ---------- |
@@ -63,9 +63,8 @@ Include this credit in the published README and docs.
 
 ## Publish checklist
 
-- [ ] `source-reference/` excluded from every package (`files` allowlist / `.npmignore`).
 - [ ] No kube.io bundled/minified code in `packages/`.
-- [ ] No kube.io map PNGs (`examples/playground/assets/maps/`) bundled into any package.
+- [ ] No kube.io map PNGs (`apps/playground/assets/maps/`) bundled into any package.
 - [ ] `LICENSE` (MIT) added at repo root.
 - [ ] Attribution credit present in README.
 - [ ] Third-party font/asset licenses (Inter, KaTeX, etc.) reviewed if any are bundled.

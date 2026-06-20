@@ -1,0 +1,11 @@
+{
+  "name": "@liquid-glass/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node serve.mjs",
+    "build": "node build.mjs",
+    "preview": "node serve.mjs dist"
+  }
+}

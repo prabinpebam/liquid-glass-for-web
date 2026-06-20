@@ -6,14 +6,17 @@
   "type": "module",
   "workspaces": [
     "packages/*",
+    "apps/*",
     "examples/*"
   ],
   "scripts": {
     "build": "pnpm -r --filter \"./packages/*\" build",
     "test": "pnpm -r --filter \"./packages/*\" test",
     "lint": "eslint .",
-    "reference:serve": "node source-reference/serve.mjs",
-    "playground:serve": "node examples/playground/serve.mjs"
+    "docs:dev": "pnpm --filter @liquid-glass/docs dev",
+    "docs:build": "pnpm --filter @liquid-glass/docs build",
+    "docs:preview": "pnpm --filter @liquid-glass/docs preview",
+    "playground:dev": "pnpm --filter @liquid-glass/playground dev"
   },
   "keywords": [
     "liquid-glass",
