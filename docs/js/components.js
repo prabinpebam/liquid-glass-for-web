@@ -1015,10 +1015,10 @@ export function glassStepper({ value = 3, min = 0, max = 99 } = {}) {
 
 export function glassPassword({ value = 'secret123' } = {}) {
   const input = h('input', { type: 'password', value, 'aria-label': 'Password' });
-  const toggle = glassIconButton({ icon: 'eye', label: 'Show password', className: 'lgc-pass__t' });
-  const eye = toggle.querySelector('i');
+  const eye = fa('eye', { cls: 'lgc-field__i' });
+  const toggle = h('button', { class: 'lgc-pass__t', type: 'button', 'aria-label': 'Show password' }, [eye]);
   let shown = false;
-  toggle.addEventListener('click', () => { shown = !shown; input.type = shown ? 'text' : 'password'; eye.className = `fa-solid fa-${shown ? 'eye-slash' : 'eye'} lgc-field__i lgc-field__i--btn`; });
+  toggle.addEventListener('click', () => { shown = !shown; input.type = shown ? 'text' : 'password'; toggle.setAttribute('aria-label', shown ? 'Hide password' : 'Show password'); eye.className = `fa-solid fa-${shown ? 'eye-slash' : 'eye'} lgc-field__i`; });
   const el = h('label', { class: 'lgc-field lgc-field--pass' }, [fa('lock', { cls: 'lgc-field__i' }), input, toggle]);
   attachGlass(el, { material: 'softFrost', surface: 'convex', radius: 12 });
   return el;
