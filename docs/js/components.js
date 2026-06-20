@@ -633,7 +633,7 @@ export function glassSkeleton() {
     h('span', { class: 'lgc-skel__line lgc-skel__line--mid' }),
     h('span', { class: 'lgc-skel__line lgc-skel__line--short' }),
   ];
-  lines.forEach((line) => attachGlass(line, { material: 'satin', surface: 'convex', radius: 'pill' }));
+  lines.forEach((line) => attachGlass(line, { material: 'softFrost', surface: 'convex', radius: 'pill', refractionInset: 3 }));
   return h('div', { class: 'lgc-skel', 'aria-label': 'Loading placeholder' }, lines);
 }
 
