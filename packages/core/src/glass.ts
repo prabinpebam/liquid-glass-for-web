@@ -80,7 +80,7 @@ function supportsBackdropFilterUrl(): boolean {
  * displacement/specular maps → SVG filter → CSS apply) and returns a handle for
  * live updates, cheap scale tweaks, and disposal.
  *
- * See ../../docs/architecture.md.
+ * See ../../docs/reference/architecture.md.
  */
 export function liquidGlass(el: HTMLElement, options: LiquidGlassOptions = {}): LiquidGlassHandle {
   if (typeof document === 'undefined') {

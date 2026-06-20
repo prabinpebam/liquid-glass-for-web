@@ -30,7 +30,7 @@ export const CHROMATIC_SPREAD_RATIO = 0.2;
  *   feImage(displacement) → feDisplacementMap(SourceGraphic)
  *   → [feGaussianBlur] → [feImage(specular) → feBlend]
  *
- * See ../../../docs/concepts/compositing.md.
+ * See ../../../docs/reference/concepts/compositing.md.
  */
 export function buildFilter(spec: FilterSpec): SVGFilterElement {
   const filter = document.createElementNS(SVG_NS, 'filter');

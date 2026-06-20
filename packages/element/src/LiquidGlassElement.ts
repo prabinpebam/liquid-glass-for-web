@@ -15,7 +15,7 @@ const NUMERIC_ATTRS = ['radius', 'bezel', 'thickness', 'scale', 'chromatic', 'bl
  * <liquid-glass radius="24" bezel="16" surface="convex">Frosted</liquid-glass>
  * ```
  *
- * See ../../../docs/getting-started.md.
+ * See ../../../docs/reference/getting-started.md.
  */
 export class LiquidGlassElement extends HTMLElement {
   static get observedAttributes(): string[] {

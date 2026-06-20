@@ -1,5 +1,5 @@
 /**
- * Snell–Descartes refraction. See ../../../docs/concepts/refraction.md.
+ * Snell–Descartes refraction. See ../../../docs/reference/concepts/refraction.md.
  *
  *   n1 * sin(theta1) = n2 * sin(theta2)
  *

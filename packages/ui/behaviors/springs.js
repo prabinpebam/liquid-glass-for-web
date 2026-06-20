@@ -3,7 +3,7 @@
  *
  * This is the single, framework-free implementation of the spring physics that
  * every interactive behavior (Switch, Slider, Lens, …) shares. It is the code
- * side of docs/design-library/motion-spec.md: behaviors pick a named spring
+ * side of docs/reference/design-library/motion-spec.md: behaviors pick a named spring
  * FAMILY and read the shared ACTIVATION endpoints from tokens, instead of
  * hard-coding stiffness/damping/feel at a call site (MO-1, MO-2, MO-3).
  *

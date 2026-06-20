@@ -1,7 +1,7 @@
 /**
  * @liquid-glass/core — framework-agnostic liquid glass refraction engine.
  *
- * Public entry point. See ../../docs/api-reference.md.
+ * Public entry point. See ../../docs/reference/api-reference.md.
  */
 
 // Orchestration

@@ -1,6 +1,6 @@
 /**
  * Shared types for the liquid-glass engine.
- * See ../../docs/api-reference.md for the documented contract.
+ * See ../../docs/reference/api-reference.md for the documented contract.
  */
 
 /** A 2D vector. */

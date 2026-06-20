@@ -7,7 +7,7 @@
    chain, and applies it as a backdrop-filter so the element refracts whatever
    is painted behind it. It also ships the Spring physics primitive + the named
    spring families and the activation model that every interactive glass control
-   shares (see docs/design-library/motion-spec.md).
+   shares (see docs/reference/design-library/motion-spec.md).
    ========================================================================== */
 
 const SVG_NS = 'http://www.w3.org/2000/svg';

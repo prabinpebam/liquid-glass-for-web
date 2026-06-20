@@ -5,7 +5,7 @@ import type { SurfaceFn, SurfaceKind, Vec2 } from '../types.js';
  *
  * Each takes a normalized distance from the side (0 = outer edge, 1 = end of
  * bezel) and returns the glass height in 0..1. See
- * ../../../docs/concepts/surface-functions.md.
+ * ../../../docs/reference/concepts/surface-functions.md.
  *
  * NOTE: these profiles are a clean-room expression of the documented technique;
  * exact curves are tuned during Phase 1 against the reference simulation.
@@ -32,7 +32,7 @@ export function resolveSurface(kind: SurfaceKind): SurfaceFn {
 
 /**
  * Surface normal at a distance, via a numerical derivative of the height
- * function rotated by −90°. See docs/concepts/surface-functions.md.
+ * function rotated by −90°. See docs/reference/concepts/surface-functions.md.
  */
 export function surfaceNormal(f: SurfaceFn, distanceFromSide: number, delta = 0.001): Vec2 {
   const y1 = f(distanceFromSide - delta);

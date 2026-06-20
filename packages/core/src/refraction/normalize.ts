@@ -5,7 +5,7 @@ import type { DisplacementField, PolarVector } from '../types.js';
  * keeping the original maximum (in px) so the displacement map can be decoded
  * back to real pixel shifts via the SVG filter `scale`.
  *
- * See ../../../docs/concepts/displacement-field.md.
+ * See ../../../docs/reference/concepts/displacement-field.md.
  */
 export function normalizeField(samples: PolarVector[], resolution: number): DisplacementField {
   const maxDisplacement = samples.reduce((m, v) => Math.max(m, Math.abs(v.magnitude)), 0);

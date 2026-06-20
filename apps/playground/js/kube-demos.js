@@ -4,7 +4,7 @@
  * kube.io/blog/liquid-glass-css-svg. The adjustable parameters tweak filter
  * attributes live (no map regeneration), exactly like the reference.
  *
- * Maps live in ../assets/maps/. See ../../../docs/attribution.md.
+ * Maps live in ../assets/maps/. See ../../../docs/reference/attribution.md.
  */
 
 const SVG_NS = 'http://www.w3.org/2000/svg';

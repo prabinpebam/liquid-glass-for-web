@@ -10,7 +10,7 @@
  * (driven by motion tokens) handles the knob travel. Attaching or detaching
  * never changes layout (design-spec §6.8).
  *
- * @see ../../docs/design-library/design-spec.md  (LG-P12, §4.8)
+ * @see ../../docs/reference/design-library/design-spec.md  (LG-P12, §4.8)
  */
 
 /**

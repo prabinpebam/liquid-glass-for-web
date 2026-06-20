@@ -2,8 +2,8 @@
  * @liquid-glass/ui — token-driven, layered design library for liquid glass.
  *
  * Built on top of @liquid-glass/core. See:
- *   - ../../docs/design-library/design-spec.md
- *   - ../../docs/design-library/architecture-spec.md
+ *   - ../../docs/reference/design-library/design-spec.md
+ *   - ../../docs/reference/design-library/architecture-spec.md
  *
  * Single default export, mirroring the layered structure:
  *   primitives  — shared building blocks (el, icon)

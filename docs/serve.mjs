@@ -1,6 +1,6 @@
 // Minimal static server for the Design Library docs app.
-//   node apps/docs/serve.mjs        ->   http://localhost:8200/
-//   node apps/docs/serve.mjs dist   ->   preview built Pages output
+//   node docs/serve.mjs        ->   http://localhost:8200/
+//   node docs/serve.mjs dist   ->   preview built Pages output
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';

@@ -4,9 +4,9 @@ Token-driven, layered design library for the **liquid glass** effect, built on
 top of [`@liquid-glass/core`](../core/README.md).
 
 Specs:
-- [Design Spec](../../docs/design-library/design-spec.md) — the rules (tokens,
+- [Design Spec](../../docs/reference/design-library/design-spec.md) — the rules (tokens,
   layers, principles, anti-patterns).
-- [Architecture Spec](../../docs/design-library/architecture-spec.md) — how it is
+- [Architecture Spec](../../docs/reference/design-library/architecture-spec.md) — how it is
   assembled (folders, manifest, runtime, build).
 
 ## The idea in one paragraph
@@ -68,4 +68,4 @@ index.js           default export: { primitives, factories, material, motion, be
    `library.manifest.json`.
 3. Use only tokens for values and only lower layers for composition.
 
-That's the whole contract — see the [Design Spec](../../docs/design-library/design-spec.md).
+That's the whole contract — see the [Design Spec](../../docs/reference/design-library/design-spec.md).

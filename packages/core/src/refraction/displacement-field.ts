@@ -12,7 +12,7 @@ import { normalizeField } from './normalize.js';
  * of polar vectors that are normalized so the largest magnitude is 1, with the
  * original maximum (in px) kept for the SVG filter `scale`.
  *
- * See ../../../docs/concepts/displacement-field.md.
+ * See ../../../docs/reference/concepts/displacement-field.md.
  *
  * @param f          bezel height function (0..1 → height)
  * @param bezelPx    bezel width in pixels (the refractive rim)

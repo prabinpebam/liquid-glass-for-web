@@ -2,7 +2,7 @@
    Liquid Glass — Design Library docs.
    Renders the component inventory into a navigable explorer and wires the
    interactions: scrollspy, search filtering, theme + motion toggles, mobile nav.
-   The INVENTORY data mirrors docs/design-library/component-inventory.md.
+   The INVENTORY data mirrors docs/reference/design-library/component-inventory.md.
 
    Interactive parts are mounted as REAL liquid-glass components (components.js):
    they refract the patterned backdrop and animate with spring physics. Icons

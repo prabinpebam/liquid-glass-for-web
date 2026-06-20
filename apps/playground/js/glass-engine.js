@@ -8,7 +8,7 @@
  *   -> backdrop-filter | filter.
  *
  * This is the example-runtime twin of @liquid-glass/core. See
- * ../../../docs/architecture.md and ../../../PROJECT-PLAN.md (Phase 6).
+ * ../../../docs/reference/architecture.md and ../../../PROJECT-PLAN.md (Phase 6).
  */
 
 const SVG_NS = 'http://www.w3.org/2000/svg';

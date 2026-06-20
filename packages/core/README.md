@@ -5,7 +5,7 @@ based displacement maps driven by SVG filters, applied via `filter` or
 `backdrop-filter`.
 
 > Part of the [liquid-glass-for-web](../../README.md) project. For the full
-> conceptual background see the [docs](../../docs/README.md).
+> conceptual background see the [docs](../../docs/reference/README.md).
 
 ## Install
 
@@ -50,7 +50,7 @@ handle.dispose();     // remove filter + release shared resources
 5. **Apply** — the filter is attached via `backdrop-filter: url(#id)` (Chromium)
    or `filter: url(#id)` (cross-browser).
 
-See [docs/architecture.md](../../docs/architecture.md).
+See [docs/reference/architecture.md](../../docs/reference/architecture.md).
 
 ## API
 
@@ -63,7 +63,7 @@ See [docs/architecture.md](../../docs/architecture.md).
 | `toDisplacementMap`, `toSpecularMap` | Field → RGBA maps. |
 | `buildFilter`, `nextFilterId` | Field/maps → SVG `<filter>`. |
 
-Full reference: [docs/api-reference.md](../../docs/api-reference.md).
+Full reference: [docs/reference/api-reference.md](../../docs/reference/api-reference.md).
 
 ## Status
 
@@ -74,4 +74,4 @@ pixel-snapshot verification against the reference) is in progress — see
 ## License
 
 MIT. Clean-room implementation from documented concepts; see
-[docs/attribution.md](../../docs/attribution.md).
+[docs/reference/attribution.md](../../docs/reference/attribution.md).

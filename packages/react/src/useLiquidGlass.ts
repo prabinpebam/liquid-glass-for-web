@@ -5,7 +5,7 @@ import { liquidGlass, type LiquidGlassHandle, type LiquidGlassOptions } from '@l
  * Attach the liquid-glass effect to a ref'd element and keep it in sync with
  * `options`. Returns a ref to spread onto the target element.
  *
- * See ../../../docs/getting-started.md.
+ * See ../../../docs/reference/getting-started.md.
  */
 export function useLiquidGlass<T extends HTMLElement = HTMLElement>(
   options: LiquidGlassOptions = {},

@@ -1,6 +1,6 @@
 /**
  * @liquid-glass/react — React bindings.
- * See ../../docs/getting-started.md.
+ * See ../../docs/reference/getting-started.md.
  */
 export { useLiquidGlass } from './useLiquidGlass.js';
 export { LiquidGlass, type LiquidGlassProps } from './LiquidGlass.js';

@@ -33,4 +33,4 @@ The hook re-applies options when they change and disposes the effect on unmount.
 
 ## License
 
-MIT. See [docs/attribution.md](../../docs/attribution.md).
+MIT. See [docs/reference/attribution.md](../../docs/reference/attribution.md).

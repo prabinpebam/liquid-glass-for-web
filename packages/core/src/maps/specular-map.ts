@@ -7,7 +7,7 @@ import type { MapGeometry } from './displacement-map.js';
  *
  * Intensity is concentrated near the rim and modulated by the surface normal
  * versus the configured light `angle`. See
- * ../../../docs/concepts/specular-highlight.md.
+ * ../../../docs/reference/concepts/specular-highlight.md.
  *
  * @remarks Phase 2: this is a clean-room placeholder of the documented rim-light
  * model. The exact falloff/curve is tuned during Phase 2 against the reference

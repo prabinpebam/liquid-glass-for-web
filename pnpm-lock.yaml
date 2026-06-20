@@ -8,9 +8,9 @@ importers:
 
   .: {}
 
-  apps/docs: {}
-
   apps/playground: {}
+
+  docs: {}
 
   packages/core:
     devDependencies:

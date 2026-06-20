@@ -15,8 +15,8 @@
  *    rAF, and only rebuild when the material key actually changes.
  *  - a global token change (theme/density/contrast) calls refreshAll().
  *
- * @see ../../docs/design-library/design-spec.md  (LG-P1, LG-P7, LG-P11)
- * @see ../../docs/design-library/architecture-spec.md §4
+ * @see ../../docs/reference/design-library/design-spec.md  (LG-P1, LG-P7, LG-P11)
+ * @see ../../docs/reference/design-library/architecture-spec.md §4
  */
 
 // The engine lives in the sibling workspace package. In a buildless dev setup

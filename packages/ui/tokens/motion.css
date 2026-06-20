@@ -4,7 +4,7 @@
    Motion is a first-class part of the design system, not a per-
    component afterthought. These tokens are the SINGLE source of
    every duration, easing, spring constant, and activation delta
-   in the library (see docs/design-library/motion-spec.md, LG-P8).
+   in the library (see docs/reference/design-library/motion-spec.md, LG-P8).
 
    Three things live here:
      1. Discrete transitions  — durations + easings (CSS).

@@ -13,7 +13,7 @@ export interface MapGeometry {
  * pixel is the inward border normal; the magnitude is looked up from the field
  * by the pixel's normalized distance into the bezel.
  *
- * See ../../../docs/concepts/displacement-map.md.
+ * See ../../../docs/reference/concepts/displacement-map.md.
  *
  * @remarks Phase 2: raster pipeline. The rounded-rectangle distance field below
  * is a clean-room implementation and is verified by pixel-snapshot tests during

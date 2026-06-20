@@ -39,4 +39,4 @@ Attribute changes update the effect live.
 
 ## License
 
-MIT. See [docs/attribution.md](../../docs/attribution.md).
+MIT. See [docs/reference/attribution.md](../../docs/reference/attribution.md).

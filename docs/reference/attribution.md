@@ -22,7 +22,7 @@ under an open-source license**.
 - The **physics and techniques** described in the article — Snell's law, displacement
   maps, specular rim lighting, the SVG filter approach — are **not copyrightable**.
   The library is built as a **clean-room reimplementation** from these documented
-  concepts (see [docs/concepts](concepts/)), not from their code.
+  concepts (see [docs/reference/concepts](concepts/)), not from their code.
 - Where we reproduce specific small formulas from the article (e.g. the
   `128 + x * 127` channel encoding), these are standard, functional expressions of the
   technique rather than creative code.

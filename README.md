@@ -38,7 +38,7 @@ liquid-glass-for-web/
 
 ## Apps
 
-- [`apps/docs`](apps/docs): the public documentation and Design Library site.
+- [`docs`](docs): the public documentation and Design Library site.
 - [`apps/playground`](apps/playground): interactive playground for low-level
   refraction parameters and engine experiments.
 
@@ -81,5 +81,5 @@ handle.dispose();
 
 This project is a clean-room implementation inspired by public writing and demos
 about browser-based refraction with CSS and SVG. See
-[`docs/attribution.md`](docs/attribution.md) for the attribution and licensing
+[`docs/reference/attribution.md`](docs/reference/attribution.md) for the attribution and licensing
 notes that govern releases.

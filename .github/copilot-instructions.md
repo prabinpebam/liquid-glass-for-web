@@ -27,7 +27,7 @@ this exact order:
 (The reference adds an optional magnifying-map pre-pass used only for the lens.)
 
 This chain lives in **one place**: `attachGlass()` in
-[apps/docs/js/glass.js](apps/docs/js/glass.js).
+[docs/js/glass.js](docs/js/glass.js).
 It is the single source of truth. Components call `attachGlass`; they never
 reimplement the filter.
 
@@ -66,7 +66,7 @@ reimplement the filter.
 
 - CSS `box-shadow` on glass elements is an **elevation drop shadow only**
   (`0 7px 20px rgba(0,0,0,.18)`), shared by all `.lgc-*` rules in
-  [apps/docs/css/docs.css](apps/docs/css/docs.css).
+  [docs/css/docs.css](docs/css/docs.css).
 - The reference's dual inset bloom (`inset ±x,±y 24px black/white`) is a
   **drag-reactive directional sheen** driven by pointer/opacity springs; at rest
   it is neutral. It is not a border. Only the interactive lens may animate it.
@@ -74,7 +74,7 @@ reimplement the filter.
 ### The hero lens is the canonical demonstration
 
 `glassLens()` in
-[apps/docs/js/components.js](apps/docs/js/components.js)
+[docs/js/components.js](docs/js/components.js)
 is the showcase of the effect. If the effect looks wrong anywhere, fix the shared
 engine so the lens is perfect — every other element inherits the fix. Never solve
 the problem element by element.

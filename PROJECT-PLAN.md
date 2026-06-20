@@ -10,13 +10,13 @@ Design Library site deployable to GitHub Pages.
 - Ship thin wrappers for React and custom elements.
 - Ship `@liquid-glass/ui` as a token-driven design library that composes the
   shared engine instead of reimplementing material effects.
-- Host the interactive Design Library from `apps/docs` on GitHub Pages.
+- Host the interactive Design Library from `docs` on GitHub Pages.
 - Keep examples small and consumer-focused.
 
 ## Current Repository Model
 
 ```text
-apps/docs          Public docs + Design Library site
+docs          Public docs + Design Library site
 apps/playground    Low-level interactive playground
 examples/          Minimal integration examples
 packages/core      Engine
@@ -64,13 +64,13 @@ interface LiquidGlassHandle {
 
 ## GitHub Pages
 
-The Design Library is hosted from `apps/docs`.
+The Design Library is hosted from `docs`.
 
 ```bash
 pnpm docs:build
 ```
 
-The build writes static output to `apps/docs/dist`, which is uploaded by
+The build writes static output to `docs/dist`, which is uploaded by
 `.github/workflows/pages.yml`.
 
 ## Definition of Done for 0.1.0
