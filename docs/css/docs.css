@@ -369,6 +369,16 @@ body {
 .pv-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
 .pv-col { display: grid; gap: 10px; justify-items: center; }
 
+.pv-divider-demo { width: 230px; display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; }
+.pv-divider-stack { display: grid; gap: 10px; min-width: 0; }
+.pv-divider-block { display: block; height: 20px; border-radius: 7px; background: var(--d-glass-2); border: 1px solid var(--d-glass-stroke); }
+.pv-divider-block--short { width: 74%; }
+.pv-divider { display: block; opacity: 0.95; }
+.pv-divider--h { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--pv-divider-line), transparent); }
+.pv-divider--v { width: 1px; height: 72px; background: linear-gradient(180deg, transparent, var(--pv-divider-line), transparent); }
+[data-theme='dark'] .pv-divider-demo { --pv-divider-line: rgba(255, 255, 255, 0.46); }
+[data-theme='light'] .pv-divider-demo { --pv-divider-line: rgba(20, 24, 42, 0.38); }
+
 .pv-iconbtn { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--d-glass-2); border: 1px solid var(--d-glass-stroke); color: var(--d-ink); }
 .pv-fab { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: linear-gradient(180deg, #5cb8ff, #4d7cff); box-shadow: 0 10px 24px rgba(77, 124, 255, 0.5); font-size: 24px; }
 

@@ -24,7 +24,7 @@ const DEMOS = {
   surface: `<div style="width:120px;height:74px;border-radius:18px;background:var(--d-glass-2);border:1px solid var(--d-glass-stroke);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 10px 30px rgba(0,0,0,.3);backdrop-filter:blur(8px)"></div>`,
   text: `<div class="pv-type"><b style="font-size:20px">The quick fox</b><span style="font-size:12px;color:var(--d-ink-dim)">body · label · caption</span></div>`,
   icon: `<div class="pv-row pv-icons" style="color:var(--d-ink)">${ic('magnifying-glass')}${ic('cube')}${ic('plus')}${ic('gear')}${ic('bell')}</div>`,
-  divider: `<div style="width:160px;display:grid;gap:10px"><div style="height:1px;background:var(--d-line-strong)"></div><div style="height:1px;background:var(--d-line)"></div></div>`,
+  divider: `<div class="pv-divider-demo" aria-label="Divider examples"><div class="pv-divider-stack"><span class="pv-divider-block"></span><i class="pv-divider pv-divider--h" aria-hidden="true"></i><span class="pv-divider-block pv-divider-block--short"></span></div><i class="pv-divider pv-divider--v" aria-hidden="true"></i><div class="pv-divider-stack"><span class="pv-divider-block pv-divider-block--short"></span><i class="pv-divider pv-divider--h" aria-hidden="true"></i><span class="pv-divider-block"></span></div></div>`,
   badge: `<div class="pv-badge"><div class="pv-badge__dot">9+</div>${ic('bell')}</div>`,
   avatar: `<div class="pv-avatar">LG</div>`,
   spinner: `<div class="pv-spinner"></div>`,
