@@ -47,12 +47,12 @@ function mixColor(a, b) {
    materials. Component call sites may pass shape/size geometry only; optical
    parameters (blur, refraction inset, refraction, saturation, specular) live here. */
 const GLASS_MATERIALS = {
-  clear: { name: 'Clear', tone: 'Very transparent', cls: 'clear', blur: 0.2, refractionInset: 10, refraction: 80, chromatic: 1, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
-  optic: { name: 'Optic', tone: 'Transparent, higher bend', cls: 'clear-strong', blur: 0.4, refractionInset: 16, refraction: 80, chromatic: 1, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
-  softFrost: { name: 'Soft Frost', tone: 'Slightly frosted', cls: 'soft', blur: 2.4, refractionInset: 14, refraction: 80, chromatic: 1, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
-  satin: { name: 'Satin', tone: 'Balanced frost', cls: 'satin', blur: 4.8, refractionInset: 18, refraction: 80, chromatic: 1, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
-  deepFrost: { name: 'Deep Frost', tone: 'More frosted', cls: 'deep', blur: 8.5, refractionInset: 22, refraction: 80, chromatic: 1, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
-  milk: { name: 'Milk Glass', tone: 'Most frosted', cls: 'milk', blur: 12, refractionInset: 26, refraction: 80, chromatic: 1, saturation: 5, specular: 1, darkTint: 0.2, lightTint: 0.2 },
+  clear: { name: 'Clear', tone: 'Very transparent', cls: 'clear', blur: 0.2, refractionInset: 10, refraction: 80, chromatic: 1, saturation: 5, specular: 1, innerShadow: 0.22, innerShadowSize: 1, innerGlow: 0.18, innerGlowSize: 1, innerShadowAngle: 45, darkTint: 0.2, lightTint: 0.2 },
+  optic: { name: 'Optic', tone: 'Transparent, higher bend', cls: 'clear-strong', blur: 0.4, refractionInset: 16, refraction: 80, chromatic: 1, saturation: 5, specular: 1, innerShadow: 0.22, innerShadowSize: 1, innerGlow: 0.18, innerGlowSize: 1, innerShadowAngle: 45, darkTint: 0.2, lightTint: 0.2 },
+  softFrost: { name: 'Soft Frost', tone: 'Slightly frosted', cls: 'soft', blur: 2.4, refractionInset: 14, refraction: 80, chromatic: 1, saturation: 5, specular: 1, innerShadow: 0.22, innerShadowSize: 1, innerGlow: 0.18, innerGlowSize: 1, innerShadowAngle: 45, darkTint: 0.2, lightTint: 0.2 },
+  satin: { name: 'Satin', tone: 'Balanced frost', cls: 'satin', blur: 4.8, refractionInset: 18, refraction: 80, chromatic: 1, saturation: 5, specular: 1, innerShadow: 0.22, innerShadowSize: 1, innerGlow: 0.18, innerGlowSize: 1, innerShadowAngle: 45, darkTint: 0.2, lightTint: 0.2 },
+  deepFrost: { name: 'Deep Frost', tone: 'More frosted', cls: 'deep', blur: 8.5, refractionInset: 22, refraction: 80, chromatic: 1, saturation: 5, specular: 1, innerShadow: 0.22, innerShadowSize: 1, innerGlow: 0.18, innerGlowSize: 1, innerShadowAngle: 45, darkTint: 0.2, lightTint: 0.2 },
+  milk: { name: 'Milk Glass', tone: 'Most frosted', cls: 'milk', blur: 12, refractionInset: 26, refraction: 80, chromatic: 1, saturation: 5, specular: 1, innerShadow: 0.22, innerShadowSize: 1, innerGlow: 0.18, innerGlowSize: 1, innerShadowAngle: 45, darkTint: 0.2, lightTint: 0.2 },
 };
 const MATERIAL_NAMES = Object.keys(GLASS_MATERIALS);
 const material = (name = 'softFrost') => GLASS_MATERIALS[name] || GLASS_MATERIALS.softFrost;
@@ -61,6 +61,7 @@ const activeTintKey = () => (currentTheme() === 'light' ? 'lightTint' : 'darkTin
 const activeTintLabel = () => (currentTheme() === 'light' ? 'Light tint' : 'Dark tint');
 const activeTintMax = () => '1';
 const HOVER_TINT_BOOST = 0.08;
+const px = (value) => `${Number(value || 0).toFixed(2)}px`;
 const materialTint = (m, alphaBoost = 0) => {
   const theme = currentTheme();
   const alpha = clamp01((theme === 'light' ? m.lightTint : m.darkTint) + alphaBoost);
@@ -83,6 +84,33 @@ const controlStateShadow = (state) => {
   const blur = lerp(8, 20, t);
   return `0 ${y.toFixed(1)}px ${blur.toFixed(1)}px rgba(0, 0, 0, ${alpha.toFixed(3)})`;
 };
+function resolveGlassRadiusPx(el, requested) {
+  const width = el.offsetWidth || 0;
+  const height = el.offsetHeight || 0;
+  const maxRadius = Math.min(width, height) / 2;
+  if (requested === 'pill') return maxRadius;
+  if (requested === 'css') {
+    const value = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+    return Math.min(maxRadius, value);
+  }
+  return Math.min(maxRadius, Number(requested) || 0);
+}
+function applyMaterialShadingVars(el, m, radius) {
+  const r = Math.max(1, radius);
+  const angle = (Number(m.innerShadowAngle ?? 45) * Math.PI) / 180;
+  const ux = Math.cos(angle);
+  const uy = Math.sin(angle);
+  const shadowOffset = Math.max(0, Number(m.innerShadowSize ?? 1)) * r;
+  const glowOffset = Math.max(0, Number(m.innerGlowSize ?? 1)) * r;
+  el.style.setProperty('--lgc-inner-shadow-x', px(ux * shadowOffset));
+  el.style.setProperty('--lgc-inner-shadow-y', px(uy * shadowOffset));
+  el.style.setProperty('--lgc-inner-shadow-blur', px(shadowOffset));
+  el.style.setProperty('--lgc-inner-shadow-alpha', String(clamp01(Number(m.innerShadow ?? 0))));
+  el.style.setProperty('--lgc-inner-glow-x', px(-ux * glowOffset));
+  el.style.setProperty('--lgc-inner-glow-y', px(-uy * glowOffset));
+  el.style.setProperty('--lgc-inner-glow-blur', px(glowOffset));
+  el.style.setProperty('--lgc-inner-glow-alpha', String(clamp01(Number(m.innerGlow ?? 0))));
+}
 const syncRangeFill = (input) => {
   const min = Number(input.min || 0);
   const max = Number(input.max || 100);
@@ -126,6 +154,7 @@ function applyGlassMaterialValues(glass, m) {
   applyGlassTint(glass, glass.el.dataset.glassTint || null);
   glass.refraction = m.refraction;
   glass.chromatic = m.chromatic ?? 1;
+  applyMaterialShadingVars(glass.el, m, glass.el._lgcRadiusPx || resolveGlassRadiusPx(glass.el, glass.el._lgcRadiusRequest));
   if (glass.el._lgcUseMaterialInset) glass.refractionInset = m.refractionInset;
   glass.blur = m.blur;
   return glass;
@@ -165,6 +194,7 @@ function attachGlass(el, shape = {}) {
   const refractionInset = shape.refractionInset ?? 'radius';
   el.dataset.glassMaterial = materialName;
   el._lgcUseMaterialInset = shape.materialInset === true;
+  el._lgcRadiusRequest = shape.radius ?? 'pill';
   const fill = materialTint(m);
   const layer = tintLayer(shape.tint);
   if (shape.tint) el.dataset.glassTint = shape.tint;
@@ -173,6 +203,8 @@ function attachGlass(el, shape = {}) {
   const shadow = tintShadow(shape.tint);
   if (shadow) el.style.setProperty('--lgc-drop-shadow', shadow);
   el.style.background = fill;
+  el._lgcRadiusPx = resolveGlassRadiusPx(el, el._lgcRadiusRequest);
+  applyMaterialShadingVars(el, m, el._lgcRadiusPx);
   const glass = attachGlassEngine(el, {
     surface: shape.surface ?? 'convex',
     radius: shape.radius ?? 'pill',
@@ -183,9 +215,17 @@ function attachGlass(el, shape = {}) {
     specular: m.specular,
     blur: m.blur,
   });
+  const rebuild = glass.rebuild;
+  glass.rebuild = () => {
+    el._lgcRadiusPx = resolveGlassRadiusPx(el, el._lgcRadiusRequest);
+    applyMaterialShadingVars(el, material(el.dataset.glassMaterial), el._lgcRadiusPx);
+    rebuild();
+  };
+  const shadeObserver = new ResizeObserver(() => glass.rebuild());
+  shadeObserver.observe(el);
   MATERIAL_HANDLES.add(glass);
   const dispose = glass.dispose;
-  glass.dispose = () => { MATERIAL_HANDLES.delete(glass); dispose(); };
+  glass.dispose = () => { shadeObserver.disconnect(); MATERIAL_HANDLES.delete(glass); dispose(); };
   const setHover = (hovered) => {
     el._lgcHovered = hovered;
     if (el._lgcRefreshMaterialTint) el._lgcRefreshMaterialTint();
@@ -673,16 +713,31 @@ export function glassMaterialLab() {
     const insetValue = h('span', { class: 'lgc-mat__value' }, `${mat.refractionInset}px`);
     const refValue = h('span', { class: 'lgc-mat__value' }, String(mat.refraction));
     const chromaticValue = h('span', { class: 'lgc-mat__value' }, (mat.chromatic ?? 1).toFixed(2));
+    const shadowValue = h('span', { class: 'lgc-mat__value' }, (mat.innerShadow ?? 0).toFixed(2));
+    const shadowSizeValue = h('span', { class: 'lgc-mat__value' }, `${(mat.innerShadowSize ?? 1).toFixed(2)}r`);
+    const glowValue = h('span', { class: 'lgc-mat__value' }, (mat.innerGlow ?? 0).toFixed(2));
+    const glowSizeValue = h('span', { class: 'lgc-mat__value' }, `${(mat.innerGlowSize ?? 1).toFixed(2)}r`);
+    const angleValue = h('span', { class: 'lgc-mat__value' }, `${mat.innerShadowAngle ?? 45}deg`);
     const tintLabel = h('span', {}, activeTintLabel());
     const tintValue = h('span', { class: 'lgc-mat__value' }, mat[activeTintKey()].toFixed(3));
     const inset = h('input', { class: 'lgc-mat__range', type: 'range', min: '4', max: '36', step: '1', value: String(mat.refractionInset), 'aria-label': `${mat.name} refraction inset in pixels` });
     const ref = h('input', { class: 'lgc-mat__range', type: 'range', min: '8', max: '120', step: '1', value: String(mat.refraction), 'aria-label': `${mat.name} refraction` });
     const chromatic = h('input', { class: 'lgc-mat__range', type: 'range', min: '0', max: '1.5', step: '0.05', value: String(mat.chromatic ?? 1), 'aria-label': `${mat.name} chromatic aberration` });
+    const shadow = h('input', { class: 'lgc-mat__range', type: 'range', min: '0', max: '1', step: '0.01', value: String(mat.innerShadow ?? 0), 'aria-label': `${mat.name} black inner shadow opacity` });
+    const shadowSize = h('input', { class: 'lgc-mat__range', type: 'range', min: '0.1', max: '3', step: '0.05', value: String(mat.innerShadowSize ?? 1), 'aria-label': `${mat.name} black inner shadow radius scale` });
+    const glow = h('input', { class: 'lgc-mat__range', type: 'range', min: '0', max: '1', step: '0.01', value: String(mat.innerGlow ?? 0), 'aria-label': `${mat.name} white caustic glow opacity` });
+    const glowSize = h('input', { class: 'lgc-mat__range', type: 'range', min: '0.1', max: '3', step: '0.05', value: String(mat.innerGlowSize ?? 1), 'aria-label': `${mat.name} white caustic glow radius scale` });
+    const angle = h('input', { class: 'lgc-mat__range', type: 'range', min: '0', max: '360', step: '1', value: String(mat.innerShadowAngle ?? 45), 'aria-label': `${mat.name} inner shadow angle` });
     const tint = h('input', { class: 'lgc-mat__range', type: 'range', min: '0', max: activeTintMax(), step: '0.005', value: String(mat[activeTintKey()]), 'aria-label': `${mat.name} ${activeTintLabel().toLowerCase()} alpha` });
-    [inset, ref, chromatic, tint].forEach(syncRangeFill);
+    [inset, ref, chromatic, shadow, shadowSize, glow, glowSize, angle, tint].forEach(syncRangeFill);
     inset.addEventListener('input', () => { const v = Number(inset.value); glass.refractionInset = v; insetValue.textContent = `${v}px`; syncRangeFill(inset); });
     ref.addEventListener('input', () => { const v = Number(ref.value); updateGlassMaterial(materialName, { refraction: v }); refValue.textContent = String(v); syncRangeFill(ref); });
     chromatic.addEventListener('input', () => { const v = Number(chromatic.value); updateGlassMaterial(materialName, { chromatic: v }); chromaticValue.textContent = v.toFixed(2); syncRangeFill(chromatic); });
+    shadow.addEventListener('input', () => { const v = Number(shadow.value); updateGlassMaterial(materialName, { innerShadow: v }); shadowValue.textContent = v.toFixed(2); syncRangeFill(shadow); });
+    shadowSize.addEventListener('input', () => { const v = Number(shadowSize.value); updateGlassMaterial(materialName, { innerShadowSize: v }); shadowSizeValue.textContent = `${v.toFixed(2)}r`; syncRangeFill(shadowSize); });
+    glow.addEventListener('input', () => { const v = Number(glow.value); updateGlassMaterial(materialName, { innerGlow: v }); glowValue.textContent = v.toFixed(2); syncRangeFill(glow); });
+    glowSize.addEventListener('input', () => { const v = Number(glowSize.value); updateGlassMaterial(materialName, { innerGlowSize: v }); glowSizeValue.textContent = `${v.toFixed(2)}r`; syncRangeFill(glowSize); });
+    angle.addEventListener('input', () => { const v = Number(angle.value); updateGlassMaterial(materialName, { innerShadowAngle: v }); angleValue.textContent = `${v}deg`; syncRangeFill(angle); });
     tint.addEventListener('input', () => {
       const v = Number(tint.value);
       updateGlassMaterial(materialName, { [activeTintKey()]: v });
@@ -697,6 +752,11 @@ export function glassMaterialLab() {
         h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Refraction inset', insetValue]), inset]),
         h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Refraction', refValue]), ref]),
         h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Chromatic aberration', chromaticValue]), chromatic]),
+        h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Black inner shadow', shadowValue]), shadow]),
+        h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Shadow size', shadowSizeValue]), shadowSize]),
+        h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['White caustic glow', glowValue]), glow]),
+        h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Glow size', glowSizeValue]), glowSize]),
+        h('label', { class: 'lgc-mat__control' }, [h('span', {}, ['Shadow angle', angleValue]), angle]),
         h('label', { class: 'lgc-mat__control' }, [h('span', {}, [tintLabel, tintValue]), tint]),
       ]),
     ]);
