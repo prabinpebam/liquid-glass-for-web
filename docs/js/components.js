@@ -414,7 +414,7 @@ export function glassLens() {
   let grabbing = false, velX = 0, loop = 0;
   const render = () => {
     capsule.style.transform = `translate(-50%,-50%) scaleX(${T.get().toFixed(3)}) scaleY(${A.get().toFixed(3)})`;
-    capsule.style.boxShadow = `0 ${(grabbing ? 16 : 6)}px 26px rgba(0,0,0,${SA.get().toFixed(3)})`;
+    capsule.style.boxShadow = `var(--lgc-inner-shadows, 0 0 0 0 transparent), 0 ${(grabbing ? 16 : 6)}px 26px rgba(0,0,0,${SA.get().toFixed(3)})`;
     applyGlassMaterial(glass, SR.get() > 0.5 ? 'optic' : 'softFrost');
   };
   const tick = () => {
