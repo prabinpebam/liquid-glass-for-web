@@ -580,18 +580,9 @@ body {
     inset var(--lgc-inner-shadow-x, 0) var(--lgc-inner-shadow-y, 0) var(--lgc-inner-shadow-blur, 0) rgba(0, 0, 0, var(--lgc-inner-shadow-alpha, 0)),
     inset var(--lgc-inner-glow-x, 0) var(--lgc-inner-glow-y, 0) var(--lgc-inner-glow-blur, 0) rgba(255, 255, 255, var(--lgc-inner-glow-alpha, 0));
 }
-[data-glass-tint]::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
-  background: var(--lgc-tint-layer);
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
 [data-glass-tint] {
   isolation: isolate;
+  background-blend-mode: screen;
 }
 [data-glass-tint] > * {
   position: relative;

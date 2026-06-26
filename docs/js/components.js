@@ -82,7 +82,7 @@ const controlStateShadow = (state) => {
   const alpha = lerp(0.32, 0.18, t);
   const y = lerp(3, 7, t);
   const blur = lerp(8, 20, t);
-  return `0 ${y.toFixed(1)}px ${blur.toFixed(1)}px rgba(0, 0, 0, ${alpha.toFixed(3)})`;
+  return `var(--lgc-inner-shadows, 0 0 0 0 transparent), 0 ${y.toFixed(1)}px ${blur.toFixed(1)}px rgba(0, 0, 0, ${alpha.toFixed(3)})`;
 };
 function resolveGlassRadiusPx(el, requested) {
   const width = el.offsetWidth || 0;
@@ -147,7 +147,8 @@ function applyGlassTint(glass, tintName = null) {
   const shadow = tintShadow(tintName);
   if (shadow) glass.el.style.setProperty('--lgc-drop-shadow', shadow);
   else glass.el.style.removeProperty('--lgc-drop-shadow');
-  glass.el.style.background = fill;
+  glass.el.style.backgroundColor = fill;
+  glass.el.style.backgroundImage = layer || 'none';
   return glass;
 }
 function applyGlassMaterialValues(glass, m) {
@@ -202,7 +203,8 @@ function attachGlass(el, shape = {}) {
   if (layer) el.style.setProperty('--lgc-tint-layer', layer);
   const shadow = tintShadow(shape.tint);
   if (shadow) el.style.setProperty('--lgc-drop-shadow', shadow);
-  el.style.background = fill;
+  el.style.backgroundColor = fill;
+  el.style.backgroundImage = layer || 'none';
   el._lgcRadiusPx = resolveGlassRadiusPx(el, el._lgcRadiusRequest);
   applyMaterialShadingVars(el, m, el._lgcRadiusPx);
   const glass = attachGlassEngine(el, {
