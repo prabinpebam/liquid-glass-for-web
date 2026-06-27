@@ -308,6 +308,61 @@ function resolveRadius(el, requested, width, height) {
 }
 
 /* ----------------------------------------------------------------------------
+ * Inner shading map — a directional inset shadow (glass thickness) plus an
+ * opposing caustic glow, rendered as one RGBA image and blended into the filter
+ * UNDER the specular rim so the lit edge always stays the top optical layer.
+ * Uses the canvas inset-shadow technique (clip to the shape, then cast the
+ * shadow of the surrounding frame inward) so the profile matches a CSS
+ * `box-shadow: inset` exactly. Offsets scale with the corner radius; the angle
+ * drives the dark (offset) and the white glow (opposite) directions.
+ * ------------------------------------------------------------------------- */
+function roundRectPath(ctx, x, y, w, h, r) {
+  const rr = Math.max(0, Math.min(r, w / 2, h / 2));
+  ctx.moveTo(x + rr, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rr);
+  ctx.arcTo(x + w, y + h, x, y + h, rr);
+  ctx.arcTo(x, y + h, x, y, rr);
+  ctx.arcTo(x, y, x + w, y, rr);
+  ctx.closePath();
+}
+
+function castInsetShadow(ctx, w, h, radius, ox, oy, blur, color) {
+  ctx.save();
+  ctx.beginPath();
+  roundRectPath(ctx, 0, 0, w, h, radius);
+  ctx.clip();                                   // the shadow only shows inside the shape
+  const pad = Math.abs(ox) + Math.abs(oy) + blur + radius + 20;
+  ctx.beginPath();
+  ctx.rect(-pad, -pad, w + pad * 2, h + pad * 2);
+  roundRectPath(ctx, 0, 0, w, h, radius);       // even-odd hole -> frame around the shape
+  ctx.shadowColor = color;
+  ctx.shadowOffsetX = ox;
+  ctx.shadowOffsetY = oy;
+  ctx.shadowBlur = blur;
+  ctx.fillStyle = '#000';                       // clipped away; only its inward shadow remains
+  ctx.fill('evenodd');
+  ctx.restore();
+}
+
+function innerShadeURL(geo, o) {
+  const w = Math.max(1, geo.width | 0), h = Math.max(1, geo.height | 0);
+  const c = makeCanvas(w, h);
+  const ctx = c.getContext('2d');
+  const shadow = clamp01(Number(o.innerShadow) || 0);
+  const glow = clamp01(Number(o.innerGlow) || 0);
+  if (shadow > 0 || glow > 0) {
+    const r = Math.max(1, geo.radius);
+    const a = ((Number(o.innerShadowAngle) || 45) * Math.PI) / 180;
+    const ux = Math.cos(a), uy = Math.sin(a);
+    const sOff = Math.max(0, Number(o.innerShadowSize) || 0) * r;
+    const gOff = Math.max(0, Number(o.innerGlowSize) || 0) * r;
+    if (shadow > 0) castInsetShadow(ctx, w, h, geo.radius, ux * sOff, uy * sOff, sOff, `rgba(0, 0, 0, ${shadow})`);
+    if (glow > 0) castInsetShadow(ctx, w, h, geo.radius, -ux * gOff, -uy * gOff, gOff, `rgba(255, 255, 255, ${glow})`);
+  }
+  return c.toDataURL('image/png');
+}
+
+/* ----------------------------------------------------------------------------
  * attachGlass(el, opts) — generate maps for the element's box and apply the
  * kube filter chain. Returns a live handle.
  *
@@ -319,6 +374,7 @@ export function attachGlass(el, opts = {}) {
   const o = {
     surface: 'convex', radius: 'pill', refractionInset: 'radius', thickness: 1.5,
     blur: 0.4, refraction: null, chromatic: 1, saturation: 6, specular: 1,
+    innerShadow: 0, innerShadowSize: 1, innerGlow: 0, innerGlowSize: 1, innerShadowAngle: 45,
     light: -Math.PI / 4, fallbackBlur: 8, ...opts,
   };
   if (opts.refractionInset == null && opts.bezel != null) o.refractionInset = opts.bezel;
@@ -333,18 +389,29 @@ export function attachGlass(el, opts = {}) {
     ? chromaticDisplacementNodes('src', 'dmap')
     : [svg('feDisplacementMap', { in: 'src', in2: 'dmap', scale: 0, xChannelSelector: 'R', yChannelSelector: 'G', result: 'displaced', 'data-lg-channel': 'base' })];
   const sat = svg('feColorMatrix', { in: 'displaced', type: 'saturate', values: o.saturation, result: 'sat' });
+  const shadeImg = svg('feImage', { x: 0, y: 0, result: 'shade', preserveAspectRatio: 'none' });
   const specImg = svg('feImage', { x: 0, y: 0, result: 'smap', preserveAspectRatio: 'none' });
   const funcA = svg('feFuncA', { type: 'linear', slope: o.specular });
   filter.append(
-    blur, dispImg, ...displacementNodes, sat, specImg,
+    blur, dispImg, ...displacementNodes,
+    shadeImg,
+    svg('feBlend', { in: 'shade', in2: 'displaced', mode: 'normal', result: 'shaded' }),
+    sat, specImg,
     svg('feComposite', { in: 'sat', in2: 'smap', operator: 'in', result: 'spec_sat' }),
     svg('feComponentTransfer', { in: 'smap', result: 'spec_faded' }, [funcA]),
-    svg('feBlend', { in: 'spec_sat', in2: 'displaced', mode: 'normal', result: 'withSat' }),
+    svg('feBlend', { in: 'spec_sat', in2: 'shaded', mode: 'normal', result: 'withSat' }),
     svg('feBlend', { in: 'spec_faded', in2: 'withSat', mode: 'normal' }),
   );
   defs().appendChild(filter);
 
-  let field = null, w = 0, h = 0, curBezel = 0, disposed = false;
+  let field = null, w = 0, h = 0, curBezel = 0, lastGeo = null, disposed = false;
+
+  const rebuildShade = () => {
+    if (!lastGeo) return;
+    shadeImg.setAttribute('href', innerShadeURL(lastGeo, o));
+    shadeImg.setAttribute('width', lastGeo.width);
+    shadeImg.setAttribute('height', lastGeo.height);
+  };
 
   const rebuild = () => {
     if (disposed) return;
@@ -367,6 +434,8 @@ export function attachGlass(el, opts = {}) {
     dispImg.setAttribute('width', w); dispImg.setAttribute('height', h);
     specImg.setAttribute('href', specularURL(geo, o.light));
     specImg.setAttribute('width', w); specImg.setAttribute('height', h);
+    lastGeo = geo;
+    rebuildShade();
     applyScale();
   };
   // Refraction is the displacement strength in px (feDisplacementMap `scale`).
@@ -401,6 +470,11 @@ export function attachGlass(el, opts = {}) {
     set saturation(v) { o.saturation = v; sat.setAttribute('values', String(v)); },
     set specular(v) { o.specular = v; funcA.setAttribute('slope', String(v)); },
     set blur(v) { o.blur = v; blur.setAttribute('stdDeviation', String(v)); },
+    set innerShadow(v) { o.innerShadow = v; rebuildShade(); },
+    set innerShadowSize(v) { o.innerShadowSize = v; rebuildShade(); },
+    set innerGlow(v) { o.innerGlow = v; rebuildShade(); },
+    set innerGlowSize(v) { o.innerGlowSize = v; rebuildShade(); },
+    set innerShadowAngle(v) { o.innerShadowAngle = v; rebuildShade(); },
     rebuild,
     dispose() {
       if (disposed) return;

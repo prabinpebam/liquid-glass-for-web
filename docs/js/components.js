@@ -61,7 +61,6 @@ const activeTintKey = () => (currentTheme() === 'light' ? 'lightTint' : 'darkTin
 const activeTintLabel = () => (currentTheme() === 'light' ? 'Light tint' : 'Dark tint');
 const activeTintMax = () => '1';
 const HOVER_TINT_BOOST = 0.08;
-const px = (value) => `${Number(value || 0).toFixed(2)}px`;
 const materialTint = (m, alphaBoost = 0) => {
   const theme = currentTheme();
   const alpha = clamp01((theme === 'light' ? m.lightTint : m.darkTint) + alphaBoost);
@@ -82,35 +81,8 @@ const controlStateShadow = (state) => {
   const alpha = lerp(0.32, 0.18, t);
   const y = lerp(3, 7, t);
   const blur = lerp(8, 20, t);
-  return `var(--lgc-inner-shadows, 0 0 0 0 transparent), 0 ${y.toFixed(1)}px ${blur.toFixed(1)}px rgba(0, 0, 0, ${alpha.toFixed(3)})`;
+  return `0 ${y.toFixed(1)}px ${blur.toFixed(1)}px rgba(0, 0, 0, ${alpha.toFixed(3)})`;
 };
-function resolveGlassRadiusPx(el, requested) {
-  const width = el.offsetWidth || 0;
-  const height = el.offsetHeight || 0;
-  const maxRadius = Math.min(width, height) / 2;
-  if (requested === 'pill') return maxRadius;
-  if (requested === 'css') {
-    const value = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
-    return Math.min(maxRadius, value);
-  }
-  return Math.min(maxRadius, Number(requested) || 0);
-}
-function applyMaterialShadingVars(el, m, radius) {
-  const r = Math.max(1, radius);
-  const angle = (Number(m.innerShadowAngle ?? 45) * Math.PI) / 180;
-  const ux = Math.cos(angle);
-  const uy = Math.sin(angle);
-  const shadowOffset = Math.max(0, Number(m.innerShadowSize ?? 1)) * r;
-  const glowOffset = Math.max(0, Number(m.innerGlowSize ?? 1)) * r;
-  el.style.setProperty('--lgc-inner-shadow-x', px(ux * shadowOffset));
-  el.style.setProperty('--lgc-inner-shadow-y', px(uy * shadowOffset));
-  el.style.setProperty('--lgc-inner-shadow-blur', px(shadowOffset));
-  el.style.setProperty('--lgc-inner-shadow-alpha', String(clamp01(Number(m.innerShadow ?? 0))));
-  el.style.setProperty('--lgc-inner-glow-x', px(-ux * glowOffset));
-  el.style.setProperty('--lgc-inner-glow-y', px(-uy * glowOffset));
-  el.style.setProperty('--lgc-inner-glow-blur', px(glowOffset));
-  el.style.setProperty('--lgc-inner-glow-alpha', String(clamp01(Number(m.innerGlow ?? 0))));
-}
 const syncRangeFill = (input) => {
   const min = Number(input.min || 0);
   const max = Number(input.max || 100);
@@ -155,7 +127,11 @@ function applyGlassMaterialValues(glass, m) {
   applyGlassTint(glass, glass.el.dataset.glassTint || null);
   glass.refraction = m.refraction;
   glass.chromatic = m.chromatic ?? 1;
-  applyMaterialShadingVars(glass.el, m, glass.el._lgcRadiusPx || resolveGlassRadiusPx(glass.el, glass.el._lgcRadiusRequest));
+  glass.innerShadow = m.innerShadow ?? 0;
+  glass.innerShadowSize = m.innerShadowSize ?? 1;
+  glass.innerGlow = m.innerGlow ?? 0;
+  glass.innerGlowSize = m.innerGlowSize ?? 1;
+  glass.innerShadowAngle = m.innerShadowAngle ?? 45;
   if (glass.el._lgcUseMaterialInset) glass.refractionInset = m.refractionInset;
   glass.blur = m.blur;
   return glass;
@@ -195,7 +171,6 @@ function attachGlass(el, shape = {}) {
   const refractionInset = shape.refractionInset ?? 'radius';
   el.dataset.glassMaterial = materialName;
   el._lgcUseMaterialInset = shape.materialInset === true;
-  el._lgcRadiusRequest = shape.radius ?? 'pill';
   const fill = materialTint(m);
   const layer = tintLayer(shape.tint);
   if (shape.tint) el.dataset.glassTint = shape.tint;
@@ -205,8 +180,6 @@ function attachGlass(el, shape = {}) {
   if (shadow) el.style.setProperty('--lgc-drop-shadow', shadow);
   el.style.backgroundColor = fill;
   el.style.backgroundImage = layer || 'none';
-  el._lgcRadiusPx = resolveGlassRadiusPx(el, el._lgcRadiusRequest);
-  applyMaterialShadingVars(el, m, el._lgcRadiusPx);
   const glass = attachGlassEngine(el, {
     surface: shape.surface ?? 'convex',
     radius: shape.radius ?? 'pill',
@@ -215,19 +188,16 @@ function attachGlass(el, shape = {}) {
     chromatic: m.chromatic ?? 1,
     saturation: m.saturation,
     specular: m.specular,
+    innerShadow: m.innerShadow ?? 0,
+    innerShadowSize: m.innerShadowSize ?? 1,
+    innerGlow: m.innerGlow ?? 0,
+    innerGlowSize: m.innerGlowSize ?? 1,
+    innerShadowAngle: m.innerShadowAngle ?? 45,
     blur: m.blur,
   });
-  const rebuild = glass.rebuild;
-  glass.rebuild = () => {
-    el._lgcRadiusPx = resolveGlassRadiusPx(el, el._lgcRadiusRequest);
-    applyMaterialShadingVars(el, material(el.dataset.glassMaterial), el._lgcRadiusPx);
-    rebuild();
-  };
-  const shadeObserver = new ResizeObserver(() => glass.rebuild());
-  shadeObserver.observe(el);
   MATERIAL_HANDLES.add(glass);
   const dispose = glass.dispose;
-  glass.dispose = () => { shadeObserver.disconnect(); MATERIAL_HANDLES.delete(glass); dispose(); };
+  glass.dispose = () => { MATERIAL_HANDLES.delete(glass); dispose(); };
   const setHover = (hovered) => {
     el._lgcHovered = hovered;
     if (el._lgcRefreshMaterialTint) el._lgcRefreshMaterialTint();
@@ -416,7 +386,7 @@ export function glassLens() {
   let grabbing = false, velX = 0, loop = 0;
   const render = () => {
     capsule.style.transform = `translate(-50%,-50%) scaleX(${T.get().toFixed(3)}) scaleY(${A.get().toFixed(3)})`;
-    capsule.style.boxShadow = `var(--lgc-inner-shadows, 0 0 0 0 transparent), 0 ${(grabbing ? 16 : 6)}px 26px rgba(0,0,0,${SA.get().toFixed(3)})`;
+    capsule.style.boxShadow = `0 ${(grabbing ? 16 : 6)}px 26px rgba(0,0,0,${SA.get().toFixed(3)})`;
     applyGlassMaterial(glass, SR.get() > 0.5 ? 'optic' : 'softFrost');
   };
   const tick = () => {
